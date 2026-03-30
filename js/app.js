@@ -67,6 +67,10 @@ document.addEventListener('DOMContentLoaded', () => {
   });
   window.addEventListener('beforeunload', () => saveSession());
 
+  // bridge สำหรับ config.js ที่ใช้ window._autoSave()
+  window._autoSave = saveSession;
+  window._updateAddPlayerBtn = updateAddPlayerBtn;
+
   // expose ทุก function ที่ HTML onclick เรียก
   Object.assign(window, {
     // app
@@ -80,7 +84,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // tabs/nav
     goTab, goGuide, goResults, goMoney,
     buildParGrid, renderPlayerRows, buildTurboGrid,
-    buildProgressBar, updateProgressBar, holeNav,
+    buildProgressBar, updateProgressBar, holeNav, toggleTH,
     // scoring
     chScore, startRpt, stopRpt, sws, swm, swe,
     setParAll, chPar, drSet,
