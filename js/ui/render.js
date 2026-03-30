@@ -153,15 +153,26 @@ export function showHole(h){
         ${G.turbo.on?`<button class="pill pill-turbo${turboOn?' on':''}" id="tc2-${h}" onclick="toggleTH(${h})">${turboOn?'หลุมเทอร์โบ ON':'เทอร์โบ'}</button>`:''}
       </div>
     </div>
-    <div id="game-toggles-${h}" style="display:flex;flex-wrap:wrap;gap:6px;padding:8px 14px;border-bottom:0.5px solid var(--sep)">
-      ${['bite','olympic','team','doubleRe','farNear'].map(k=>{
-        const icons={bite:'🐶',olympic:'🏅',team:'🤝',doubleRe:'🎲',farNear:'🎯'};
-        const names={bite:'หมากัด',olympic:'โอลิมปิก',team:'ทีม',doubleRe:'เบิ้ล-รี',farNear:'Far-Near'};
-        const on=G[k].on;
-        return`<button id="gt-${h}-${k}" onclick="toggleGameMidPlay('${k}',${h})" style="padding:5px 12px;border-radius:16px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;border:1.5px solid ${on?'rgba(10,132,255,0.5)':'var(--bg4)'};background:${on?'rgba(10,132,255,0.15)':'var(--fill)'};color:${on?'var(--blue)':'var(--lbl2)'}">
-          ${icons[k]} ${names[k]}${on?'':' (ปิด)'}
-        </button>`;
-      }).join('')}
+    <div id="game-toggles-${h}" style="display:flex;flex-direction:column;gap:5px;padding:8px 12px;border-bottom:0.5px solid var(--sep)">
+      ${(()=>{
+        const icons ={bite:'🐶',olympic:'🏅',team:'🤝',doubleRe:'🎲',farNear:'🎯'};
+        const names ={bite:'หมากัด',olympic:'โอลิมปิก',team:'ทีม',doubleRe:'เบิ้ล-รี',farNear:'Far-Near'};
+        const colOn ={bite:'var(--red)',olympic:'var(--yellow)',farNear:'var(--green)',team:'var(--blue)',doubleRe:'#bf5af2'};
+        const bgOn  ={bite:'rgba(255,69,58,0.18)',olympic:'rgba(255,215,0,0.15)',farNear:'rgba(48,209,88,0.15)',team:'rgba(10,132,255,0.18)',doubleRe:'rgba(191,90,242,0.18)'};
+        const bdOn  ={bite:'rgba(255,69,58,0.45)',olympic:'rgba(255,215,0,0.45)',farNear:'rgba(48,209,88,0.45)',team:'rgba(10,132,255,0.45)',doubleRe:'rgba(191,90,242,0.45)'};
+        const btn=(k)=>{
+          const on=G[k].on;
+          return`<button id="gt-${h}-${k}" onclick="toggleGameMidPlay('${k}',${h})"
+            style="flex:1;padding:7px 4px;border-radius:8px;font-size:11px;font-weight:700;
+            cursor:pointer;font-family:inherit;text-align:center;
+            border:1.5px solid ${on?bdOn[k]:'var(--bg4)'};
+            background:${on?bgOn[k]:'var(--bg3)'};
+            color:${on?colOn[k]:'var(--lbl3)'};"
+            >${icons[k]} ${names[k]}</button>`;
+        };
+        return`<div style="display:flex;gap:5px">${btn('bite')}${btn('olympic')}${btn('farNear')}</div>
+               <div style="display:flex;gap:5px">${btn('team')}${btn('doubleRe')}</div>`;
+      })()}
     </div>
     <div class="score-rows">${scoreRowsHTML}</div>
     ${['bite','farNear'].filter(k=>G[k].on).length>0?`

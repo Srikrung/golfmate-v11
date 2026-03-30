@@ -18,6 +18,7 @@ import { initSwipe, goTab, goGuide, goResults, goMoney,
          buildProgressBar, updateProgressBar, holeNav, toggleTH,
          changeCoursePreset, applyParsFromPreset } from './ui/tabs.js';
 import { showHole, updateTotals, drSet, _refreshOlyInline,
+         getTeamBadgeHTML,
          setHoleMatrixPill, setMatrixPill, lbToggleMatrix,
          buildResults, buildMoney } from './ui/render.js';
 
@@ -75,7 +76,7 @@ document.addEventListener('DOMContentLoaded', () => {
   Object.assign(window, {
     // app
     setToday, fmtDate, toggleSw, toggleSkipPlayer, toggleSkipGame,
-    toggleTeamSolo, setTeamMode, setH2HSize, startGame, newGame,
+    toggleTeamSolo, toggleTeamScorecard, setTeamMode, setH2HSize, startGame, newGame,
     showAddPlayerModal, hideAddPlayerModal, confirmAddPlayer,
     updateAddPlayerBtn, saveSession, loadSession, clearSession, autoSave,
     shareToLine,
@@ -143,6 +144,46 @@ export function toggleSw(id){
 // ============================================================
 // SKIP
 // ============================================================
+// ── TEAM SCORECARD TOGGLE ──
+// กด badge ทีม → วนรอบ: A → B → Solo → ไม่เล่น → A
+export function toggleTeamScorecard(h, p){
+  const isSolo = teamSoloPlayers.has(p);
+  const isOut  = skipData[h]?.[p]?.has('team');
+  const cur    = (() => {
+    if(G.team.swapType==='domo') return G.team.domoTeams[h]?.[p]||'A';
+    let base=G.team.baseTeams[p]||'A';
+    const interval=parseInt(G.team.swapType);
+    if(!isNaN(interval)&&interval>0) base=((Math.floor(h/interval)+players.indexOf(players[p]))%2===0)?'A':'B';
+    return base;
+  })();
+
+  if(isOut){
+    // ไม่เล่น → กลับ A
+    skipData[h][p].delete('team');
+    teamSoloPlayers.delete(p);
+    if(G.team.swapType==='domo') G.team.domoTeams[h][p]='A';
+    else G.team.baseTeams[p]='A';
+  } else if(isSolo){
+    // Solo → ไม่เล่น
+    teamSoloPlayers.delete(p);
+    if(!skipData[h]) skipData[h]=Array(players.length).fill(null).map(()=>new Set());
+    if(!skipData[h][p]) skipData[h][p]=new Set();
+    skipData[h][p].add('team');
+  } else if(cur==='B'){
+    // B → Solo
+    teamSoloPlayers.add(p);
+  } else {
+    // A → B
+    const nxt = cur==='A'?'B':'A';
+    if(G.team.swapType==='domo') G.team.domoTeams[h][p]=nxt;
+    else G.team.baseTeams[p]=nxt;
+  }
+  // อัปเดต badge เฉพาะจุด ไม่ต้อง render ทั้งหน้า
+  const el = document.getElementById(`tb-${h}-${p}`);
+  if(el) el.innerHTML = getTeamBadgeHTML(h,p);
+  updateTotals(); autoSave();
+}
+
 export function toggleSkipPlayer(h, p){
   toggleSkipGame(h,p,'bite');
   toggleSkipGame(h,p,'olympic');
@@ -385,7 +426,7 @@ export async function shareToLine(tid){
 // เพื่อให้ HTML onclick เรียกได้ก่อน DOM ready
 Object.assign(window, {
   setToday, fmtDate, toggleSw, toggleSkipPlayer, toggleSkipGame,
-  toggleTeamSolo, setTeamMode, setH2HSize, startGame, newGame,
+  toggleTeamSolo, toggleTeamScorecard, setTeamMode, setH2HSize, startGame, newGame,
   showAddPlayerModal, hideAddPlayerModal, confirmAddPlayer,
   updateAddPlayerBtn, saveSession, loadSession, clearSession, autoSave,
   shareToLine,

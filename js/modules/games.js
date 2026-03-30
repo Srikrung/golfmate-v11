@@ -174,9 +174,16 @@ export function olyAct(h,p,action){
     if(st==='dq')od.status[p]='dq-sank';else if(st==='dq-sank')od.status[p]='dq-miss';else if(st==='dq-miss')od.status[p]='dq';
     else if(idx!==-1){if(st==='sank')od.status[p]='miss';else if(st==='miss')delete od.status[p];else od.status[p]='sank';}
   }
-  olyRenderHole(h);updateTotals();autoSave();
+  olyRenderHole(h);  // fallback กรณีมี oly-wrap (leaderboard ฯลฯ)
+  if(typeof window._refreshOlyInline === 'function') window._refreshOlyInline(h);
+  updateTotals();autoSave();
 }
-export function olyReset(h){olympicData[h]={order:[],status:{}};olyRenderHole(h);updateTotals();autoSave();}
+export function olyReset(h){
+  olympicData[h]={order:[],status:{}};
+  olyRenderHole(h);
+  if(typeof window._refreshOlyInline === 'function') window._refreshOlyInline(h);
+  updateTotals();autoSave();
+}
 export function olyRenderHole(h){
   const od=olympicData[h],wrap=document.getElementById(`oly-players-${h}`);if(!wrap)return;
   let dqC=players.filter((_,p)=>od.status[p]==='dq'||od.status[p]==='dq-sank'||od.status[p]==='dq-miss').length;
