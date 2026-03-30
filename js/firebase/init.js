@@ -1,0 +1,36 @@
+// ============================================================
+// firebase/init.js — toggle sync, room code, sync bar
+// ============================================================
+import { FB_URL } from '../config.js';
+
+export let syncEnabled = false;
+export let joinMode = false;
+export let joinPlayerName = '';
+
+export function setSyncEnabled(v){ syncEnabled = v; }
+export function setJoinMode(v){ joinMode = v; }
+export function setJoinPlayerName(v){ joinPlayerName = v; }
+
+export function toggleSyncSw(){
+  syncEnabled=!syncEnabled;
+  document.getElementById('sw-sync').classList.toggle('on',syncEnabled);
+}
+export function updateRoomCode(){
+  const l=document.getElementById('room-code-letter').value;
+  const n=document.getElementById('room-code-num').value;
+  const n2=document.getElementById('room-code-num2').value;
+  const code=(l&&n&&n2)?l+n+n2:'';
+  document.getElementById('room-code').value=code;
+  document.getElementById('room-code-preview').textContent=code||'—';
+}
+export function getRoomCode(){return(document.getElementById('room-code')?.value||'').trim()||'DEFAULT';}
+export function getApiUrl(){return(document.getElementById('api-url')?.value||'').trim()||FB_URL;}
+export function showSyncBar(msg,color,duration=2500){
+  const bar=document.getElementById('sync-bar');
+  if(!bar)return;
+  bar.style.display='block';
+  bar.style.background=color;
+  bar.style.color='#fff';
+  bar.textContent=msg;
+  if(duration>0)setTimeout(()=>{bar.style.display='none';},duration);
+}

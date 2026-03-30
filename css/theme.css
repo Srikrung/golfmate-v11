@@ -1,0 +1,72 @@
+/* ============================================================
+   theme.css — Score colors, Srikrung, Leaderboard animations
+   ============================================================ */
+
+/* ── SCORE BADGE COLORS ── */
+.b-hio{color:#000;background:var(--yellow);padding:2px 6px;border-radius:8px}
+.b-alba{color:var(--yellow)}.b-eagle{color:var(--yellow)}.b-birdie{color:var(--green)}
+.b-par{color:rgba(255,215,0,0.8)}.b-bogey{color:var(--lbl2)}.b-double{color:var(--lbl2)}.b-worse{color:var(--red)}
+body.light .b-alba{color:#8a6400}
+body.light .b-eagle{color:#005cc8}
+body.light .b-birdie{color:#cc0000}
+body.light .b-par{color:#005cc8}
+body.light .b-bogey{color:#444}
+body.light .b-double{color:#444}
+body.light .b-worse{color:#cc3030}
+
+/* ── OLYMPIC BUTTONS ── */
+.ob-chip.on{background:rgba(255,215,0,0.25);color:#ffd60a;border:1px solid rgba(255,215,0,0.5)}
+.ob-dq.on{background:rgba(255,69,58,0.25);color:#ff6b62;border:1px solid rgba(255,69,58,0.5)}
+.ob-rank.on{background:rgba(10,132,255,0.25);color:#4da3ff;border:1px solid rgba(10,132,255,0.5);font-weight:700}
+.ob-sank.on{background:rgba(48,209,88,0.22);color:#34e070;border:1px solid rgba(48,209,88,0.5);font-weight:700}
+.ob-miss.on{background:rgba(255,69,58,0.22);color:#ff6b62;border:1px solid rgba(255,69,58,0.5);font-weight:700}
+.ob-dis{opacity:0.25;pointer-events:none}
+
+/* ── TEAM BADGES ── */
+.team-badge{font-size:11px;font-weight:700;padding:4px 10px;border-radius:6px;flex-shrink:0;cursor:pointer;letter-spacing:0.3px}
+.tb-a{background:rgba(10,132,255,0.15);color:var(--blue);border:1px solid rgba(10,132,255,0.5)}
+.tb-b{background:rgba(255,69,58,0.15);color:var(--red);border:1px solid rgba(255,69,58,0.5)}
+.tb-c{background:rgba(255,159,10,0.15);color:var(--orange);border:1px solid rgba(255,159,10,0.5)}
+
+/* ── PILL ── */
+.pill{font-size:12px;font-weight:700;padding:6px 13px;border-radius:20px;cursor:pointer;font-family:inherit;letter-spacing:-0.2px}
+.pill-turbo{background:var(--bg3);color:var(--lbl2);border:1.5px solid var(--bg4)}
+body.light .pill-turbo{background:#e8e8ed;color:rgba(0,0,0,0.4);border:1.5px solid rgba(0,0,0,0.15)}
+.pill-turbo.on{background:rgba(255,159,10,0.25);color:var(--orange);border:1.5px solid var(--orange);box-shadow:0 0 8px rgba(255,159,10,0.3)}
+body.light .pill-turbo.on{background:rgba(255,149,0,0.18);color:#e08800;border:1.5px solid rgba(255,149,0,0.7);box-shadow:0 0 6px rgba(255,149,0,0.25)}
+.pill-all{background:var(--bg3);color:var(--lbl);border:1.5px solid var(--bg4);font-weight:700}
+body.light .pill-all{background:#e8e8ed;color:#1c1c1e;border:1.5px solid rgba(0,0,0,0.18)}
+
+/* ── TURBO GRID ── */
+.t-grid{display:grid;grid-template-columns:repeat(9,1fr);gap:4px}
+.t-cell{text-align:center}
+.t-cell-num{font-size:10px;color:var(--lbl2);margin-bottom:2px}
+.t-cb{height:28px;background:var(--bg3);border-radius:6px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--lbl2);border:1px solid var(--bg4)}
+.t-cb.on{background:rgba(255,159,10,0.18);color:var(--orange);border-color:rgba(255,159,10,0.5)}
+
+/* ── DOUBLE-RE ── */
+.dr-row{display:flex;align-items:center;gap:8px;padding:10px 14px;background:var(--hole-row);border-top:0.5px solid var(--sep);flex-wrap:wrap}
+.dr-btn{padding:7px 14px;border-radius:8px;border:1px solid var(--bg4);font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;background:var(--bg3);color:var(--lbl2)}
+.dr-btn.sel-dbl{background:rgba(255,215,0,0.15);color:var(--yellow);border-color:rgba(255,215,0,0.4)}
+.dr-btn.sel-re{background:rgba(48,209,88,0.15);color:var(--green);border-color:rgba(48,209,88,0.4)}
+
+/* ── LEADERBOARD ANIMATIONS ── */
+@keyframes lbScroll{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+@keyframes lbPulse{0%,100%{opacity:1}50%{opacity:.35}}
+#lb-filter::-webkit-scrollbar{display:none}
+#lb-content::-webkit-scrollbar{display:none}
+
+.lb-sc{display:inline-flex;align-items:center;justify-content:center;border-radius:50%;font-weight:800;width:20px;height:20px;font-size:11px}
+.lb-sc.bir{background:#7a1a1a;color:#ff8080}
+.lb-sc.egl{background:#1a3560;color:#60b4ff}
+.lb-sc.alb{background:#7a5800;color:#ffd060}
+.lb-sc.hio{background:#c8a000;color:#000}
+
+/* ── SAVING OVERLAY ── */
+#saving-ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:999;align-items:center;justify-content:center;flex-direction:column;gap:14px}
+#saving-ov.show{display:flex}
+
+/* ── AD / PROMO ── */
+.ad-banner{margin-top:14px;padding:14px 16px;background:#0a0a14;border-radius:14px;text-align:center;border:0.5px solid rgba(255,255,255,0.08)}
+body.light .ad-banner{background:#fff;border:0.5px solid rgba(0,0,0,0.08);box-shadow:0 1px 3px rgba(0,0,0,0.08)}
+.ad-btn{display:inline-block;padding:8px 20px;background:var(--blue);color:#fff;font-weight:700;text-decoration:none;border-radius:20px;font-size:13px;margin-top:8px}

@@ -1,0 +1,378 @@
+// ============================================================
+// app.js — Entry point สำหรับ GolfMate v11
+// import ทั้งหมดต้องอยู่บนสุดเท่านั้น (ES Module rule)
+// ============================================================
+
+// ── config ──
+import { players, scores, pars, G,
+         olympicData, farNearData, srikrungData, skipData, teamSoloPlayers,
+         setPlayers, setScores, setGameStarted, setCurrentHole,
+         isGameStarted, getCurrentHole, LS_KEY } from './config.js';
+
+// ── ui ──
+import { initTheme, toggleTheme,
+         showExportModal, hideExportModal,
+         setExportWho, doExport } from './ui/alerts.js';
+import { initSwipe, goTab, goGuide, goResults, goMoney,
+         buildParGrid, renderPlayerRows, buildTurboGrid,
+         buildProgressBar, updateProgressBar, holeNav,
+         changeCoursePreset, applyParsFromPreset } from './ui/tabs.js';
+import { showHole, updateTotals, drSet,
+         setHoleMatrixPill, setMatrixPill, lbToggleMatrix,
+         buildResults, buildMoney } from './ui/render.js';
+
+// ── modules ──
+import { initHcapPairs, addHcapPairsForPlayer, buildHcapUI,
+         hcapTogglePair, hcapSetStroke, hcapSetField } from './modules/handicap.js';
+import { updateBiteMultUI, toggleBiteMult,
+         toggleGameMidPlay, olyAct, olyReset, olyRenderHole,
+         fnChangeMode, fnToggleSank, fnSelectPlayer, fnRenderHole } from './modules/games.js';
+import { sgToggle, sgChPutt, sgSetPutt1 } from './modules/srikrung.js';
+import { joinRoomLookup, selectJoinPlayer } from './modules/join.js';
+import { chScore, startRpt, stopRpt, sws, swm, swe,
+         setParAll, chPar } from './modules/scoring.js';
+import { goLeaderboard, lbGoPrev, lbGoNext,
+         lbSetTab, lbSetRoom, lbFetch } from './modules/leaderboard.js';
+
+// ── firebase ──
+import { toggleSyncSw, updateRoomCode } from './firebase/init.js';
+import { loadOnlineSetting, goOnlineSetup, saveOnlineSetup, testConnection } from './firebase/room.js';
+import { registerAllPlayers } from './firebase/sync.js';
+
+// ============================================================
+// INIT
+// ============================================================
+document.addEventListener('DOMContentLoaded', () => {
+  initTheme();
+  setTimeout(() => document.getElementById('splash')?.classList.add('hide'), 1200);
+  setToday();
+  const preset = document.getElementById('course-preset');
+  if(preset){ preset.value = 'mthb13'; changeCoursePreset(); }
+  buildParGrid();
+  renderPlayerRows();
+  buildTurboGrid();
+  loadSession();
+  loadOnlineSetting();
+  initSwipe();
+  updateBiteMultUI();
+
+  document.getElementById('add-player-modal')?.addEventListener('click', function(e){
+    if(e.target === this) hideAddPlayerModal();
+  });
+  document.getElementById('export-modal')?.addEventListener('click', function(e){
+    if(e.target === this) hideExportModal();
+  });
+  document.addEventListener('visibilitychange', () => {
+    if(document.visibilityState === 'hidden') saveSession();
+  });
+  window.addEventListener('beforeunload', () => saveSession());
+
+  // expose ทุก function ที่ HTML onclick เรียก
+  Object.assign(window, {
+    // app
+    setToday, fmtDate, toggleSw, toggleSkipPlayer, toggleSkipGame,
+    toggleTeamSolo, setTeamMode, setH2HSize, startGame, newGame,
+    showAddPlayerModal, hideAddPlayerModal, confirmAddPlayer,
+    updateAddPlayerBtn, saveSession, loadSession, clearSession, autoSave,
+    shareToLine,
+    // course
+    changeCoursePreset, applyParsFromPreset,
+    // tabs/nav
+    goTab, goGuide, goResults, goMoney,
+    buildParGrid, renderPlayerRows, buildTurboGrid,
+    buildProgressBar, updateProgressBar, holeNav,
+    // scoring
+    chScore, startRpt, stopRpt, sws, swm, swe,
+    setParAll, chPar, drSet,
+    // games
+    toggleGameMidPlay, olyAct, olyReset, olyRenderHole,
+    fnChangeMode, fnToggleSank, fnSelectPlayer, fnRenderHole,
+    toggleBiteMult, updateBiteMultUI,
+    setHoleMatrixPill, setMatrixPill, lbToggleMatrix,
+    // handicap
+    hcapTogglePair, hcapSetStroke, hcapSetField, buildHcapUI,
+    // srikrung
+    sgToggle, sgChPutt, sgSetPutt1,
+    // leaderboard
+    goLeaderboard, lbGoPrev, lbGoNext, lbSetTab, lbSetRoom, lbFetch,
+    // firebase
+    toggleSyncSw, updateRoomCode,
+    goOnlineSetup, saveOnlineSetup, testConnection, registerAllPlayers,
+    // join
+    joinRoomLookup, selectJoinPlayer,
+    // export / share
+    showExportModal, hideExportModal, setExportWho, doExport,
+    toggleTheme,
+  });
+});
+
+// ============================================================
+// HELPERS
+// ============================================================
+export function setToday(){
+  const d = new Date(Date.now() + 7*3600000);
+  const el = document.getElementById('game-date');
+  if(el) el.value = `${d.getUTCFullYear()}-${String(d.getUTCMonth()+1).padStart(2,'0')}-${String(d.getUTCDate()).padStart(2,'0')}`;
+}
+export function fmtDate(v){
+  if(!v) return '';
+  const [y,m,d] = v.split('-');
+  const mn = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+  return `${+d} ${mn[+m-1]}${+y+543}`;
+}
+
+// ============================================================
+// TOGGLE GAME SWITCH
+// ============================================================
+export function toggleSw(id){
+  G[id].on = !G[id].on;
+  document.getElementById(`sw-${id}`)?.classList.toggle('on', G[id].on);
+  const body = document.getElementById(`gb-${id}`);
+  if(body) body.style.display = G[id].on ? 'block' : 'none';
+  if(isGameStarted()){
+    const sy = window.scrollY;
+    showHole(getCurrentHole());
+    requestAnimationFrame(() => window.scrollTo(0, sy));
+  }
+}
+
+// ============================================================
+// SKIP
+// ============================================================
+export function toggleSkipPlayer(h, p){
+  toggleSkipGame(h,p,'bite');
+  toggleSkipGame(h,p,'olympic');
+  toggleSkipGame(h,p,'farNear');
+}
+export function toggleSkipGame(h, p, k){
+  if(!skipData[h]) skipData[h] = Array(players.length).fill(null).map(() => new Set());
+  if(!skipData[h][p]) skipData[h][p] = new Set();
+  if(skipData[h][p].has(k)) skipData[h][p].delete(k);
+  else skipData[h][p].add(k);
+  updateTotals(); autoSave(); showHole(h);
+}
+
+// ============================================================
+// TEAM SOLO
+// ============================================================
+export function toggleTeamSolo(p){
+  if(teamSoloPlayers.has(p)) teamSoloPlayers.delete(p);
+  else teamSoloPlayers.add(p);
+  showHole(getCurrentHole()); updateTotals(); autoSave();
+}
+export function setTeamMode(mode){ G.team.mode = 'h2h'; }
+export function setH2HSize(sz){}
+
+// ============================================================
+// NEW GAME
+// ============================================================
+export function newGame(){
+  if(confirm('เริ่มเกมใหม่?')){
+    setGameStarted(false);
+    setPlayers([]); setScores([]); setCurrentHole(0);
+    clearSession(); goTab('setup');
+  }
+}
+
+// ============================================================
+// START GAME
+// ============================================================
+export function startGame(){
+  const n = +document.getElementById('num-players').value;
+  setPlayers([...document.querySelectorAll('.pn')].slice(0,n).map((el,i) => ({
+    name: el.value.trim() || el.placeholder || `ผู้เล่น ${i+1}`,
+    hcp:  Math.max(0, +(document.querySelectorAll('.ph')[i]?.value) || 0)
+  })));
+  setScores(Array(n).fill(null).map(() => Array(18).fill(null)));
+
+  ['bite','olympic','team','farNear'].forEach(k => {
+    const ve = document.getElementById(`gv-${k}`);
+    if(ve) G[k].val = Math.max(1, +ve.value || 20);
+  });
+  G.team.chuanVal = Math.max(1, +(document.getElementById('gv-team-chuan')?.value) || 4);
+  G.team.mode = 'h2h'; G.team.swapType = 'domo';
+  for(let i=0; i<n; i++){ if(!G.team.baseTeams[i]) G.team.baseTeams[i] = i%2===0?'A':'B'; }
+  G.team.domoTeams = Array(18).fill(null).map(() => [...G.team.baseTeams]);
+  G.doubleRe.mults = Array(18).fill(1);
+
+  olympicData.splice(0, olympicData.length,
+    ...Array(18).fill(null).map(() => ({order:[],status:{}})));
+  farNearData.splice(0, farNearData.length,
+    ...Array(18).fill(null).map(() => ({mode:'none',far:null,near:null,farSank:null,nearSank:null,solo:null,soloSank1:null,soloSank2:null})));
+  srikrungData.splice(0, srikrungData.length,
+    ...Array(18).fill(null).map(() => players.map(() => ({fw:null,gir:null,putt:null}))));
+  skipData.splice(0, skipData.length,
+    ...Array(18).fill(null).map(() => Array(n).fill(null).map(() => new Set())));
+  teamSoloPlayers.clear();
+
+  initHcapPairs(n);
+  setGameStarted(true); setCurrentHole(0);
+  buildProgressBar(); showHole(0); goTab('scorecard');
+  autoSave(); registerAllPlayers();
+}
+
+// ============================================================
+// ADD PLAYER
+// ============================================================
+const ADD_MAX = 8;
+
+export function showAddPlayerModal(){
+  if(!isGameStarted()) return;
+  if(players.length >= ADD_MAX){
+    alert(`ไม่สามารถเพิ่มได้\nผู้เล่นครบ ${ADD_MAX} คนแล้ว`); return;
+  }
+  const modal = document.getElementById('add-player-modal');
+  const sheet = document.getElementById('add-player-sheet');
+  document.getElementById('new-player-name').value = '';
+  document.getElementById('new-player-hcp').value = '0';
+  const badge = document.getElementById('ap-slot-badge');
+  if(badge) badge.textContent = `เหลือ ${ADD_MAX-players.length} ช่อง`;
+  const cta = document.querySelector('#add-player-sheet .cta');
+  if(cta) cta.textContent = `เพิ่มผู้เล่น (${players.length+1}/${ADD_MAX})`;
+  modal.style.display = 'flex';
+  requestAnimationFrame(() => requestAnimationFrame(() => { sheet.style.transform = 'translateY(0)'; }));
+}
+export function hideAddPlayerModal(){
+  const sheet = document.getElementById('add-player-sheet');
+  sheet.style.transform = 'translateY(100%)';
+  setTimeout(() => { document.getElementById('add-player-modal').style.display = 'none'; }, 300);
+}
+export function confirmAddPlayer(){
+  if(players.length >= ADD_MAX){ alert('ไม่สามารถเพิ่มผู้เล่นได้'); hideAddPlayerModal(); return; }
+  const name = document.getElementById('new-player-name').value.trim();
+  const hcp  = Math.max(0, +(document.getElementById('new-player-hcp').value) || 0);
+  if(!name){ document.getElementById('new-player-name').focus(); return; }
+  const p = players.length;
+  players.push({name, hcp});
+  scores.push(Array(18).fill(null));
+  srikrungData.forEach(hd => hd.push({fw:null,gir:null,putt:null}));
+  G.team.baseTeams.push(p%2===0?'A':'B');
+  G.team.domoTeams.forEach(hd => hd.push(p%2===0?'A':'B'));
+  addHcapPairsForPlayer(p);
+  updateAddPlayerBtn(); hideAddPlayerModal();
+  showHole(getCurrentHole()); autoSave();
+}
+export function updateAddPlayerBtn(){
+  const btn = document.getElementById('btn-add-player'); if(!btn) return;
+  if(players.length >= ADD_MAX){
+    btn.textContent = `✋ ผู้เล่นครบ ${ADD_MAX} คนแล้ว`;
+    btn.style.opacity = '0.4'; btn.style.pointerEvents = 'none';
+    btn.style.color = 'var(--lbl2)'; btn.style.borderColor = 'var(--sep)';
+  } else {
+    btn.textContent = `+ เพิ่มผู้เล่น (เหลือ ${ADD_MAX-players.length} ช่อง)`;
+    btn.style.opacity = '1'; btn.style.pointerEvents = 'auto';
+    btn.style.color = 'var(--blue)'; btn.style.borderColor = 'rgba(10,132,255,0.3)';
+  }
+}
+
+// ============================================================
+// SESSION
+// ============================================================
+export function saveSession(){
+  if(!isGameStarted()) return;
+  try{
+    localStorage.setItem(LS_KEY, JSON.stringify({
+      v:1, players, scores, pars,
+      currentHole: getCurrentHole(),
+      gameStarted: isGameStarted(),
+      G:{
+        bite:    {on:G.bite.on,    val:G.bite.val,    mults:G.bite.mults},
+        olympic: {on:G.olympic.on, val:G.olympic.val},
+        team:    {on:G.team.on,    val:G.team.val,    chuanVal:G.team.chuanVal,
+                  mode:G.team.mode, swapType:G.team.swapType,
+                  baseTeams:G.team.baseTeams, domoTeams:G.team.domoTeams},
+        farNear: {on:G.farNear.on, val:G.farNear.val},
+        turbo:   {on:G.turbo.on,   holes:[...G.turbo.holes], mult:G.turbo.mult},
+        doubleRe:{on:G.doubleRe.on,mults:G.doubleRe.mults},
+        srikrung:{on:G.srikrung.on},
+        hcap:    {on:G.hcap.on,    pairs:G.hcap.pairs.map(p => ({...p}))}
+      },
+      olympicData, farNearData, srikrungData,
+      skipData: skipData.map(row => row.map(s => [...s])),
+      teamSoloPlayers: [...teamSoloPlayers],
+      courseName: document.getElementById('course-name')?.value,
+      gameDate:   document.getElementById('game-date')?.value
+    }));
+  } catch(e){}
+}
+
+export function loadSession(){
+  try{
+    const raw = localStorage.getItem(LS_KEY); if(!raw) return;
+    const data = JSON.parse(raw);
+    if(!data?.v || !data.players?.length) return;
+    const names = data.players.map(p => p.name).join(', ');
+    if(!confirm(`พบเกมเก่า: ${names}\n${fmtDate(data.gameDate)||''}\nต่อจากที่ค้างไว้ไหมครับ?`)){
+      localStorage.removeItem(LS_KEY); return;
+    }
+    setPlayers(data.players);
+    setScores(data.scores);
+    pars.splice(0, pars.length, ...data.pars);
+    setCurrentHole(data.currentHole || 0);
+    setGameStarted(data.gameStarted);
+
+    olympicData.splice(0, olympicData.length,
+      ...(data.olympicData || Array(18).fill(null).map(() => ({order:[],status:{}}))));
+    farNearData.splice(0, farNearData.length,
+      ...(data.farNearData || Array(18).fill(null).map(() => ({mode:'none',far:null,near:null,farSank:null,nearSank:null,solo:null,soloSank1:null,soloSank2:null}))));
+    srikrungData.splice(0, srikrungData.length,
+      ...(data.srikrungData || Array(18).fill(null).map(() => players.map(() => ({fw:null,gir:null,putt:1})))));
+    skipData.splice(0, skipData.length,
+      ...(data.skipData
+        ? data.skipData.map(row => row.map(s => new Set(s)))
+        : Array(18).fill(null).map(() => Array(players.length).fill(null).map(() => new Set()))));
+    teamSoloPlayers.clear();
+    (data.teamSoloPlayers || []).forEach(v => teamSoloPlayers.add(v));
+
+    const gd = data.G;
+    if(gd){
+      Object.assign(G.bite,    gd.bite);
+      G.bite.mults = {...{hio:50,albatross:4,eagle:3,birdie:2}, ...(gd.bite?.mults||{})};
+      Object.assign(G.olympic, gd.olympic);
+      Object.assign(G.team,    gd.team);
+      Object.assign(G.farNear, gd.farNear);
+      Object.assign(G.turbo,   gd.turbo);
+      G.turbo.holes = new Set(gd.turbo?.holes || []);
+      Object.assign(G.doubleRe,gd.doubleRe);
+      if(gd.srikrung) Object.assign(G.srikrung, gd.srikrung);
+      if(gd.hcap){ Object.assign(G.hcap, gd.hcap); setTimeout(buildHcapUI, 300); }
+    }
+
+    const cnEl = document.getElementById('course-name');
+    const gdEl = document.getElementById('game-date');
+    if(data.courseName && cnEl) cnEl.value = data.courseName;
+    if(data.gameDate   && gdEl) gdEl.value = data.gameDate;
+
+    updateBiteMultUI();
+    buildParGrid();
+    buildProgressBar();
+    showHole(getCurrentHole());
+    goTab('scorecard');
+  } catch(e){ localStorage.removeItem(LS_KEY); }
+}
+
+export function clearSession(){ try{ localStorage.removeItem(LS_KEY); } catch(e){} }
+export function autoSave(){ saveSession(); }
+
+// ============================================================
+// SHARE
+// ============================================================
+export async function shareToLine(tid){
+  const ov = document.getElementById('saving-ov');
+  if(ov) ov.classList.add('show');
+  try{
+    const c = await html2canvas(document.getElementById(tid),{
+      backgroundColor:'#000', scale:2, useCORS:true, logging:false,
+      ignoreElements: el => el.hasAttribute('data-html2canvas-ignore')
+    });
+    c.toBlob(async b => {
+      const f = new File([b], 'golfmate.png', {type:'image/png'});
+      if(ov) ov.classList.remove('show');
+      if(navigator.canShare && navigator.canShare({files:[f]})){
+        try{ await navigator.share({files:[f]}); } catch(e){}
+      } else {
+        alert('ไม่สามารถแชร์ตรงๆ ได้ โปรดบันทึกหน้าจอแทนครับ');
+      }
+    }, 'image/png');
+  } catch(e){ if(ov) ov.classList.remove('show'); }
+}
