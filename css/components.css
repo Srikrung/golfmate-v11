@@ -111,3 +111,42 @@ body.light .tbl-wrap{background:#fff;border:0.5px solid rgba(0,0,0,0.08);box-sha
 .tbl-inner th{font-size:10px;font-weight:600;color:var(--lbl2);text-align:center;padding:7px 2px;background:var(--bg3);border-bottom:0.5px solid var(--sep)}
 .tbl-inner td{text-align:center;border-bottom:0.5px solid var(--sep);padding:0}
 .tbl-inner tr:last-child td{border:none}
+
+/* ── SCORE ROW NEW (3 แถว) ── */
+.score-row-new{
+  padding:10px 12px 11px;
+  border-bottom:0.5px solid var(--sep);
+  background:var(--hole-row);
+  display:flex;flex-direction:column;gap:6px;
+}
+.score-row-new:last-child{border:none}
+
+/* ── OLYMPIC INLINE BUTTONS ── */
+.ob{
+  padding:6px 0;border-radius:8px;
+  border:1.5px solid var(--bg4);
+  cursor:pointer;font-family:inherit;
+  font-size:11px;font-weight:700;
+  background:var(--bg3);color:var(--lbl3);
+  text-align:center;
+}
+.ob.ob-on            {background:rgba(10,132,255,0.18);color:var(--blue);border-color:rgba(10,132,255,0.5)}
+.ob.ob-chip          {background:var(--bg3);color:var(--lbl3)}
+.ob.ob-chip.ob-on    {background:rgba(255,215,0,0.18);color:var(--yellow);border-color:rgba(255,215,0,0.5)}
+.ob.ob-dq.ob-on      {background:rgba(255,69,58,0.2);color:var(--red);border-color:rgba(255,69,58,0.5)}
+.ob.ob-sank.ob-on    {background:rgba(48,209,88,0.2);color:var(--green);border-color:rgba(48,209,88,0.5)}
+.ob.ob-miss.ob-on    {background:rgba(255,69,58,0.15);color:var(--red);border-color:rgba(255,69,58,0.4)}
+.ob.ob-rank.ob-on    {background:rgba(10,132,255,0.22);color:#60aaff;border-color:rgba(10,132,255,0.5)}
+.ob.ob-dim           {opacity:0.2;pointer-events:none}
+
+/* ── ROW-SUB: ทีม + เบิ้ล-รี ── */
+.row-sub{display:flex;align-items:center;gap:5px;flex-wrap:wrap;margin-top:3px}
+.dr-inline{
+  font-size:10px;font-weight:800;padding:2px 8px;border-radius:5px;
+  cursor:pointer;font-family:inherit;
+  border:1.5px solid var(--bg4);
+  background:var(--bg3);color:var(--lbl3);
+}
+.dr-inline.dbl-on{background:rgba(255,215,0,0.18);color:var(--yellow);border-color:rgba(255,215,0,0.5)}
+.dr-inline.re-on {background:rgba(48,209,88,0.18);color:var(--green); border-color:rgba(48,209,88,0.5)}
+.dr-inline.rst   {background:rgba(255,255,255,0.06);color:var(--lbl3);border-color:var(--bg4)}

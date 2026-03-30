@@ -15,9 +15,9 @@ import { initTheme, toggleTheme,
          setExportWho, doExport } from './ui/alerts.js';
 import { initSwipe, goTab, goGuide, goResults, goMoney,
          buildParGrid, renderPlayerRows, buildTurboGrid,
-         buildProgressBar, updateProgressBar, holeNav,
+         buildProgressBar, updateProgressBar, holeNav, toggleTH,
          changeCoursePreset, applyParsFromPreset } from './ui/tabs.js';
-import { showHole, updateTotals, drSet,
+import { showHole, updateTotals, drSet, _refreshOlyInline,
          setHoleMatrixPill, setMatrixPill, lbToggleMatrix,
          buildResults, buildMoney } from './ui/render.js';
 
@@ -380,3 +380,30 @@ export async function shareToLine(tid){
     }, 'image/png');
   } catch(e){ if(ov) ov.classList.remove('show'); }
 }
+
+// ── EXPOSE ทันทีที่ module โหลด (ไม่รอ DOMContentLoaded) ──
+// เพื่อให้ HTML onclick เรียกได้ก่อน DOM ready
+Object.assign(window, {
+  setToday, fmtDate, toggleSw, toggleSkipPlayer, toggleSkipGame,
+  toggleTeamSolo, setTeamMode, setH2HSize, startGame, newGame,
+  showAddPlayerModal, hideAddPlayerModal, confirmAddPlayer,
+  updateAddPlayerBtn, saveSession, loadSession, clearSession, autoSave,
+  shareToLine,
+  changeCoursePreset, applyParsFromPreset,
+  goTab, goGuide, goResults, goMoney,
+  buildParGrid, renderPlayerRows, buildTurboGrid,
+  buildProgressBar, updateProgressBar, holeNav, toggleTH,
+  chScore, startRpt, stopRpt, sws, swm, swe, setParAll, chPar, drSet,
+  toggleGameMidPlay, olyAct, olyReset, olyRenderHole,
+  fnChangeMode, fnToggleSank, fnSelectPlayer, fnRenderHole,
+  toggleBiteMult, updateBiteMultUI,
+  setHoleMatrixPill, setMatrixPill, lbToggleMatrix,
+  hcapTogglePair, hcapSetStroke, hcapSetField, buildHcapUI,
+  sgToggle, sgChPutt, sgSetPutt1,
+  goLeaderboard, lbGoPrev, lbGoNext, lbSetTab, lbSetRoom, lbFetch,
+  toggleSyncSw, updateRoomCode,
+  goOnlineSetup, saveOnlineSetup, testConnection, registerAllPlayers,
+  joinRoomLookup, selectJoinPlayer,
+  showExportModal, hideExportModal, setExportWho, doExport,
+  toggleTheme, _refreshOlyInline,
+});

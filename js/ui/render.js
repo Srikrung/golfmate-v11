@@ -88,18 +88,58 @@ export function showHole(h){
   setCurrentHole(h);const wrap=document.getElementById('single-hole-wrap');if(!wrap)return;
   updateAddPlayerBtn();
   const turboOn=G.turbo.on&&G.turbo.holes.has(h);
-  const scoreRowsHTML=players.map((_,p)=>`
-    <div class="score-row">
-      <div class="s-name"><span class="s-name-text">${players[p].name}</span><span id="tb-${h}-${p}">${getTeamBadgeHTML(h,p)}</span></div>
-      <div class="stepper" id="swc-${h}-${p}">
-        <button class="sb" onpointerdown="startRpt(${h},${p},-1)" onpointerup="stopRpt()" onpointerleave="stopRpt()">−</button>
-        <div class="ss"></div>
-        <div class="sv e" id="swd-${h}-${p}" ontouchstart="sws(event,${h},${p})" ontouchmove="swm(event,${h},${p})" ontouchend="swe(event,${h},${p})">—</div>
-        <div class="ss"></div>
-        <button class="sb" onpointerdown="startRpt(${h},${p},1)" onpointerup="stopRpt()" onpointerleave="stopRpt()">+</button>
+  const scoreRowsHTML=players.map((_,p)=>{
+    // ── Olympic inline buttons ──
+    const olyRows = G.olympic.on ? `
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px">
+        <button id="oly-chip-${h}-${p}" class="ob ob-chip" onclick="olyAct(${h},${p},'chip')">🟡 Chip</button>
+        <button id="oly-rank-${h}-${p}" class="ob ob-rank" onclick="olyAct(${h},${p},'rank')">อันดับ</button>
       </div>
-      <div class="s-badge" id="swb-${h}-${p}"></div>
-    </div>`).join('');
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px">
+        <button id="oly-dq-${h}-${p}"   class="ob" onclick="olyAct(${h},${p},'dq')">🚫 DQ</button>
+        <button id="oly-sank-${h}-${p}" class="ob ob-sank" onclick="olyAct(${h},${p},'putt')">ลง ✓</button>
+        <button id="oly-miss-${h}-${p}" class="ob ob-miss" onclick="olyAct(${h},${p},'putt')">ไม่ลง</button>
+      </div>` : '';
+
+    // ── Team badge + Double-Re (แถว sub ใต้ชื่อ) ──
+    const teamPart = G.team.on
+      ? `<span id="tb-${h}-${p}">${getTeamBadgeHTML(h,p)}</span>`
+      : `<span id="tb-${h}-${p}" style="display:none"></span>`;
+
+    const drPart = G.doubleRe.on ? (() => {
+      const m = G.doubleRe.mults[h];
+      const dblCls = m===2 ? ' dbl-on' : '';
+      const reCls  = m===3 ? ' re-on'  : '';
+      return `<button class="dr-inline${dblCls}" onclick="drSet(${h},2)">เบิ้ล ×2</button>
+              <button class="dr-inline${reCls}"  onclick="drSet(${h},3)">รี ×3</button>
+              <button class="dr-inline rst"       onclick="drSet(${h},1)">↺</button>`;
+    })() : '';
+
+    const subRow = (G.team.on || G.doubleRe.on)
+      ? `<div class="row-sub">${teamPart}${drPart}</div>`
+      : `<span id="tb-${h}-${p}" style="display:none"></span>`;
+
+    return`<div class="score-row-new">
+      <!-- แถว 1: ชื่อ (ซ้าย) | stepper (กลาง) | badge (ขวา) -->
+      <div style="display:flex;align-items:center;gap:8px">
+        <div style="flex:1;min-width:0">
+          <div style="font-size:15px;font-weight:700;color:var(--lbl);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${players[p].name}</div>
+          ${subRow}
+        </div>
+        <div class="stepper" id="swc-${h}-${p}">
+          <button class="sb" onpointerdown="startRpt(${h},${p},-1)" onpointerup="stopRpt()" onpointerleave="stopRpt()">−</button>
+          <div class="ss"></div>
+          <div class="sv e" id="swd-${h}-${p}" ontouchstart="sws(event,${h},${p})" ontouchmove="swm(event,${h},${p})" ontouchend="swe(event,${h},${p})">—</div>
+          <div class="ss"></div>
+          <button class="sb" onpointerdown="startRpt(${h},${p},1)" onpointerup="stopRpt()" onpointerleave="stopRpt()">+</button>
+        </div>
+        <div class="s-badge" id="swb-${h}-${p}" style="min-width:44px;text-align:right"></div>
+      </div>
+      <!-- แถว 2+3: Olympic inline (ถ้าเปิด) -->
+      ${olyRows}
+    </div>
+    ${p < players.length-1 ? '<div style="height:4px;background:var(--bg3)"></div>' : ''}`;
+  }).join('');
 
   wrap.innerHTML=`<div class="hole-card">
     <div class="hc-top">
@@ -123,17 +163,13 @@ export function showHole(h){
         </button>`;
       }).join('')}
     </div>
-    ${G.team.on&&G.doubleRe.on?`<div id="team-sub-pills-${h}" style="display:flex;flex-wrap:wrap;gap:6px;padding:6px 14px;border-bottom:0.5px solid var(--sep)">
-      <button onclick="drSet(${h},2)" style="padding:4px 12px;border-radius:14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;border:1.5px solid ${G.doubleRe.mults[h]===2?'rgba(255,215,0,0.5)':'var(--bg4)'};background:${G.doubleRe.mults[h]===2?'rgba(255,215,0,0.15)':'var(--fill)'};color:${G.doubleRe.mults[h]===2?'var(--yellow)':'var(--lbl2)'}">เบิ้ล ×2</button>
-      <button onclick="drSet(${h},3)" style="padding:4px 12px;border-radius:14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;border:1.5px solid ${G.doubleRe.mults[h]===3?'rgba(48,209,88,0.5)':'var(--bg4)'};background:${G.doubleRe.mults[h]===3?'rgba(48,209,88,0.15)':'var(--fill)'};color:${G.doubleRe.mults[h]===3?'var(--green)':'var(--lbl2)'}">รี ×3</button>
-    </div>`:''}
     <div class="score-rows">${scoreRowsHTML}</div>
-    ${['bite','olympic','farNear'].filter(k=>G[k].on).length>0?`
+    ${['bite','farNear'].filter(k=>G[k].on).length>0?`
     <div style="padding:8px 14px 4px;border-top:0.5px solid var(--sep)">
       <div style="font-size:11px;color:var(--lbl3);margin-bottom:6px;font-weight:600">ไม่เล่น (ต่อเกม)</div>
       <div style="display:flex;flex-direction:column;gap:6px">
-        ${['bite','olympic','farNear'].filter(k=>G[k].on).map(k=>{
-          const gnames={bite:'🐶 หมากัด',olympic:'🏅 โอลิมปิก',farNear:'🎯 Far-Near'};
+        ${['bite','farNear'].filter(k=>G[k].on).map(k=>{
+          const gnames={bite:'🐶 หมากัด',farNear:'🎯 Far-Near'};
           return`<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
             <span style="font-size:11px;font-weight:700;color:var(--lbl2);min-width:80px">${gnames[k]}</span>
             ${players.map((pl,p)=>{const sk=skipData[h]?.[p]?.has(k);return`<button onclick="toggleSkipGame(${h},${p},'${k}')" style="padding:4px 10px;border-radius:12px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;border:1.5px solid ${sk?'rgba(255,69,58,0.5)':'var(--bg4)'};background:${sk?'rgba(255,69,58,0.12)':'var(--fill)'};color:${sk?'var(--red)':'var(--lbl2)'}"> ${sk?'✕ ':''}${pl.name}</button>`;}).join('')}
@@ -141,15 +177,13 @@ export function showHole(h){
         }).join('')}
       </div>
     </div>`:''}
-    ${G.doubleRe.on?`<div class="dr-row"><div style="flex:1;font-size:14px;color:var(--lbl2)">🎲 <span id="drm-${h}" style="font-size:19px;font-weight:700;color:var(--lbl)">×${G.doubleRe.mults[h]}</span></div><button class="dr-btn${G.doubleRe.mults[h]===2?' sel-dbl':''}" onclick="drSet(${h},2)">เบิ้ล ×2</button><button class="dr-btn${G.doubleRe.mults[h]===3?' sel-re':''}" onclick="drSet(${h},3)">รี ×3</button><button class="dr-btn" onclick="drSet(${h},1)">↺</button></div>`:''}
-    ${G.olympic.on?`<div class="oly-wrap"><div class="section-label">🏅 โอลิมปิก <span id="oly-base-${h}" style="color:var(--lbl2);font-weight:400">ฐาน 2pt</span><button style="background:var(--fill);border:none;border-radius:7px;padding:4px 10px;font-family:inherit;font-size:11px;color:var(--lbl2);cursor:pointer" onclick="olyReset(${h})">↺ รีเซ็ต</button></div><div id="oly-players-${h}"></div></div>`:''}
     ${G.farNear.on&&pars[h]===3?`<div class="fn-wrap"><div class="fn-section-label">🎯 Far-Near</div><select id="fn-mode-${h}" onchange="fnChangeMode(${h},this.value)" style="width:100%;padding:8px 12px;font-size:14px;border-radius:9px;margin-bottom:8px"><option value="none">-- เลือกโหมด --</option><option value="multi">ออน 2 คนขึ้นไป</option><option value="solo">เหมาออนคนเดียว</option></select><div id="fn-ui-${h}" style="display:flex;flex-direction:column;gap:7px"></div></div>`:''}
     ${G.srikrung.on?`<div class="sg-wrap" id="sg-wrap-${h}"><div class="section-label" style="color:var(--green)">⛳ Srikrung Golf Day</div><div id="sg-players-${h}"></div></div>`:''}
     <div class="sum-bar" id="hc-sum-${h}"><div class="sum-title">📊 Matrix หลุม ${h+1}</div><div id="sum-rows-${h}"></div></div>
   </div>`;
 
   players.forEach((_,p)=>refWidget(h,p));
-  if(G.olympic.on)olyRenderHole(h);
+  if(G.olympic.on) _refreshOlyInline(h);
   if(G.farNear.on&&pars[h]===3)fnRenderHole(h);
   if(G.srikrung.on)sgRenderHole(h);
   const prev=document.getElementById('btn-prev');
@@ -160,6 +194,46 @@ export function showHole(h){
 }
 
 // ── UPDATE TOTALS (Matrix ต่อหลุม) ──
+// ── OLYMPIC INLINE REFRESH ──
+// อัปเดตสถานะปุ่มโอลิมปิก inline ในแถวสกอร์
+export function _refreshOlyInline(h){
+  if(!olympicData[h]) return;
+  const od = olympicData[h];
+  let dqC = players.filter((_,p)=>['dq','dq-sank','dq-miss'].includes(od.status[p])).length;
+  const bPt = 2 + dqC;
+  // อัปเดต oly-base label ถ้ามี
+  const baseEl = document.getElementById(`oly-base-${h}`);
+  if(baseEl) baseEl.textContent = `ฐาน ${bPt}pt`;
+
+  players.forEach((_,p)=>{
+    const st  = od.status[p];
+    const idx = od.order.indexOf(p);
+    const isChip = st==='chip';
+    const isDQ   = st==='dq'||st==='dq-sank'||st==='dq-miss';
+    const isSank = st==='sank'||st==='dq-sank';
+    const isMiss = st==='miss'||st==='dq-miss';
+
+    const setBtn = (id, active, dim, label)=>{
+      const el = document.getElementById(id); if(!el) return;
+      // เก็บ class เฉพาะ (ob-chip, ob-dq, ob-sank, ob-miss, ob-rank)
+      const specific = [...el.classList].find(c => c.startsWith('ob-') && c !== 'ob-on' && c !== 'ob-dim') || '';
+      el.className = `ob${specific?' '+specific:''}${active?' ob-on':''}${dim?' ob-dim':''}`;
+      if(label !== undefined) el.textContent = label;
+    };
+
+    setBtn(`oly-chip-${h}-${p}`, isChip,  isDQ,  '🟡 Chip');
+    // rank: dim ถ้า DQ หรือ Chip
+    const rankLabel = idx!==-1 ? `${idx+1}st` : 'อันดับ';
+    setBtn(`oly-rank-${h}-${p}`, idx!==-1, isChip||isDQ, rankLabel);
+    // DQ: dim ถ้า chip หรือมี rank แล้ว
+    setBtn(`oly-dq-${h}-${p}`,  isDQ,  isChip||idx!==-1, '🚫 DQ');
+    // ลง✓: active ถ้า sank, ไม่ dim (DQ ยังพัตต์ได้)
+    setBtn(`oly-sank-${h}-${p}`, isSank, false, isSank?'ลง ✓ ✅':'ลง ✓');
+    // ไม่ลง: active ถ้า miss
+    setBtn(`oly-miss-${h}-${p}`, isMiss, false, isMiss?'ไม่ลง ✕':'ไม่ลง');
+  });
+}
+
 export function drSet(h,m){
   G.doubleRe.mults[h]=(G.doubleRe.mults[h]===m)?1:m;
   if(G.doubleRe.mults[h]>1&&!G.doubleRe.on){
