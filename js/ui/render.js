@@ -90,27 +90,28 @@ export function showHole(h){
   const turboOn=G.turbo.on&&G.turbo.holes.has(h);
   const scoreRowsHTML=players.map((_,p)=>{
     // ── Olympic 5 ปุ่ม 1 แถว แคปซูล ──
-    const olyRows = G.olympic.on ? `
-      <div style="display:flex;gap:4px">
-        <button id="oly-dq-${h}-${p}"   class="obc ob-dq"   onclick="olyAct(${h},${p},'dq')">🚫 DQ</button>
-        <button id="oly-chip-${h}-${p}" class="obc ob-chip" onclick="olyAct(${h},${p},'chip')">🟡 Chip</button>
-        <button id="oly-rank-${h}-${p}" class="obc ob-rank" onclick="olyAct(${h},${p},'rank')">อันดับ</button>
-        <button id="oly-sank-${h}-${p}" class="obc ob-sank" onclick="olyAct(${h},${p},'putt')">ลง ✓</button>
-        <button id="oly-miss-${h}-${p}" class="obc ob-miss" onclick="olyAct(${h},${p},'putt')">ไม่ลง</button>
-      </div>` : '';
+    const olyRows = G.olympic.on ? (
+      '<div style="display:flex;gap:4px">'
+      + '<button id="oly-dq-'+h+'-'+p+'"   class="obc ob-dq"   onclick="olyAct('+h+','+p+",'dq')\">🚫 DQ</button>"
+      + '<button id="oly-chip-'+h+'-'+p+'" class="obc ob-chip" onclick="olyAct('+h+','+p+",'chip')\">🟡 Chip</button>"
+      + '<button id="oly-rank-'+h+'-'+p+'" class="obc ob-rank" onclick="olyAct('+h+','+p+",'rank')\">อันดับ</button>"
+      + '<button id="oly-sank-'+h+'-'+p+'" class="obc ob-sank" onclick="olyAct('+h+','+p+",'putt')\">ลง ✓</button>"
+      + '<button id="oly-miss-'+h+'-'+p+'" class="obc ob-miss" onclick="olyAct('+h+','+p+",'putt')\">ไม่ลง</button>"
+      + '</div>'
+    ) : '';
 
     // ── Team badge + Double-Re (แถว sub ใต้ชื่อ) ──
     const teamPart = G.team.on
       ? `<span id="tb-${h}-${p}">${getTeamBadgeHTML(h,p)}</span>`
       : `<span id="tb-${h}-${p}" style="display:none"></span>`;
 
-    const drPart = G.doubleRe.on ? (() => {
+    const drPart = G.doubleRe.on ? (()=>{
       const m = G.doubleRe.mults[h];
       const dblCls = m===2 ? ' dbl-on' : '';
       const reCls  = m===3 ? ' re-on'  : '';
-      return `<button class="dr-inline${dblCls}" onclick="drSet(${h},2)">เบิ้ล ×2</button>
-              <button class="dr-inline${reCls}"  onclick="drSet(${h},3)">รี ×3</button>
-              <button class="dr-inline rst"       onclick="drSet(${h},1)">↺</button>`;
+      return '<button class="dr-inline'+dblCls+'" onclick="drSet('+h+',2)">เบิ้ล ×2</button>'
+           + '<button class="dr-inline'+reCls+'"  onclick="drSet('+h+',3)">รี ×3</button>'
+           + '<button class="dr-inline rst"        onclick="drSet('+h+',1)">↺</button>';
     })() : '';
 
     const subRow = (G.team.on || G.doubleRe.on)
@@ -264,6 +265,7 @@ export function drSet(h,m){
     G.doubleRe.on=true;
     document.getElementById('sw-doubleRe')?.classList.add('on');
   }
+  showHole._noScroll=true;
   showHole(h);updateTotals();autoSave();
 }
 

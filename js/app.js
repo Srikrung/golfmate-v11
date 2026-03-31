@@ -199,15 +199,13 @@ export function toggleSkipGame(h, p, k){
   updateTotals(); autoSave();
   // จำสถานะ skip section ก่อน render ใหม่
   const skipOpen = document.getElementById(`skip-body-${h}`)?.style.display === 'block';
-  showHole._noScroll = skipOpen; // ถ้า skip เปิดอยู่ → ไม่ scroll ขึ้นบน
+  showHole._noScroll = true; // ไม่ scroll ขึ้นบนเสมอเมื่อกด skip
   showHole(h);
-  // เปิด skip section กลับถ้าเปิดอยู่ก่อนหน้า
-  if(skipOpen){
-    const body = document.getElementById(`skip-body-${h}`);
-    const arr  = document.getElementById(`skip-arr-${h}`);
-    if(body) body.style.display = 'block';
-    if(arr)  arr.textContent = '▼';
-  }
+  // คืนสถานะ skip section เหมือนเดิม
+  const body = document.getElementById(`skip-body-${h}`);
+  const arr  = document.getElementById(`skip-arr-${h}`);
+  if(body) body.style.display = skipOpen ? 'block' : 'none';
+  if(arr)  arr.textContent    = skipOpen ? '▼' : '▶';
 }
 
 // ============================================================
@@ -467,9 +465,9 @@ export function toggleSkipSection(h){
   const body=document.getElementById(`skip-body-${h}`);
   const arr=document.getElementById(`skip-arr-${h}`);
   if(!body||!arr)return;
-  // เปิดอย่างเดียว ไม่ปิด
-  body.style.display='block';
-  arr.textContent='▼';
+  const open=body.style.display==='block';
+  body.style.display=open?'none':'block';
+  arr.textContent=open?'▶':'▼';
 }
 export function toggleMatrixSection(h){
   const body=document.getElementById(`sum-rows-${h}`);
