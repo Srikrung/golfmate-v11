@@ -88,17 +88,17 @@ export function showHole(h){
   setCurrentHole(h);const wrap=document.getElementById('single-hole-wrap');if(!wrap)return;
   updateAddPlayerBtn();
   const turboOn=G.turbo.on&&G.turbo.holes.has(h);
-  const scoreRowsHTML=players.map((_,p)=>{
-    // ── Olympic inline buttons ──
+  const scoreRowsHTML=players.map((_,p)=>{RowsHTML=players.map((_,p)=>{
+    // ── Olympic 5 ปุ่ม 2 แถว แคปซูล ──
     const olyRows = G.olympic.on ? `
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px">
-        <button id="oly-chip-${h}-${p}" class="ob ob-chip" onclick="olyAct(${h},${p},'chip')">🟡 Chip</button>
-        <button id="oly-rank-${h}-${p}" class="ob ob-rank" onclick="olyAct(${h},${p},'rank')">อันดับ</button>
+      <div style="display:flex;gap:5px">
+        <button id="oly-chip-${h}-${p}" class="obc ob-chip" onclick="olyAct(${h},${p},'chip')">🟡 Chip</button>
+        <button id="oly-rank-${h}-${p}" class="obc ob-rank" onclick="olyAct(${h},${p},'rank')">อันดับ</button>
       </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px">
-        <button id="oly-dq-${h}-${p}"   class="ob" onclick="olyAct(${h},${p},'dq')">🚫 DQ</button>
-        <button id="oly-sank-${h}-${p}" class="ob ob-sank" onclick="olyAct(${h},${p},'putt')">ลง ✓</button>
-        <button id="oly-miss-${h}-${p}" class="ob ob-miss" onclick="olyAct(${h},${p},'putt')">ไม่ลง</button>
+      <div style="display:flex;gap:5px">
+        <button id="oly-dq-${h}-${p}"   class="obc ob-dq"   onclick="olyAct(${h},${p},'dq')">🚫 DQ</button>
+        <button id="oly-sank-${h}-${p}" class="obc ob-sank" onclick="olyAct(${h},${p},'putt')">ลง ✓</button>
+        <button id="oly-miss-${h}-${p}" class="obc ob-miss" onclick="olyAct(${h},${p},'putt')">ไม่ลง</button>
       </div>` : '';
 
     // ── Team badge + Double-Re (แถว sub ใต้ชื่อ) ──
@@ -120,10 +120,9 @@ export function showHole(h){
       : `<span id="tb-${h}-${p}" style="display:none"></span>`;
 
     return`<div class="score-row-new">
-      <!-- แถว 1: ชื่อ (ซ้าย) | stepper (กลาง) | badge (ขวา) -->
-      <div style="display:flex;align-items:center;gap:8px">
+      <div style="display:flex;align-items:center;gap:7px">
         <div style="flex:1;min-width:0">
-          <div style="font-size:15px;font-weight:700;color:var(--lbl);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${players[p].name}</div>
+          <div style="font-size:14px;font-weight:700;color:var(--lbl);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${players[p].name}</div>
           ${subRow}
         </div>
         <div class="stepper" id="swc-${h}-${p}">
@@ -135,10 +134,9 @@ export function showHole(h){
         </div>
         <div class="s-badge" id="swb-${h}-${p}" style="min-width:44px;text-align:right"></div>
       </div>
-      <!-- แถว 2+3: Olympic inline (ถ้าเปิด) -->
       ${olyRows}
     </div>
-    ${p < players.length-1 ? '<div style="height:4px;background:var(--bg3)"></div>' : ''}`;
+    ${p < players.length-1 ? '<div style="height:3px;background:var(--bg3)"></div>' : ''}`;
   }).join('');
 
   wrap.innerHTML=`<div class="hole-card">
@@ -163,11 +161,11 @@ export function showHole(h){
         const btn=(k)=>{
           const on=G[k].on;
           return`<button id="gt-${h}-${k}" onclick="toggleGameMidPlay('${k}',${h})"
-            style="flex:1;padding:7px 4px;border-radius:8px;font-size:11px;font-weight:700;
+            style="flex:1;padding:7px 4px;border-radius:999px;font-size:11px;font-weight:700;
             cursor:pointer;font-family:inherit;text-align:center;
-            border:1.5px solid ${on?bdOn[k]:'var(--bg4)'};
-            background:${on?bgOn[k]:'var(--bg3)'};
-            color:${on?colOn[k]:'var(--lbl3)'};"
+            border:1.5px solid ${on?'rgba(77,163,255,0.5)':'var(--bg4)'};
+            background:${on?'rgba(77,163,255,0.13)':'var(--bg3)'};
+            color:${on?'#4da3ff':'var(--lbl3)'};"
             >${icons[k]} ${names[k]}</button>`;
         };
         return`<div style="display:flex;gap:5px">${btn('bite')}${btn('olympic')}${btn('farNear')}</div>
@@ -175,22 +173,36 @@ export function showHole(h){
       })()}
     </div>
     <div class="score-rows">${scoreRowsHTML}</div>
-    ${['bite','farNear'].filter(k=>G[k].on).length>0?`
-    <div style="padding:8px 14px 4px;border-top:0.5px solid var(--sep)">
-      <div style="font-size:11px;color:var(--lbl3);margin-bottom:6px;font-weight:600">ไม่เล่น (ต่อเกม)</div>
-      <div style="display:flex;flex-direction:column;gap:6px">
-        ${['bite','farNear'].filter(k=>G[k].on).map(k=>{
-          const gnames={bite:'🐶 หมากัด',farNear:'🎯 Far-Near'};
-          return`<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
-            <span style="font-size:11px;font-weight:700;color:var(--lbl2);min-width:80px">${gnames[k]}</span>
-            ${players.map((pl,p)=>{const sk=skipData[h]?.[p]?.has(k);return`<button onclick="toggleSkipGame(${h},${p},'${k}')" style="padding:4px 10px;border-radius:12px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;border:1.5px solid ${sk?'rgba(255,69,58,0.5)':'var(--bg4)'};background:${sk?'rgba(255,69,58,0.12)':'var(--fill)'};color:${sk?'var(--red)':'var(--lbl2)'}"> ${sk?'✕ ':''}${pl.name}</button>`;}).join('')}
-          </div>`;
-        }).join('')}
+    ${['bite','olympic','farNear'].filter(k=>G[k].on).length>0?`
+    <div style="border-top:0.5px solid var(--sep)">
+      <div onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none';this.querySelector('.skip-arr').textContent=this.nextElementSibling.style.display==='none'?'▶':'▼'"
+        style="display:flex;align-items:center;justify-content:space-between;padding:8px 14px;cursor:pointer">
+        <span style="font-size:11px;color:var(--lbl2);font-weight:700">👤 คนไม่เล่น</span>
+        <span class="skip-arr" style="font-size:10px;color:var(--lbl3)">▼</span>
+      </div>
+      <div style="display:none;padding:0 14px 8px">
+        <div style="display:flex;flex-direction:column;gap:6px">
+          ${['bite','olympic','farNear'].filter(k=>G[k].on).map(k=>{
+            const gnames={bite:'🐶 หมากัด',olympic:'🏅 โอลิมปิก',farNear:'🎯 Far-Near'};
+            return`<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+              <span style="font-size:11px;font-weight:700;color:var(--lbl2);min-width:76px">${gnames[k]}</span>
+              ${players.map((pl,p)=>{const sk=skipData[h]?.[p]?.has(k);return`<button onclick="toggleSkipGame(${h},${p},'${k}')" style="padding:3px 10px;border-radius:999px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;border:1.5px solid ${sk?'rgba(255,69,58,0.5)':'var(--bg4)'};background:${sk?'rgba(255,69,58,0.12)':'var(--fill)'};color:${sk?'var(--red)':'var(--lbl2)'}"> ${sk?'✕ ':''}${pl.name}</button>`;}).join('')}
+            </div>`;
+          }).join('')}
+        </div>
       </div>
     </div>`:''}
     ${G.farNear.on&&pars[h]===3?`<div class="fn-wrap"><div class="fn-section-label">🎯 Far-Near</div><select id="fn-mode-${h}" onchange="fnChangeMode(${h},this.value)" style="width:100%;padding:8px 12px;font-size:14px;border-radius:9px;margin-bottom:8px"><option value="none">-- เลือกโหมด --</option><option value="multi">ออน 2 คนขึ้นไป</option><option value="solo">เหมาออนคนเดียว</option></select><div id="fn-ui-${h}" style="display:flex;flex-direction:column;gap:7px"></div></div>`:''}
     ${G.srikrung.on?`<div class="sg-wrap" id="sg-wrap-${h}"><div class="section-label" style="color:var(--green)">⛳ Srikrung Golf Day</div><div id="sg-players-${h}"></div></div>`:''}
-    <div class="sum-bar" id="hc-sum-${h}"><div class="sum-title">📊 Matrix หลุม ${h+1}</div><div id="sum-rows-${h}"></div></div>
+    <div id="hc-sum-${h}" style="border-top:0.5px solid var(--sep)">
+      <div onclick="const b=document.getElementById('sum-rows-${h}');const a=document.getElementById('sum-pills-${h}');const show=b.style.display==='none';b.style.display=show?'block':'none';a.style.display=show?'flex':'none';this.querySelector('.mx-arr').textContent=show?'▼':'▶'"
+        style="display:flex;align-items:center;justify-content:space-between;padding:9px 14px;cursor:pointer">
+        <span style="font-size:13px;font-weight:700;color:var(--lbl)">📊 Matrix หลุม ${h+1}</span>
+        <span class="mx-arr" style="font-size:10px;color:var(--lbl3)">▶</span>
+      </div>
+      <div id="sum-pills-${h}" style="display:none;padding:0 14px 6px;gap:6px;flex-wrap:wrap"></div>
+      <div id="sum-rows-${h}" style="display:none;padding:0 14px 12px"></div>
+    </div>
   </div>`;
 
   players.forEach((_,p)=>refWidget(h,p));
@@ -206,13 +218,11 @@ export function showHole(h){
 
 // ── UPDATE TOTALS (Matrix ต่อหลุม) ──
 // ── OLYMPIC INLINE REFRESH ──
-// อัปเดตสถานะปุ่มโอลิมปิก inline ในแถวสกอร์
 export function _refreshOlyInline(h){
   if(!olympicData[h]) return;
   const od = olympicData[h];
   let dqC = players.filter((_,p)=>['dq','dq-sank','dq-miss'].includes(od.status[p])).length;
   const bPt = 2 + dqC;
-  // อัปเดต oly-base label ถ้ามี
   const baseEl = document.getElementById(`oly-base-${h}`);
   if(baseEl) baseEl.textContent = `ฐาน ${bPt}pt`;
 
@@ -226,21 +236,21 @@ export function _refreshOlyInline(h){
 
     const setBtn = (id, active, dim, label)=>{
       const el = document.getElementById(id); if(!el) return;
-      // เก็บ class เฉพาะ (ob-chip, ob-dq, ob-sank, ob-miss, ob-rank)
-      const specific = [...el.classList].find(c => c.startsWith('ob-') && c !== 'ob-on' && c !== 'ob-dim') || '';
-      el.className = `ob${specific?' '+specific:''}${active?' ob-on':''}${dim?' ob-dim':''}`;
+      const specific = [...el.classList].find(c => c.startsWith('ob-') && c!=='ob-on' && c!=='ob-dim') || '';
+      el.className = `obc${specific?' '+specific:''}${active?' ob-on':''}${dim?' ob-dim':''}`;
       if(label !== undefined) el.textContent = label;
     };
 
-    setBtn(`oly-chip-${h}-${p}`, isChip,  isDQ,  '🟡 Chip');
-    // rank: dim ถ้า DQ หรือ Chip
+    // Chip
+    setBtn(`oly-chip-${h}-${p}`, isChip, false, '🟡 Chip');
+    // DQ — dim ถ้า chip หรือมีอันดับแล้ว
+    setBtn(`oly-dq-${h}-${p}`, isDQ, isChip||idx!==-1, '🚫 DQ');
+    // อันดับ — dim ถ้า chip หรือ DQ
     const rankLabel = idx!==-1 ? `${idx+1}st` : 'อันดับ';
     setBtn(`oly-rank-${h}-${p}`, idx!==-1, isChip||isDQ, rankLabel);
-    // DQ: dim ถ้า chip หรือมี rank แล้ว
-    setBtn(`oly-dq-${h}-${p}`,  isDQ,  isChip||idx!==-1, '🚫 DQ');
-    // ลง✓: active ถ้า sank, ไม่ dim (DQ ยังพัตต์ได้)
+    // ลง ✓ — DQ ยังกดได้ (dq-sank)
     setBtn(`oly-sank-${h}-${p}`, isSank, false, isSank?'ลง ✓ ✅':'ลง ✓');
-    // ไม่ลง: active ถ้า miss
+    // ไม่ลง — DQ ยังกดได้ (dq-miss)
     setBtn(`oly-miss-${h}-${p}`, isMiss, false, isMiss?'ไม่ลง ✕':'ไม่ลง');
   });
 }
@@ -278,14 +288,37 @@ export function updateTotals(){
 
   function renderHoleTable(pp){
     const rowTot=pp.map(row=>row.reduce((a,b)=>a+b,0));
-    const thS=`padding:7px 4px;font-size:${hfs};font-weight:700;text-align:center;background:var(--bg3);border:0.5px solid var(--sep)`;
-    let t=`<div class="tbl-wrap"><table class="tbl-inner" style="border-collapse:collapse;width:100%"><thead><tr><th style="${thS};text-align:left;padding-left:8px"></th>${players.map(pl=>`<th style="${thS}">${shortName(pl.name,n)}</th>`).join('')}<th style="${thS};background:rgba(10,132,255,0.12);color:var(--blue)">ยอด</th></tr></thead><tbody>`;
-    players.forEach((pl,i)=>{const tot=rowTot[i];t+=`<tr><td style="padding:8px 4px 8px 8px;font-size:${fs};font-weight:700;color:var(--lbl);background:var(--bg3);border:0.5px solid var(--sep)">${shortName(pl.name,n)}</td>${players.map((_,j)=>{if(i===j)return`<td style="background:var(--bg4);border:0.5px solid var(--sep)"></td>`;const v=pp[i][j];if(v===0)return`<td style="text-align:center;font-size:${fs};color:var(--lbl3);padding:8px 4px;border:0.5px solid var(--sep)">0</td>`;const c=v>0?'var(--green)':'var(--red)',bg=v>0?'rgba(48,209,88,0.07)':'rgba(255,69,58,0.06)';return`<td style="text-align:center;font-size:${fs};font-weight:700;color:${c};background:${bg};padding:8px 4px;border:0.5px solid var(--sep)">${v>0?'+':''}${v}</td>`;}).join('')}<td style="text-align:center;font-size:${fs};font-weight:800;color:${tot>0?'var(--green)':tot<0?'var(--red)':'var(--lbl2)'};background:${tot>0?'rgba(48,209,88,0.1)':tot<0?'rgba(255,69,58,0.08)':'var(--bg3)'};padding:8px 4px;border:0.5px solid var(--sep);border-left:2px solid rgba(10,132,255,0.3)">${tot>0?'+':''}${tot}</td></tr>`;});
+    const thS=`padding:6px 4px;font-size:${hfs};font-weight:700;text-align:center;background:rgba(77,163,255,0.12);color:rgba(77,163,255,0.9);border-bottom:1px solid rgba(77,163,255,0.2)`;
+    const thN=`padding:6px 4px 6px 8px;font-size:${hfs};font-weight:700;text-align:left;background:rgba(77,163,255,0.12);color:var(--lbl2);border-bottom:1px solid rgba(77,163,255,0.2)`;
+    let t=`<div style="overflow-x:auto;border-radius:10px;border:1px solid var(--bg4)"><table style="width:100%;border-collapse:collapse"><thead><tr>
+      <th style="${thN}">ผู้เล่น</th>
+      ${players.map(pl=>`<th style="${thS}">${shortName(pl.name,n)}</th>`).join('')}
+      <th style="${thS};background:rgba(77,163,255,0.2);border-left:2px solid rgba(77,163,255,0.35)">รวม pt</th>
+    </tr></thead><tbody>`;
+    players.forEach((pl,i)=>{
+      const tot=rowTot[i];
+      const totC=tot>0?'var(--green)':tot<0?'var(--red)':'var(--lbl2)';
+      const totBg=tot>0?'rgba(52,209,122,0.13)':tot<0?'rgba(255,92,82,0.11)':'var(--bg3)';
+      t+=`<tr>
+        <td style="padding:7px 4px 7px 8px;font-size:${fs};font-weight:700;color:var(--lbl);background:var(--bg3);border-bottom:0.5px solid var(--sep)">${shortName(pl.name,n)}</td>
+        ${players.map((_,j)=>{
+          if(i===j)return`<td style="background:var(--bg4);border-bottom:0.5px solid var(--sep)"></td>`;
+          const v=pp[i][j];
+          if(v===0)return`<td style="text-align:center;font-size:${fs};color:var(--lbl3);padding:7px 4px;border-bottom:0.5px solid var(--sep)">·</td>`;
+          const c=v>0?'var(--green)':'var(--red)';
+          const bg=v>0?'rgba(52,209,122,0.08)':'rgba(255,92,82,0.07)';
+          return`<td style="text-align:center;font-size:${fs};font-weight:700;color:${c};background:${bg};padding:7px 4px;border-bottom:0.5px solid var(--sep)">${v>0?'+':''}${v}</td>`;
+        }).join('')}
+        <td style="text-align:center;font-size:${fs};font-weight:800;color:${totC};background:${totBg};padding:7px 4px;border-bottom:0.5px solid var(--sep);border-left:2px solid rgba(77,163,255,0.3)">${tot>0?'+':''}${tot}</td>
+      </tr>`;
+    });
     t+=`</tbody></table></div>`;return t;
   }
 
   const pillsHTML=`<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px"><button id="hmpill-all" onclick="setHoleMatrixPill('all')" style="padding:5px 12px;border-radius:14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;border:1.5px solid rgba(10,132,255,0.6);background:rgba(10,132,255,0.18);color:var(--blue)">📊 รวม</button>${games.map(k=>`<button id="hmpill-${k}" onclick="setHoleMatrixPill('${k}')" style="padding:5px 12px;border-radius:14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;border:1.5px solid var(--bg4);background:var(--fill);color:var(--lbl2)">${gameIcons[k]} ${gameNames[k]}</button>`).join('')}</div>`;
-  el.innerHTML=`${pillsHTML}<div id="hole-matrix-table">${renderHoleTable(perPairAll)}</div>`;
+  const pillsEl = document.getElementById(`sum-pills-${getCurrentHole()}`);
+  if(pillsEl) pillsEl.innerHTML = pillsHTML;
+  el.innerHTML=`<div id="hole-matrix-table">${renderHoleTable(perPairAll)}</div>`;
 }
 
 export function setHoleMatrixPill(key){
@@ -293,12 +326,38 @@ export function setHoleMatrixPill(key){
   const n=players.length,fs=tblFs(n),hfs=hdrFs(n);
   const pp=window._holeMatrixData[key];
   const rowTot=pp.map(row=>row.reduce((a,b)=>a+b,0));
-  const thS=`padding:7px 4px;font-size:${hfs};font-weight:700;text-align:center;background:var(--bg3);border:0.5px solid var(--sep)`;
-  let t=`<div class="tbl-wrap"><table class="tbl-inner" style="border-collapse:collapse;width:100%"><thead><tr><th style="${thS};text-align:left;padding-left:8px"></th>${players.map(pl=>`<th style="${thS}">${shortName(pl.name,n)}</th>`).join('')}<th style="${thS};background:rgba(10,132,255,0.12);color:var(--blue)">ยอด</th></tr></thead><tbody>`;
-  players.forEach((pl,i)=>{const tot=rowTot[i];t+=`<tr><td style="padding:8px 4px 8px 8px;font-size:${fs};font-weight:700;color:var(--lbl);background:var(--bg3);border:0.5px solid var(--sep)">${shortName(pl.name,n)}</td>${players.map((_,j)=>{if(i===j)return`<td style="background:var(--bg4);border:0.5px solid var(--sep)"></td>`;const v=pp[i][j];if(v===0)return`<td style="text-align:center;font-size:${fs};color:var(--lbl3);padding:8px 4px;border:0.5px solid var(--sep)">0</td>`;const c=v>0?'var(--green)':'var(--red)',bg=v>0?'rgba(48,209,88,0.07)':'rgba(255,69,58,0.06)';return`<td style="text-align:center;font-size:${fs};font-weight:700;color:${c};background:${bg};padding:8px 4px;border:0.5px solid var(--sep)">${v>0?'+':''}${v}</td>`;}).join('')}<td style="text-align:center;font-size:${fs};font-weight:800;color:${tot>0?'var(--green)':tot<0?'var(--red)':'var(--lbl2)'};background:${tot>0?'rgba(48,209,88,0.1)':tot<0?'rgba(255,69,58,0.08)':'var(--bg3)'};padding:8px 4px;border:0.5px solid var(--sep);border-left:2px solid rgba(10,132,255,0.3)">${tot>0?'+':''}${tot}</td></tr>`;});
+  const thS=`padding:6px 4px;font-size:${hfs};font-weight:700;text-align:center;background:rgba(77,163,255,0.12);color:rgba(77,163,255,0.9);border-bottom:1px solid rgba(77,163,255,0.2)`;
+  const thN=`padding:6px 4px 6px 8px;font-size:${hfs};font-weight:700;text-align:left;background:rgba(77,163,255,0.12);color:var(--lbl2);border-bottom:1px solid rgba(77,163,255,0.2)`;
+  let t=`<div style="overflow-x:auto;border-radius:10px;border:1px solid var(--bg4)"><table style="width:100%;border-collapse:collapse"><thead><tr>
+    <th style="${thN}">ผู้เล่น</th>
+    ${players.map(pl=>`<th style="${thS}">${shortName(pl.name,n)}</th>`).join('')}
+    <th style="${thS};background:rgba(77,163,255,0.2);border-left:2px solid rgba(77,163,255,0.35)">รวม pt</th>
+  </tr></thead><tbody>`;
+  players.forEach((pl,i)=>{
+    const tot=rowTot[i];
+    const totC=tot>0?'var(--green)':tot<0?'var(--red)':'var(--lbl2)';
+    const totBg=tot>0?'rgba(52,209,122,0.13)':tot<0?'rgba(255,92,82,0.11)':'var(--bg3)';
+    t+=`<tr>
+      <td style="padding:7px 4px 7px 8px;font-size:${fs};font-weight:700;color:var(--lbl);background:var(--bg3);border-bottom:0.5px solid var(--sep)">${shortName(pl.name,n)}</td>
+      ${players.map((_,j)=>{
+        if(i===j)return`<td style="background:var(--bg4);border-bottom:0.5px solid var(--sep)"></td>`;
+        const v=pp[i][j];
+        if(v===0)return`<td style="text-align:center;font-size:${fs};color:var(--lbl3);padding:7px 4px;border-bottom:0.5px solid var(--sep)">·</td>`;
+        const c=v>0?'var(--green)':'var(--red)';
+        const bg=v>0?'rgba(52,209,122,0.08)':'rgba(255,92,82,0.07)';
+        return`<td style="text-align:center;font-size:${fs};font-weight:700;color:${c};background:${bg};padding:7px 4px;border-bottom:0.5px solid var(--sep)">${v>0?'+':''}${v}</td>`;
+      }).join('')}
+      <td style="text-align:center;font-size:${fs};font-weight:800;color:${totC};background:${totBg};padding:7px 4px;border-bottom:0.5px solid var(--sep);border-left:2px solid rgba(77,163,255,0.3)">${tot>0?'+':''}${tot}</td>
+    </tr>`;
+  });
   t+=`</tbody></table></div>`;
   document.getElementById('hole-matrix-table').innerHTML=t;
-  document.querySelectorAll('[id^="hmpill-"]').forEach(btn=>{const k=btn.id.replace('hmpill-','');const on=k===key;btn.style.borderColor=on?'rgba(10,132,255,0.6)':'';btn.style.background=on?'rgba(10,132,255,0.18)':'';btn.style.color=on?'var(--blue)':'';});
+  document.querySelectorAll('[id^="hmpill-"]').forEach(btn=>{
+    const k=btn.id.replace('hmpill-','');const on=k===key;
+    btn.style.borderColor=on?'rgba(77,163,255,0.6)':'';
+    btn.style.background=on?'rgba(77,163,255,0.18)':'';
+    btn.style.color=on?'var(--blue)':'';
+  });
 }
 
 export function lbToggleMatrix(h){
