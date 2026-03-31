@@ -112,37 +112,39 @@ body.light .tbl-wrap{background:#fff;border:0.5px solid rgba(0,0,0,0.08);box-sha
 .tbl-inner td{text-align:center;border-bottom:0.5px solid var(--sep);padding:0}
 .tbl-inner tr:last-child td{border:none}
 
-/* ── SCORE ROW NEW (3 แถว) ── */
+
+/* ══════════════════════════════════
+   CAPSULE UI — score row new
+══════════════════════════════════ */
+
+/* score row */
 .score-row-new{
-  padding:10px 12px 11px;
+  padding:7px 10px 8px;
   border-bottom:0.5px solid var(--sep);
   background:var(--hole-row);
-  display:flex;flex-direction:column;gap:6px;
+  display:flex;flex-direction:column;gap:5px;
 }
 .score-row-new:last-child{border:none}
 
-/* ── OLYMPIC INLINE BUTTONS ── */
-.ob{
-  padding:6px 0;border-radius:8px;
-  border:1.5px solid var(--bg4);
-  cursor:pointer;font-family:inherit;
-  font-size:11px;font-weight:700;
-  background:var(--bg3);color:var(--lbl3);
-  text-align:center;
-}
-.ob.ob-on            {background:rgba(10,132,255,0.18);color:var(--blue);border-color:rgba(10,132,255,0.5)}
-.ob.ob-chip          {background:var(--bg3);color:var(--lbl3)}
-.ob.ob-chip.ob-on    {background:rgba(255,215,0,0.18);color:var(--yellow);border-color:rgba(255,215,0,0.5)}
-.ob.ob-dq.ob-on      {background:rgba(255,69,58,0.2);color:var(--red);border-color:rgba(255,69,58,0.5)}
-.ob.ob-sank.ob-on    {background:rgba(48,209,88,0.2);color:var(--green);border-color:rgba(48,209,88,0.5)}
-.ob.ob-miss.ob-on    {background:rgba(255,69,58,0.15);color:var(--red);border-color:rgba(255,69,58,0.4)}
-.ob.ob-rank.ob-on    {background:rgba(10,132,255,0.22);color:#60aaff;border-color:rgba(10,132,255,0.5)}
-.ob.ob-dim           {opacity:0.2;pointer-events:none}
+/* stepper — แคปซูล */
+.stepper{border-radius:999px!important}
 
-/* ── ROW-SUB: ทีม + เบิ้ล-รี ── */
-.row-sub{display:flex;align-items:center;gap:5px;flex-wrap:wrap;margin-top:3px}
+/* s-badge — แคปซูล */
+.s-badge{border-radius:999px!important;padding:3px 10px!important;font-size:11px;font-weight:800}
+
+/* row-sub: ทีม + เบิ้ล-รี */
+.row-sub{display:flex;align-items:center;gap:5px;flex-wrap:wrap;margin-top:2px}
+
+/* team badge — แคปซูล */
+.team-badge{
+  font-size:9px!important;font-weight:700;
+  padding:2px 9px;border-radius:999px;cursor:pointer;
+}
+
+/* DR inline — แคปซูล */
 .dr-inline{
-  font-size:10px;font-weight:800;padding:2px 8px;border-radius:5px;
+  font-size:10px;font-weight:800;padding:2px 9px;
+  border-radius:999px;
   cursor:pointer;font-family:inherit;
   border:1.5px solid var(--bg4);
   background:var(--bg3);color:var(--lbl3);
@@ -150,3 +152,35 @@ body.light .tbl-wrap{background:#fff;border:0.5px solid rgba(0,0,0,0.08);box-sha
 .dr-inline.dbl-on{background:rgba(255,215,0,0.18);color:var(--yellow);border-color:rgba(255,215,0,0.5)}
 .dr-inline.re-on {background:rgba(48,209,88,0.18);color:var(--green); border-color:rgba(48,209,88,0.5)}
 .dr-inline.rst   {background:rgba(255,255,255,0.06);color:var(--lbl3);border-color:var(--bg4)}
+
+/* game toggle buttons — แคปซูล */
+[id^="gt-"]{border-radius:999px!important}
+
+/* ══ OLYMPIC compact แคปซูล ══ */
+.obc{
+  flex:1;
+  padding:6px 0;
+  border-radius:999px;
+  border:1.5px solid var(--bg4);
+  cursor:pointer;font-family:inherit;
+  font-size:10px;font-weight:700;
+  background:var(--bg3);
+  color:var(--lbl3);
+  text-align:center;
+  transition:all .15s;
+  white-space:nowrap;
+}
+/* inactive — hint สีอ่อนๆ แต่ละปุ่ม */
+.obc.ob-chip {border-color:rgba(255,215,0,0.2); color:rgba(255,215,0,0.45)}
+.obc.ob-dq   {border-color:rgba(255,92,82,0.2);  color:rgba(255,92,82,0.45)}
+.obc.ob-rank {border-color:rgba(77,163,255,0.2);  color:rgba(77,163,255,0.45)}
+.obc.ob-sank {border-color:rgba(52,209,122,0.2);  color:rgba(52,209,122,0.45)}
+.obc.ob-miss {border-color:rgba(255,92,82,0.2);   color:rgba(255,92,82,0.35)}
+
+/* active — สว่างชัดเจน */
+.obc.ob-chip.ob-on{background:rgba(255,215,0,0.2); color:var(--yellow);border-color:rgba(255,215,0,0.6)}
+.obc.ob-dq.ob-on  {background:rgba(255,92,82,0.22);color:#ff5c52;       border-color:rgba(255,92,82,0.6)}
+.obc.ob-rank.ob-on{background:rgba(77,163,255,0.2);color:#4da3ff;        border-color:rgba(77,163,255,0.6)}
+.obc.ob-sank.ob-on{background:rgba(52,209,122,0.2);color:#34d17a;        border-color:rgba(52,209,122,0.6)}
+.obc.ob-miss.ob-on{background:rgba(255,92,82,0.18);color:#ff5c52;        border-color:rgba(255,92,82,0.5)}
+.obc.ob-dim       {opacity:0.15;pointer-events:none}

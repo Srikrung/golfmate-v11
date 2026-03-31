@@ -677,6 +677,11 @@
 </div>
 <div class="screen" id="scr-scorecard">
   <div id="sync-bar" style="display:none;padding:6px 16px;font-size:12px;font-weight:600;text-align:center;transition:all .3s"></div>
+  <!-- ── NAV บน ── -->
+  <div class="nav-row" style="padding:8px 12px;gap:8px">
+    <button class="nav-b" id="btn-prev" onclick="holeNav(-1)" style="border-radius:999px">← ก่อนหน้า</button>
+    <button class="nav-b pr" id="btn-next" onclick="holeNav(1)" style="border-radius:999px">ถัดไป →</button>
+  </div>
   <div class="prog-wrap">
     <div class="prog-row">
       <span class="prog-lbl" id="prog-label">1 / 18</span>
@@ -685,11 +690,7 @@
     <div class="prog" id="progress-dots"></div>
   </div>
   <div id="single-hole-wrap"></div>
-  <div class="nav-row">
-    <button class="nav-b" id="btn-prev" onclick="holeNav(-1)">← ก่อนหน้า</button>
-    <button class="nav-b pr" id="btn-next" onclick="holeNav(1)">ถัดไป →</button>
-  </div>
-  <button class="nav-b" id="btn-add-player" onclick="showAddPlayerModal()" style="width:100%;margin-bottom:4px;color:var(--blue);border-color:rgba(10,132,255,0.3)">+ เพิ่มผู้เล่น</button>
+  <button class="nav-b" id="btn-add-player" onclick="showAddPlayerModal()" style="width:100%;margin-bottom:4px;color:var(--blue);border-color:rgba(10,132,255,0.3);border-radius:999px">+ เพิ่มผู้เล่น</button>
 </div>
 
 <!-- ADD PLAYER MODAL -->

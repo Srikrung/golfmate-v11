@@ -108,6 +108,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // export / share
     showExportModal, hideExportModal, setExportWho, doExport,
     toggleTheme,
+    // collapse
+    toggleSkipSection, toggleMatrixSection,
   });
 });
 
@@ -194,7 +196,18 @@ export function toggleSkipGame(h, p, k){
   if(!skipData[h][p]) skipData[h][p] = new Set();
   if(skipData[h][p].has(k)) skipData[h][p].delete(k);
   else skipData[h][p].add(k);
-  updateTotals(); autoSave(); showHole(h);
+  updateTotals(); autoSave();
+  // จำสถานะ skip section ก่อน render ใหม่
+  const skipOpen = document.getElementById(`skip-body-${h}`)?.style.display === 'block';
+  showHole._noScroll = skipOpen; // ถ้า skip เปิดอยู่ → ไม่ scroll ขึ้นบน
+  showHole(h);
+  // เปิด skip section กลับถ้าเปิดอยู่ก่อนหน้า
+  if(skipOpen){
+    const body = document.getElementById(`skip-body-${h}`);
+    const arr  = document.getElementById(`skip-arr-${h}`);
+    if(body) body.style.display = 'block';
+    if(arr)  arr.textContent = '▼';
+  }
 }
 
 // ============================================================
@@ -446,5 +459,25 @@ Object.assign(window, {
   goOnlineSetup, saveOnlineSetup, testConnection, registerAllPlayers,
   joinRoomLookup, selectJoinPlayer,
   showExportModal, hideExportModal, setExportWho, doExport,
-  toggleTheme, _refreshOlyInline,
+  toggleTheme, _refreshOlyInline, toggleSkipSection, toggleMatrixSection,
 });
+
+// ── COLLAPSE HELPERS ──
+export function toggleSkipSection(h){
+  const body=document.getElementById(`skip-body-${h}`);
+  const arr=document.getElementById(`skip-arr-${h}`);
+  if(!body||!arr)return;
+  // เปิดอย่างเดียว ไม่ปิด
+  body.style.display='block';
+  arr.textContent='▼';
+}
+export function toggleMatrixSection(h){
+  const body=document.getElementById(`sum-rows-${h}`);
+  const pills=document.getElementById(`sum-pills-${h}`);
+  const arr=document.getElementById(`mx-arr-${h}`);
+  if(!body)return;
+  const open=body.style.display==='none'||body.style.display==='';
+  body.style.display=open?'block':'none';
+  if(pills)pills.style.display=open?'flex':'none';
+  if(arr)arr.textContent=open?'▼':'▶';
+}
