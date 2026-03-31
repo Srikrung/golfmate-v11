@@ -109,7 +109,7 @@ document.addEventListener('DOMContentLoaded', () => {
     showExportModal, hideExportModal, setExportWho, doExport,
     toggleTheme,
     // collapse
-    toggleSkipSection, toggleMatrixSection,
+    toggleSkipSection, toggleMatrixSection, chParNav,
   });
 });
 
@@ -457,7 +457,7 @@ Object.assign(window, {
   goOnlineSetup, saveOnlineSetup, testConnection, registerAllPlayers,
   joinRoomLookup, selectJoinPlayer,
   showExportModal, hideExportModal, setExportWho, doExport,
-  toggleTheme, _refreshOlyInline, toggleSkipSection, toggleMatrixSection,
+  toggleTheme, _refreshOlyInline, toggleSkipSection, toggleMatrixSection, chParNav,
 });
 
 // ── COLLAPSE HELPERS ──
@@ -478,4 +478,10 @@ export function toggleMatrixSection(h){
   body.style.display=open?'block':'none';
   if(pills)pills.style.display=open?'flex':'none';
   if(arr)arr.textContent=open?'▼':'▶';
+}
+
+// ── chParNav: แก้ PAR จาก nav bar ──
+export function chParNav(d){
+  const h = getCurrentHole();
+  chPar(h, d);
 }

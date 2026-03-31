@@ -171,8 +171,26 @@ export function olyAct(h,p,action){
   else if(action==='rank'){if(st==='chip'||st==='dq')return;if(idx!==-1){od.order.splice(idx,1);if(st==='sank'||st==='miss')delete od.status[p];}else od.order.push(p);}
   else if(action==='putt'){
     if(st==='chip')return;
-    if(st==='dq')od.status[p]='dq-sank';else if(st==='dq-sank')od.status[p]='dq-miss';else if(st==='dq-miss')od.status[p]='dq';
-    else if(idx!==-1){if(st==='sank')od.status[p]='miss';else if(st==='miss')delete od.status[p];else od.status[p]='sank';}
+    if(st==='dq')       od.status[p]='dq-sank';
+    else if(st==='dq-sank') od.status[p]='dq-miss';
+    else if(st==='dq-miss') od.status[p]='dq';
+    else if(st==='sank') od.status[p]='miss';
+    else if(st==='miss') delete od.status[p];
+    else                 od.status[p]='sank';
+  }
+  else if(action==='sank'){
+    if(st==='chip')return;
+    if(st==='dq')       od.status[p]='dq-sank';
+    else if(st==='dq-sank') delete od.status[p], od.status[p]='dq';
+    else if(st==='sank') delete od.status[p];
+    else                 od.status[p]='sank';
+  }
+  else if(action==='miss'){
+    if(st==='chip')return;
+    if(st==='dq')       od.status[p]='dq-miss';
+    else if(st==='dq-miss') od.status[p]='dq';
+    else if(st==='miss') delete od.status[p];
+    else                 od.status[p]='miss';
   }
   olyRenderHole(h);  // fallback กรณีมี oly-wrap (leaderboard ฯลฯ)
   if(typeof window._refreshOlyInline === 'function') window._refreshOlyInline(h);

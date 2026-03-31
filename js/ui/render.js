@@ -95,8 +95,8 @@ export function showHole(h){
       + '<button id="oly-dq-'+h+'-'+p+'"   class="obc ob-dq"   onclick="olyAct('+h+','+p+",'dq')\">🚫 DQ</button>"
       + '<button id="oly-chip-'+h+'-'+p+'" class="obc ob-chip" onclick="olyAct('+h+','+p+",'chip')\">🟡 Chip</button>"
       + '<button id="oly-rank-'+h+'-'+p+'" class="obc ob-rank" onclick="olyAct('+h+','+p+",'rank')\">อันดับ</button>"
-      + '<button id="oly-sank-'+h+'-'+p+'" class="obc ob-sank" onclick="olyAct('+h+','+p+",'putt')\">ลง ✓</button>"
-      + '<button id="oly-miss-'+h+'-'+p+'" class="obc ob-miss" onclick="olyAct('+h+','+p+",'putt')\">ไม่ลง</button>"
+      + '<button id="oly-sank-'+h+'-'+p+'" class="obc ob-sank" onclick="olyAct('+h+','+p+",'sank')\">ลง ✓</button>"
+      + '<button id="oly-miss-'+h+'-'+p+'" class="obc ob-miss" onclick="olyAct('+h+','+p+",'miss')\">ไม่ลง</button>"
       + '</div>'
     ) : '';
 
@@ -118,38 +118,27 @@ export function showHole(h){
       ? `<div class="row-sub">${teamPart}${drPart}</div>`
       : `<span id="tb-${h}-${p}" style="display:none"></span>`;
 
-    return`<div class="score-row-new">
-      <div style="display:flex;align-items:center;gap:7px">
-        <div style="flex:1;min-width:0">
+    return`<div class="score-row-new${p%2===1?' row-b':''}">
+      <div style="display:flex;align-items:center;gap:6px">
+        <div style="flex:1;min-width:0;overflow:hidden">
           <div style="font-size:14px;font-weight:700;color:var(--lbl);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${players[p].name}</div>
           ${subRow}
         </div>
-        <div class="stepper" id="swc-${h}-${p}">
+        <div class="stepper" id="swc-${h}-${p}" style="flex-shrink:0;width:104px">
           <button class="sb" onpointerdown="startRpt(${h},${p},-1)" onpointerup="stopRpt()" onpointerleave="stopRpt()">−</button>
           <div class="ss"></div>
           <div class="sv e" id="swd-${h}-${p}" ontouchstart="sws(event,${h},${p})" ontouchmove="swm(event,${h},${p})" ontouchend="swe(event,${h},${p})">—</div>
           <div class="ss"></div>
           <button class="sb" onpointerdown="startRpt(${h},${p},1)" onpointerup="stopRpt()" onpointerleave="stopRpt()">+</button>
         </div>
-        <div class="s-badge" id="swb-${h}-${p}" style="min-width:44px;text-align:right"></div>
+        <div class="s-badge" id="swb-${h}-${p}" style="width:48px;text-align:center;flex-shrink:0"></div>
       </div>
       ${olyRows}
     </div>
-    ${p < players.length-1 ? '<div style="height:3px;background:var(--bg3)"></div>' : ''}`;
+    `;
   }).join('');
 
   wrap.innerHTML=`<div class="hole-card">
-    <div class="hc-top">
-      <div class="h-badge"><div class="h-sm">HOLE</div><div class="h-lg">${h+1}</div></div>
-      <div class="h-par">
-        <div class="h-par-lbl">PAR</div>
-        <div class="h-par-ctrl"><button class="ps-btn" onclick="chPar(${h},-1)">−</button><div class="ps-val" id="pv-${h}">${pars[h]}</div><button class="ps-btn" onclick="chPar(${h},1)">+</button></div>
-      </div>
-      <div class="hc-pills">
-        <button class="pill pill-all" onclick="setParAll(${h})">พาร์ทุกคน</button>
-        ${G.turbo.on?`<button class="pill pill-turbo${turboOn?' on':''}" id="tc2-${h}" onclick="toggleTH(${h})">${turboOn?'หลุมเทอร์โบ ON':'เทอร์โบ'}</button>`:''}
-      </div>
-    </div>
     <div id="game-toggles-${h}" style="display:flex;flex-direction:column;gap:5px;padding:8px 12px;border-bottom:0.5px solid var(--sep)">
       ${(()=>{
         const icons ={bite:'🐶',olympic:'🏅',team:'🤝',doubleRe:'🎲',farNear:'🎯'};
@@ -213,8 +202,9 @@ export function showHole(h){
   if(G.farNear.on&&pars[h]===3)fnRenderHole(h);
   if(G.srikrung.on)sgRenderHole(h);
   const prev=document.getElementById('btn-prev');
-  prev.disabled=h===0;prev.style.opacity=h===0?'0.3':'1';
-  document.getElementById('btn-next').textContent=h===17?'สรุปผลการแข่งขัน 🏆':'ถัดไป →';
+  if(prev){prev.disabled=h===0;prev.style.opacity=h===0?'0.3':'1';}
+  const nxt=document.getElementById('btn-next');
+  if(nxt) nxt.textContent=h===17?'🏆':'›';
   updateProgressBar();updateTotals();
   if(!showHole._noScroll) requestAnimationFrame(()=>{window.scrollTo(0,0);document.documentElement.scrollTop=0;document.body.scrollTop=0;});
   showHole._noScroll=false;

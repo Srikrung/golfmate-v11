@@ -11,6 +11,7 @@
   --fill:rgba(255,255,255,0.07);--fill2:rgba(255,255,255,0.12);
   --win:#30d158;--lose:#ff453a;
   --hole-row:#0d0d1a;--sum-bg:#0d0d1a;--oly-bg:#0d0d1a;
+  --row-a:#0d0d1a;--row-b:#161626;
   --card-shadow:none;
 }
 body.light{
@@ -22,6 +23,7 @@ body.light{
   --fill:rgba(0,0,0,0.04);--fill2:rgba(0,0,0,0.07);
   --win:#1a8a3a;--lose:#cc3030;
   --hole-row:#f9f9fb;--sum-bg:#f9f9fb;--oly-bg:#f0f0f8;
+  --row-a:#ffffff;--row-b:#eef1f8;
   --card-shadow:0 1px 3px rgba(0,0,0,0.08);
 }
 

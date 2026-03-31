@@ -195,10 +195,23 @@ export function updateProgressBar(){
     else if(has)        d.classList.add('scored');
     else if(h < cur)    d.classList.add('done');
   }
-  const lblEl  = document.getElementById('prog-label');
-  const totEl  = document.getElementById('prog-total');
-  const subEl  = document.getElementById('hdr-sub');
-  const cnEl   = document.getElementById('course-name');
+  // อัปเดต nav badge (Option B)
+  const holeNumEl = document.getElementById('nav-hole-num');
+  const parValEl  = document.getElementById('nav-par-val');
+  const progLblEl = document.getElementById('nav-prog-label');
+  const parAllBtn = document.getElementById('nav-par-all');
+  if(holeNumEl) holeNumEl.textContent = cur+1;
+  if(parValEl)  parValEl.textContent  = pars[cur];
+  if(progLblEl) progLblEl.textContent = `${cur+1} / 18`;
+  if(parAllBtn) parAllBtn.setAttribute('onclick', `setParAll(${cur})`);
+  // ปุ่ม prev disabled
+  const prevBtn = document.getElementById('btn-prev');
+  if(prevBtn){ prevBtn.disabled=cur===0; prevBtn.style.opacity=cur===0?'0.3':'1'; }
+  // อัปเดต legacy elements ถ้ายังมี
+  const lblEl = document.getElementById('prog-label');
+  const totEl = document.getElementById('prog-total');
+  const subEl = document.getElementById('hdr-sub');
+  const cnEl  = document.getElementById('course-name');
   if(lblEl) lblEl.textContent = `${cur+1} / 18`;
   if(totEl) totEl.textContent = `Par ${pars[cur]}`;
   if(subEl) subEl.textContent = `${cnEl?.value||'—'} · หลุม ${cur+1}`;
