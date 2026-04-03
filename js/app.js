@@ -257,6 +257,7 @@ export function startGame(){
   for(let i=0; i<n; i++){ if(!G.team.baseTeams[i]) G.team.baseTeams[i] = i%2===0?'A':'B'; }
   G.team.domoTeams = Array(18).fill(null).map(() => [...G.team.baseTeams]);
   G.doubleRe.mults = Array(18).fill(1);
+  G.doubleRe.on = G.team.on; // เบิ้ล-รีเปิดพร้อมทีมเสมอ
 
   olympicData.splice(0, olympicData.length,
     ...Array(18).fill(null).map(() => ({order:[],status:{}})));
