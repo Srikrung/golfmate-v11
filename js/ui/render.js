@@ -55,12 +55,13 @@ export function getTeamForHole(h,p){
 export function getTeamBadgeHTML(h,p){
   if(!G.team.on)return'';
   const isOut=skipData[h]?.[p]?.has('team');
-  if(isOut)return`<span class="team-badge" style="background:rgba(255,255,255,0.06);color:var(--lbl3);border:1px solid rgba(255,255,255,0.1)" onclick="toggleTeamScorecard(${h},${p})">ไม่เล่น</span>`;
+  if(isOut)return`<button class="pg-tb" style="background:rgba(255,255,255,0.06);color:var(--lbl3)" onclick="toggleTeamScorecard(${h},${p})">ไม่เล่น</button>`;
   const isSolo=teamSoloPlayers.has(p);
-  if(isSolo)return`<span class="team-badge" style="background:rgba(52,199,89,0.15);color:var(--green);border:1px solid rgba(52,199,89,0.5)" onclick="toggleTeamScorecard(${h},${p})">⚡Solo</span>`;
+  if(isSolo)return`<button class="pg-tb" style="background:rgba(52,199,89,0.18);color:var(--green)" onclick="toggleTeamScorecard(${h},${p})">⚡Solo</button>`;
   const t=getTeamForHole(h,p);
-  const cls=t==='A'?'tb-a':t==='B'?'tb-b':'tb-c';
-  return`<span class="team-badge ${cls}" onclick="toggleTeamScorecard(${h},${p})">ทีม ${t}</span>`;
+  const bg=t==='A'?'rgba(77,163,255,0.2)':t==='B'?'rgba(255,92,82,0.2)':'rgba(255,159,10,0.2)';
+  const cl=t==='A'?'var(--blue)':t==='B'?'var(--red)':'var(--orange,#ff9f0a)';
+  return`<button class="pg-tb" style="background:${bg};color:${cl}" onclick="toggleTeamScorecard(${h},${p})">ทีม ${t}</button>`;
 }
 
 // ── REFWIDGET ──
@@ -105,18 +106,18 @@ export function showHole(h){
       ? `<span id="tb-${h}-${p}">${getTeamBadgeHTML(h,p)}</span>`
       : `<span id="tb-${h}-${p}" style="display:none"></span>`;
 
-    // เบิ้ล-รีแสดงเมื่อเปิดทีม — เป็นตัวคูณของทีมเสมอ
-    const drPart = G.team.on ? (()=>{
+    // เบิ้ล-รีในกรอบเดียวกับทีม — Pill Group
+    const subRow = G.team.on ? (()=>{
       const m = G.doubleRe.mults[h];
-      const dblCls = m===2 ? ' dbl-on' : '';
-      const reCls  = m===3 ? ' re-on'  : '';
-      return '<button class="dr-inline'+dblCls+'" onclick="drSet('+h+',2)">เบิ้ล ×2</button>'
-           + '<button class="dr-inline'+reCls+'"  onclick="drSet('+h+',3)">รี ×3</button>';
-    })() : '';
-
-    const subRow = G.team.on
-      ? `<div class="row-sub">${teamPart}${drPart}</div>`
-      : `<span id="tb-${h}-${p}" style="display:none"></span>`;
+      const dblCls = m===2 ? ' pg-on-dbl' : '';
+      const reCls  = m===3 ? ' pg-on-re'  : '';
+      const tbHTML = getTeamBadgeHTML(h,p);
+      return '<div class="pill-group">'
+        + '<span id="tb-'+h+'-'+p+'" class="pg-tb">'+tbHTML+'</span>'
+        + '<button class="pg-dr'+dblCls+'" onclick="drSet('+h+',2)">เบิ้ล ×2</button>'
+        + '<button class="pg-dr'+reCls+'"  onclick="drSet('+h+',3)">รี ×3</button>'
+        + '</div>';
+    })() : `<span id="tb-${h}-${p}" style="display:none"></span>`;
 
     return`<div class="score-row-new${p%2===1?' row-b':''}">
       <div style="display:flex;align-items:center;gap:7px;margin-bottom:${G.team.on?'7px':'9px'}">
