@@ -52,16 +52,21 @@ export function getTeamForHole(h,p){
   if(Math.floor(h/interval)%2===1)return base==='A'?'B':base==='B'?'C':'A';
   return base;
 }
-export function getTeamBadgeHTML(h,p){
-  if(!G.team.on)return'';
+export function getTeamBadgeProps(h,p){
+  if(!G.team.on)return{bg:'transparent',cl:'var(--lbl3)',label:'—'};
   const isOut=skipData[h]?.[p]?.has('team');
-  if(isOut)return`<button class="pg-tb" style="width:100%;background:rgba(255,255,255,0.06);color:var(--lbl3)" onclick="toggleTeamScorecard(${h},${p})">ไม่เล่น</button>`;
+  if(isOut)return{bg:'rgba(255,255,255,0.06)',cl:'var(--lbl3)',label:'ไม่เล่น'};
   const isSolo=teamSoloPlayers.has(p);
-  if(isSolo)return`<button class="pg-tb" style="width:100%;background:rgba(52,199,89,0.18);color:var(--green)" onclick="toggleTeamScorecard(${h},${p})">⚡Solo</button>`;
+  if(isSolo)return{bg:'rgba(52,199,89,0.18)',cl:'var(--green)',label:'⚡Solo'};
   const t=getTeamForHole(h,p);
   const bg=t==='A'?'rgba(77,163,255,0.2)':t==='B'?'rgba(255,92,82,0.2)':'rgba(255,159,10,0.2)';
   const cl=t==='A'?'var(--blue)':t==='B'?'var(--red)':'var(--orange,#ff9f0a)';
-  return`<button class="pg-tb" style="width:100%;background:${bg};color:${cl}" onclick="toggleTeamScorecard(${h},${p})">ทีม ${t}</button>`;
+  return{bg,cl,label:'ทีม '+t};
+}
+export function getTeamBadgeHTML(h,p){
+  // compat: บางส่วนยังเรียกใช้อยู่
+  const {bg,cl,label}=getTeamBadgeProps(h,p);
+  return`<button class="pg-tb-btn" style="width:100%;background:${bg};color:${cl}" onclick="toggleTeamScorecard(${h},${p})">${label}</button>`;
 }
 
 // ── REFWIDGET ──
@@ -111,9 +116,9 @@ export function showHole(h){
       const m = G.doubleRe.mults[h];
       const dblCls = m===2 ? ' pg-on-dbl' : '';
       const reCls  = m===3 ? ' pg-on-re'  : '';
-      const tbHTML = getTeamBadgeHTML(h,p);
+      const {bg,cl,label} = getTeamBadgeProps(h,p);
       return '<div class="pill-group">'
-        + '<span id="tb-'+h+'-'+p+'" class="pg-tb">'+tbHTML+'</span>'
+        + '<button id="tb-'+h+'-'+p+'" class="pg-tb-btn" style="background:'+bg+';color:'+cl+'" onclick="toggleTeamScorecard('+h+','+p+')">'+label+'</button>'
         + '<button class="pg-dr'+dblCls+'" onclick="drSet('+h+',2)">เบิ้ล ×2</button>'
         + '<button class="pg-dr'+reCls+'"  onclick="drSet('+h+',3)">รี ×3</button>'
         + '</div>';
