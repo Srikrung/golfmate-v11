@@ -388,7 +388,11 @@ export function loadSession(){
       ...(data.srikrungData || Array(18).fill(null).map(() => players.map(() => ({fw:null,gir:null,putt:1})))));
     skipData.splice(0, skipData.length,
       ...(data.skipData
-        ? data.skipData.map(row => row.map(s => new Set(s)))
+        ? data.skipData.map(row => row.map(s => {
+            const set = new Set(s);
+            set.delete('team'); // team ไม่เก็บใน skipData แล้ว — ใช้ teamSoloPlayers แทน
+            return set;
+          }))
         : Array(18).fill(null).map(() => Array(players.length).fill(null).map(() => new Set()))));
     teamSoloPlayers.clear();
     (data.teamSoloPlayers || []).forEach(v => teamSoloPlayers.add(v));
