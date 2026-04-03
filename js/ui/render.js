@@ -154,8 +154,8 @@ export function showHole(h){
             color:${on?'#4da3ff':'var(--lbl3)'};"
             >${icons[k]} ${names[k]}</button>`;
         };
-        return`<div style="display:flex;gap:5px">${btn('bite')}${btn('olympic')}${btn('farNear')}</div>
-               <div style="display:flex;gap:5px">${btn('team')}</div>`;
+        return`<div style="display:flex;gap:5px">${btn('bite')}${btn('olympic')}</div>
+               <div style="display:flex;gap:5px">${btn('farNear')}${btn('team')}</div>`;
       })()}
     </div>
     <div class="score-rows">${scoreRowsHTML}</div>
