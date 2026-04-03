@@ -55,13 +55,13 @@ export function getTeamForHole(h,p){
 export function getTeamBadgeHTML(h,p){
   if(!G.team.on)return'';
   const isOut=skipData[h]?.[p]?.has('team');
-  if(isOut)return`<button class="pg-tb" style="background:rgba(255,255,255,0.06);color:var(--lbl3)" onclick="toggleTeamScorecard(${h},${p})">ไม่เล่น</button>`;
+  if(isOut)return`<button class="pg-tb" style="width:100%;background:rgba(255,255,255,0.06);color:var(--lbl3)" onclick="toggleTeamScorecard(${h},${p})">ไม่เล่น</button>`;
   const isSolo=teamSoloPlayers.has(p);
-  if(isSolo)return`<button class="pg-tb" style="background:rgba(52,199,89,0.18);color:var(--green)" onclick="toggleTeamScorecard(${h},${p})">⚡Solo</button>`;
+  if(isSolo)return`<button class="pg-tb" style="width:100%;background:rgba(52,199,89,0.18);color:var(--green)" onclick="toggleTeamScorecard(${h},${p})">⚡Solo</button>`;
   const t=getTeamForHole(h,p);
   const bg=t==='A'?'rgba(77,163,255,0.2)':t==='B'?'rgba(255,92,82,0.2)':'rgba(255,159,10,0.2)';
   const cl=t==='A'?'var(--blue)':t==='B'?'var(--red)':'var(--orange,#ff9f0a)';
-  return`<button class="pg-tb" style="background:${bg};color:${cl}" onclick="toggleTeamScorecard(${h},${p})">ทีม ${t}</button>`;
+  return`<button class="pg-tb" style="width:100%;background:${bg};color:${cl}" onclick="toggleTeamScorecard(${h},${p})">ทีม ${t}</button>`;
 }
 
 // ── REFWIDGET ──
