@@ -231,9 +231,15 @@ body.light .tbl-wrap{background:#fff;border:0.5px solid rgba(0,0,0,0.08);box-sha
   margin-top:6px;
 }
 .pg-tb{
-  flex:1.2;padding:6px 0;
-  font-size:10px;font-weight:800;text-align:center;cursor:pointer;
-  border-radius:999px;border:none;background:transparent;
+  flex:1.2;padding:0;
+  display:flex;align-items:stretch;
+  border-radius:999px;overflow:hidden;
+}
+.pg-tb button,.pg-tb>*{
+  flex:1;padding:6px 0;
+  font-size:10px;font-weight:800;text-align:center;
+  cursor:pointer;border:none;font-family:inherit;
+  border-radius:999px;
 }
 .pg-dr{
   flex:1;padding:6px 0;
