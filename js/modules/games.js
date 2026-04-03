@@ -156,8 +156,18 @@ export function getHoleMoney(h){return{bite:calcBiteHole(h),olympic:calcOlympicH
 export function toggleGameMidPlay(k,h){
   G[k].on=!G[k].on;
   if(G[k].on){
-    if(k==='team'&&G.team.domoTeams.length===0){
-      G.team.domoTeams=Array(18).fill(null).map(()=>[...G.team.baseTeams]);
+    if(k==='team'){
+      // เบิ้ล-รีเป็นส่วนหนึ่งของทีม — เปิดพร้อมกัน
+      G.doubleRe.on=true;
+      if(G.team.domoTeams.length===0){
+        G.team.domoTeams=Array(18).fill(null).map(()=>[...G.team.baseTeams]);
+      }
+    }
+  } else {
+    if(k==='team'){
+      // ปิดทีม → ปิดเบิ้ล-รีด้วย รีเซ็ต mults
+      G.doubleRe.on=false;
+      G.doubleRe.mults=Array(18).fill(1);
     }
   }
   showHole(h);autoSave();
