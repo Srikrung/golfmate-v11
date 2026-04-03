@@ -89,18 +89,18 @@ export function showHole(h){
   updateAddPlayerBtn();
   const turboOn=G.turbo.on&&G.turbo.holes.has(h);
   const scoreRowsHTML=players.map((_,p)=>{
-    // ── Olympic 5 ปุ่ม 1 แถว แคปซูล ──
+    // ── Olympic grid: DQ/Chip แถวบน · ลง/ไม่ลง แถวล่าง · อันดับสูง 2 แถว ──
     const olyRows = G.olympic.on ? (
-      '<div style="display:flex;gap:4px">'
-      + '<button id="oly-dq-'+h+'-'+p+'"   class="obc ob-dq"   onclick="olyAct('+h+','+p+",'dq')\">🚫 DQ</button>"
-      + '<button id="oly-chip-'+h+'-'+p+'" class="obc ob-chip" onclick="olyAct('+h+','+p+",'chip')\">🟡 Chip</button>"
-      + '<button id="oly-rank-'+h+'-'+p+'" class="obc ob-rank" onclick="olyAct('+h+','+p+",'rank')\">อันดับ</button>"
-      + '<button id="oly-sank-'+h+'-'+p+'" class="obc ob-sank" onclick="olyAct('+h+','+p+",'sank')\">ลง ✓</button>"
-      + '<button id="oly-miss-'+h+'-'+p+'" class="obc ob-miss" onclick="olyAct('+h+','+p+",'miss')\">ไม่ลง</button>"
+      '<div class="oly-grid">'
+      + '<button id="oly-dq-'+h+'-'+p+'"   class="ob ob-dq"   onclick="olyAct('+h+','+p+",'dq')\">🚫 DQ</button>"
+      + '<button id="oly-chip-'+h+'-'+p+'" class="ob ob-chip" onclick="olyAct('+h+','+p+",'chip')\">🟡 Chip</button>"
+      + '<button id="oly-rank-'+h+'-'+p+'" class="ob ob-rank" onclick="olyAct('+h+','+p+",'rank')\"><span class='rn'>—</span><span class='rl'>อันดับ</span></button>"
+      + '<button id="oly-sank-'+h+'-'+p+'" class="ob ob-sank" onclick="olyAct('+h+','+p+",'sank')\">ลง ✓</button>"
+      + '<button id="oly-miss-'+h+'-'+p+'" class="ob ob-miss" onclick="olyAct('+h+','+p+",'miss')\">ไม่ลง</button>"
       + '</div>'
     ) : '';
 
-    // ── Team badge + Double-Re (แถว sub ใต้ชื่อ) ──
+    // ── Team badge + Double-Re ──
     const teamPart = G.team.on
       ? `<span id="tb-${h}-${p}">${getTeamBadgeHTML(h,p)}</span>`
       : `<span id="tb-${h}-${p}" style="display:none"></span>`;
@@ -119,19 +119,19 @@ export function showHole(h){
       : `<span id="tb-${h}-${p}" style="display:none"></span>`;
 
     return`<div class="score-row-new${p%2===1?' row-b':''}">
-      <div style="display:flex;align-items:center;gap:6px">
+      <div style="display:flex;align-items:center;gap:7px;margin-bottom:${G.team.on||G.doubleRe.on?'7px':'9px'}">
         <div style="flex:1;min-width:0;overflow:hidden">
-          <div style="font-size:14px;font-weight:700;color:var(--lbl);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${players[p].name}</div>
+          <div style="font-size:17px;font-weight:700;color:var(--lbl);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:-.3px">${players[p].name}</div>
           ${subRow}
         </div>
-        <div class="stepper" id="swc-${h}-${p}" style="flex-shrink:0;width:104px">
+        <div class="stepper" id="swc-${h}-${p}" style="flex-shrink:0;width:116px">
           <button class="sb" onpointerdown="startRpt(${h},${p},-1)" onpointerup="stopRpt()" onpointerleave="stopRpt()">−</button>
           <div class="ss"></div>
           <div class="sv e" id="swd-${h}-${p}" ontouchstart="sws(event,${h},${p})" ontouchmove="swm(event,${h},${p})" ontouchend="swe(event,${h},${p})">—</div>
           <div class="ss"></div>
           <button class="sb" onpointerdown="startRpt(${h},${p},1)" onpointerup="stopRpt()" onpointerleave="stopRpt()">+</button>
         </div>
-        <div class="s-badge" id="swb-${h}-${p}" style="width:48px;text-align:center;flex-shrink:0"></div>
+        <div class="s-badge" id="swb-${h}-${p}" style="width:52px;text-align:center;flex-shrink:0"></div>
       </div>
       ${olyRows}
     </div>
@@ -228,24 +228,25 @@ export function _refreshOlyInline(h){
     const isSank = st==='sank'||st==='dq-sank';
     const isMiss = st==='miss'||st==='dq-miss';
 
-    const setBtn = (id, active, dim, label)=>{
+    const setBtn = (id, active, dim, label, isRank)=>{
       const el = document.getElementById(id); if(!el) return;
       const specific = [...el.classList].find(c => c.startsWith('ob-') && c!=='ob-on' && c!=='ob-dim') || '';
-      el.className = `obc${specific?' '+specific:''}${active?' ob-on':''}${dim?' ob-dim':''}`;
-      if(label !== undefined) el.textContent = label;
+      el.className = `ob${specific?' '+specific:''}${active?' ob-on':''}${dim?' ob-dim':''}`;
+      if(label !== undefined){
+        if(isRank){
+          el.innerHTML = '<span class="rn">'+label+'</span><span class="rl">อันดับ</span>';
+        } else {
+          el.textContent = label;
+        }
+      }
     };
 
-    // Chip
     setBtn(`oly-chip-${h}-${p}`, isChip, false, '🟡 Chip');
-    // DQ — dim ถ้า chip หรือมีอันดับแล้ว
-    setBtn(`oly-dq-${h}-${p}`, isDQ, isChip||idx!==-1, '🚫 DQ');
-    // อันดับ — dim ถ้า chip หรือ DQ
-    const rankLabel = idx!==-1 ? `${idx+1}st` : 'อันดับ';
-    setBtn(`oly-rank-${h}-${p}`, idx!==-1, isChip||isDQ, rankLabel);
-    // ลง ✓ — DQ ยังกดได้ (dq-sank)
+    setBtn(`oly-dq-${h}-${p}`,   isDQ,   isChip||idx!==-1, '🚫 DQ');
+    const rankLabel = idx!==-1 ? (idx+1)+'st' : '—';
+    setBtn(`oly-rank-${h}-${p}`, idx!==-1, isChip||isDQ, rankLabel, true);
     setBtn(`oly-sank-${h}-${p}`, isSank, false, isSank?'ลง ✓ ✅':'ลง ✓');
-    // ไม่ลง — DQ ยังกดได้ (dq-miss)
-    setBtn(`oly-miss-${h}-${p}`, isMiss, false, isMiss?'ไม่ลง ✕':'ไม่ลง');
+    setBtn(`oly-miss-${h}-${p}`, isMiss, false, 'ไม่ลง');
   });
 }
 
