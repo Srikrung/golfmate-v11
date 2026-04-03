@@ -105,7 +105,8 @@ export function showHole(h){
       ? `<span id="tb-${h}-${p}">${getTeamBadgeHTML(h,p)}</span>`
       : `<span id="tb-${h}-${p}" style="display:none"></span>`;
 
-    const drPart = G.doubleRe.on ? (()=>{
+    // เบิ้ล-รีแสดงเมื่อเปิดทีม — เป็นตัวคูณของทีมเสมอ
+    const drPart = G.team.on ? (()=>{
       const m = G.doubleRe.mults[h];
       const dblCls = m===2 ? ' dbl-on' : '';
       const reCls  = m===3 ? ' re-on'  : '';
@@ -113,12 +114,12 @@ export function showHole(h){
            + '<button class="dr-inline'+reCls+'"  onclick="drSet('+h+',3)">รี ×3</button>';
     })() : '';
 
-    const subRow = (G.team.on || G.doubleRe.on)
+    const subRow = G.team.on
       ? `<div class="row-sub">${teamPart}${drPart}</div>`
       : `<span id="tb-${h}-${p}" style="display:none"></span>`;
 
     return`<div class="score-row-new${p%2===1?' row-b':''}">
-      <div style="display:flex;align-items:center;gap:7px;margin-bottom:${G.team.on||G.doubleRe.on?'7px':'9px'}">
+      <div style="display:flex;align-items:center;gap:7px;margin-bottom:${G.team.on?'7px':'9px'}">
         <div style="flex:1;min-width:0;overflow:hidden">
           <div style="font-size:17px;font-weight:700;color:var(--lbl);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:-.3px">${players[p].name}</div>
           ${subRow}
@@ -153,7 +154,7 @@ export function showHole(h){
             >${icons[k]} ${names[k]}</button>`;
         };
         return`<div style="display:flex;gap:5px">${btn('bite')}${btn('olympic')}${btn('farNear')}</div>
-               <div style="display:flex;gap:5px">${btn('team')}${btn('doubleRe')}</div>`;
+               <div style="display:flex;gap:5px">${btn('team')}</div>`;
       })()}
     </div>
     <div class="score-rows">${scoreRowsHTML}</div>
@@ -250,11 +251,8 @@ export function _refreshOlyInline(h){
 }
 
 export function drSet(h,m){
+  // toggle: กดซ้ำ = ยกเลิก
   G.doubleRe.mults[h]=(G.doubleRe.mults[h]===m)?1:m;
-  if(G.doubleRe.mults[h]>1&&!G.doubleRe.on){
-    G.doubleRe.on=true;
-    document.getElementById('sw-doubleRe')?.classList.add('on');
-  }
   showHole._noScroll=true;
   showHole(h);updateTotals();autoSave();
 }
