@@ -168,7 +168,8 @@ export function toggleTeamScorecard(h, p){
   } else if(isSolo){
     // Solo → ไม่เล่น
     teamSoloPlayers.delete(p);
-    if(!skipData[h]) skipData[h]=Array(players.length).fill(null).map(()=>new Set());
+    if(!skipData[h]){ skipData[h]=Array(players.length).fill(null).map(()=>new Set()); }
+    else { while(skipData[h].length<players.length) skipData[h].push(new Set()); }
     if(!skipData[h][p]) skipData[h][p]=new Set();
     skipData[h][p].add('team');
   } else if(cur==='B'){
@@ -192,7 +193,13 @@ export function toggleSkipPlayer(h, p){
   toggleSkipGame(h,p,'farNear');
 }
 export function toggleSkipGame(h, p, k){
-  if(!skipData[h]) skipData[h] = Array(players.length).fill(null).map(() => new Set());
+  // init แบบปลอดภัย — ไม่ล้าง slot เดิมที่มีอยู่
+  if(!skipData[h]){
+    skipData[h] = Array(players.length).fill(null).map(()=>new Set());
+  } else {
+    // ถ้า array สั้นกว่า players ปัจจุบัน (เพิ่มคนระหว่างแมท) → ต่อ slot
+    while(skipData[h].length < players.length) skipData[h].push(new Set());
+  }
   if(!skipData[h][p]) skipData[h][p] = new Set();
   if(skipData[h][p].has(k)) skipData[h][p].delete(k);
   else skipData[h][p].add(k);
@@ -305,6 +312,11 @@ export function confirmAddPlayer(){
   G.team.baseTeams.push(p%2===0?'A':'B');
   G.team.domoTeams.forEach(hd => hd.push(p%2===0?'A':'B'));
   addHcapPairsForPlayer(p);
+  // เพิ่ม skipData slot สำหรับคนใหม่ทุกหลุม
+  for(let h=0; h<18; h++){
+    if(!skipData[h]) skipData[h] = Array(p+1).fill(null).map(()=>new Set());
+    else if(!skipData[h][p]) skipData[h][p] = new Set();
+  }
   updateAddPlayerBtn(); hideAddPlayerModal();
   showHole(getCurrentHole()); autoSave();
 }
