@@ -167,10 +167,13 @@ body.light .tbl-wrap{background:#fff;border:0.5px solid rgba(0,0,0,0.08);box-sha
 /* row-sub: ทีม + เบิ้ล-รี */
 .row-sub{display:flex;align-items:center;gap:5px;flex-wrap:wrap;margin-top:2px}
 
-/* team badge — แคปซูล */
+/* team badge — แคปซูล ขนาดคงที่ตาม "⚡ Solo" */
 .team-badge{
-  font-size:9px!important;font-weight:700;
-  padding:2px 9px;border-radius:999px;cursor:pointer;
+  font-size:10px!important;font-weight:700;
+  padding:5px 0;border-radius:999px;cursor:pointer;
+  min-width:64px;        /* กว้างพอสำหรับ "⚡ Solo" ไม่ขยับ */
+  text-align:center;
+  flex-shrink:0;
 }
 
 /* DR inline — แคปซูล */
