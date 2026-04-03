@@ -3,7 +3,7 @@
 // ============================================================
 import { G, players, scores, pars, courseDB,
          isGameStarted, getCurrentHole, setCurrentHole,
-         LS_KEY } from '../config.js';
+         LS_KEY, autoSave } from '../config.js';
 import { buildHcapUI } from '../modules/handicap.js';
 import { updateBiteMultUI } from '../modules/games.js';
 import { buildResults, buildMoney, showHole, updateTotals } from './render.js';
@@ -164,10 +164,17 @@ export function toggleTH(h){
   if(G.turbo.holes.has(h)) G.turbo.holes.delete(h);
   else G.turbo.holes.add(h);
   const on = G.turbo.holes.has(h);
+  // Setup grid button
   document.getElementById(`tc-${h}`)?.classList.toggle('on', on);
+  // Scorecard button — อัปเดต inline style ด้วย
   const t2 = document.getElementById(`tc2-${h}`);
-  if(t2){ t2.classList.toggle('on', on); t2.textContent = on ? 'เทอร์โบ ON' : 'เทอร์โบ'; }
-  updateTotals();
+  if(t2){
+    t2.textContent = on ? '⚡ หลุมเทอร์โบ' : '⚡ Turbo';
+    t2.style.borderColor  = on ? 'rgba(255,159,10,0.6)' : 'var(--bg4)';
+    t2.style.background   = on ? 'rgba(255,159,10,0.18)' : 'var(--bg3)';
+    t2.style.color        = on ? '#ff9f0a' : 'var(--lbl3)';
+  }
+  updateTotals(); autoSave();
 }
 
 // ============================================================
