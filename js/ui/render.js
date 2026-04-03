@@ -152,8 +152,20 @@ export function showHole(h){
             color:${on?'#4da3ff':'var(--lbl3)'};"
             >${icons[k]} ${names[k]}</button>`;
         };
+        const turboHoleOn=G.turbo.on&&G.turbo.holes.has(h);
+        const turboBtn=G.turbo.on
+          ?`<button id="tc2-${h}" onclick="toggleTH(${h})"
+              style="flex:1;padding:7px 4px;border-radius:999px;font-size:11px;font-weight:700;
+              cursor:pointer;font-family:inherit;text-align:center;
+              border:1.5px solid ${turboHoleOn?'rgba(255,214,10,0.6)':'var(--bg4)'};
+              background:${turboHoleOn?'rgba(255,214,10,0.15)':'var(--bg3)'};
+              color:${turboHoleOn?'#ffd60a':'var(--lbl3)'};">⚡ ${turboHoleOn?'Turbo ON':'Turbo'}</button>`
+          :'';
+        const row2=turboBtn
+          ?`<div style="display:flex;gap:5px">${btn('farNear')}${btn('team')}${turboBtn}</div>`
+          :`<div style="display:flex;gap:5px">${btn('farNear')}${btn('team')}</div>`;
         return`<div style="display:flex;gap:5px">${btn('bite')}${btn('olympic')}</div>
-               <div style="display:flex;gap:5px">${btn('farNear')}${btn('team')}</div>`;
+               ${row2}`;
       })()}
     </div>
     <div class="score-rows">${scoreRowsHTML}</div>
