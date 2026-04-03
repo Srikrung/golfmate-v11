@@ -241,5 +241,5 @@ body.light .tbl-wrap{background:#fff;border:0.5px solid rgba(0,0,0,0.08);box-sha
   border-radius:999px;border:none;
   background:transparent;color:var(--lbl2);font-family:inherit;
 }
-.pg-dr.pg-on-dbl{background:rgba(255,255,255,0.15);color:var(--lbl);font-weight:800}
-.pg-dr.pg-on-re {background:rgba(52,209,122,0.2); color:var(--green);font-weight:800}
+.pg-dr.pg-on-dbl{background:rgba(48,209,88,0.2); color:var(--green);font-weight:800}
+.pg-dr.pg-on-re {background:rgba(255,159,10,0.2);color:var(--orange,#ff9f0a);font-weight:800}
