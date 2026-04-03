@@ -110,8 +110,7 @@ export function showHole(h){
       const dblCls = m===2 ? ' dbl-on' : '';
       const reCls  = m===3 ? ' re-on'  : '';
       return '<button class="dr-inline'+dblCls+'" onclick="drSet('+h+',2)">เบิ้ล ×2</button>'
-           + '<button class="dr-inline'+reCls+'"  onclick="drSet('+h+',3)">รี ×3</button>'
-           + '<button class="dr-inline rst"        onclick="drSet('+h+',1)">↺</button>';
+           + '<button class="dr-inline'+reCls+'"  onclick="drSet('+h+',3)">รี ×3</button>';
     })() : '';
 
     const subRow = (G.team.on || G.doubleRe.on)
