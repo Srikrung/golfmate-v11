@@ -219,3 +219,27 @@ body.light .tbl-wrap{background:#fff;border:0.5px solid rgba(0,0,0,0.08);box-sha
 .obc.ob-sank.ob-on{background:rgba(52,209,122,0.25);color:#3ddb8a; border-color:rgba(52,209,122,0.8)}
 .obc.ob-miss.ob-on{background:rgba(255,92,82,0.22); color:#ff6b61; border-color:rgba(255,92,82,0.7)}
 .obc.ob-dim       {opacity:0.15;pointer-events:none}
+
+/* ── PILL GROUP: ทีม + เบิ้ล-รี กรอบเดียวกัน ── */
+.pill-group{
+  display:flex;
+  background:var(--bg3);
+  border-radius:999px;
+  border:1.5px solid var(--bg4);
+  padding:3px;
+  gap:3px;
+  margin-top:6px;
+}
+.pg-tb{
+  flex:1.2;padding:6px 0;
+  font-size:10px;font-weight:800;text-align:center;cursor:pointer;
+  border-radius:999px;border:none;background:transparent;
+}
+.pg-dr{
+  flex:1;padding:6px 0;
+  font-size:10px;font-weight:700;text-align:center;cursor:pointer;
+  border-radius:999px;border:none;
+  background:transparent;color:var(--lbl2);font-family:inherit;
+}
+.pg-dr.pg-on-dbl{background:rgba(255,255,255,0.15);color:var(--lbl);font-weight:800}
+.pg-dr.pg-on-re {background:rgba(52,209,122,0.2); color:var(--green);font-weight:800}
