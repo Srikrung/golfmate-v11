@@ -121,10 +121,7 @@ export function showHole(h){
 
     return`<div class="score-row-new${p%2===1?' row-b':''}">
       <div style="display:flex;align-items:center;gap:7px;margin-bottom:${G.team.on?'7px':'9px'}">
-        <div style="flex:1;min-width:0;overflow:hidden">
-          <div style="font-size:17px;font-weight:700;color:var(--lbl);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:-.3px">${players[p].name}</div>
-          ${subRow}
-        </div>
+        <div style="font-size:17px;font-weight:700;color:var(--lbl);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:-.3px;flex:1;min-width:0">${players[p].name}</div>
         <div class="stepper" id="swc-${h}-${p}" style="flex-shrink:0;width:116px">
           <button class="sb" onpointerdown="startRpt(${h},${p},-1)" onpointerup="stopRpt()" onpointerleave="stopRpt()">−</button>
           <div class="ss"></div>
@@ -134,6 +131,7 @@ export function showHole(h){
         </div>
         <div class="s-badge" id="swb-${h}-${p}" style="width:52px;text-align:center;flex-shrink:0"></div>
       </div>
+      ${subRow}
       ${olyRows}
     </div>
     `;
