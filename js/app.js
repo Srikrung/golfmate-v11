@@ -18,7 +18,7 @@ import { initSwipe, goTab, goGuide, goResults, goMoney,
          buildProgressBar, updateProgressBar, holeNav, toggleTH,
          changeCoursePreset, applyParsFromPreset } from './ui/tabs.js';
 import { showHole, updateTotals, drSet, _refreshOlyInline,
-         getTeamBadgeHTML,
+         getTeamBadgeHTML, getTeamBadgeProps,
          setHoleMatrixPill, setMatrixPill, lbToggleMatrix,
          buildResults, buildMoney } from './ui/render.js';
 
@@ -183,7 +183,12 @@ export function toggleTeamScorecard(h, p){
   }
   // อัปเดต badge เฉพาะจุด ไม่ต้อง render ทั้งหน้า
   const el = document.getElementById(`tb-${h}-${p}`);
-  if(el) el.innerHTML = getTeamBadgeHTML(h,p);
+  if(el){
+    const {bg,cl,label} = getTeamBadgeProps(h,p);
+    el.style.background = bg;
+    el.style.color = cl;
+    el.textContent = label;
+  }
   updateTotals(); autoSave();
 }
 
