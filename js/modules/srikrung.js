@@ -12,6 +12,20 @@ function hdrFs(n){ return n>5?'9px':n>4?'10px':'11px'; }
 // ─────────────────────────────────────────
 // RENDER HOLE (ใช้ในหน้าสกอร์การ์ด)
 // ─────────────────────────────────────────
+// ── Focus player state ──
+let sgFocusPlayer = null; // null = ทุกคน, number = index คนที่เลือก
+
+export function getSgFocusPlayer(){ return sgFocusPlayer; }
+export function setSgFocusPlayer(p){ sgFocusPlayer = p; }
+
+export function sgToggleFocus(p){
+  sgFocusPlayer = (sgFocusPlayer === p) ? null : p;
+  // re-render ทุกหลุมที่เปิดอยู่
+  for(let h=0;h<18;h++){
+    if(document.getElementById(`sg-players-${h}`)) sgRenderHole(h);
+  }
+}
+
 export function sgRenderHole(h){
   const wrap = document.getElementById(`sg-players-${h}`);
   if(!wrap) return;
@@ -20,33 +34,48 @@ export function sgRenderHole(h){
   wrap.innerHTML = players.map((pl, p) => {
     const d = srikrungData[h]?.[p];
     if(!d) return '';
+
+    // Focus mode: ซ่อนคนอื่น ถ้าเลือก "ของฉัน"
+    const isFocused = sgFocusPlayer !== null;
+    const isMe = sgFocusPlayer === p;
+    const canEdit = !isFocused || isMe;
+
+    // Join mode: กดได้แค่คนที่ join
+    const { isJoinMode, getJoinPlayerName } = window._sgJoinHelper || {};
+    const joinMode = typeof isJoinMode === 'function' && isJoinMode();
+    const joinName = typeof getJoinPlayerName === 'function' && getJoinPlayerName();
+    const isJoinMe = joinMode && pl.name.trim() === joinName?.trim();
+    const editable = joinMode ? isJoinMe : canEdit;
+
     const fwOn  = d.fw  === true;
     const girOn = d.gir === true;
 
-    const btnBase = `flex:1;padding:7px 0;border-radius:8px;border:none;cursor:pointer;font-family:inherit;font-size:12px;font-weight:600;background:var(--bg4);color:var(--lbl2)`;
-    const btnOn   = `flex:1;padding:7px 0;border-radius:8px;border:1px solid rgba(52,199,89,0.5);cursor:pointer;font-family:inherit;font-size:12px;font-weight:700;background:rgba(52,199,89,0.2);color:var(--green)`;
+    const btnBase = `flex:1;padding:7px 0;border-radius:8px;border:none;font-family:inherit;font-size:12px;font-weight:600;background:var(--bg4);color:var(--lbl2);${editable?'cursor:pointer':'cursor:default;opacity:0.45;pointer-events:none'}`;
+    const btnOn   = `flex:1;padding:7px 0;border-radius:8px;border:1px solid rgba(52,199,89,0.5);font-family:inherit;font-size:12px;font-weight:700;background:rgba(52,199,89,0.2);color:var(--green);${editable?'cursor:pointer':'cursor:default;opacity:0.7;pointer-events:none'}`;
+    const editAttr = editable ? '' : 'disabled';
 
     const fwBtn  = isPar3 ? '' :
-      `<button style="${fwOn?btnOn:btnBase}" onclick="sgToggle(${h},${p},'fw')">${fwOn?'FW ✓':'FW'}</button>`;
+      `<button style="${fwOn?btnOn:btnBase}" ${editable?`onclick="sgToggle(${h},${p},'fw')"`:''} ${editAttr}>${fwOn?'FW ✓':'FW'}</button>`;
     const girBtn =
-      `<button style="${girOn?btnOn:btnBase}" onclick="sgToggle(${h},${p},'gir')">${girOn?'GIR ✓':'GIR'}</button>`;
+      `<button style="${girOn?btnOn:btnBase}" ${editable?`onclick="sgToggle(${h},${p},'gir')"`:''} ${editAttr}>${girOn?'GIR ✓':'GIR'}</button>`;
 
     const putt = d.putt;
     const puttRecorded = putt !== null && putt !== undefined;
+    const puttOpacity = editable ? '' : 'opacity:0.45;pointer-events:none';
 
     const puttWidget = `
       <div style="display:flex;align-items:center;background:var(--bg4);border-radius:8px;overflow:hidden;
-        border:1px solid ${puttRecorded?'rgba(10,132,255,0.3)':'var(--bg4)'};flex-shrink:0">
+        border:1px solid ${puttRecorded?'rgba(10,132,255,0.3)':'var(--bg4)'};flex-shrink:0;${puttOpacity}">
         <button style="width:28px;height:30px;background:none;border:none;color:var(--blue);
-          font-size:18px;font-weight:300;cursor:pointer" onclick="sgChPutt(${h},${p},-1)">−</button>
+          font-size:18px;font-weight:300;${editable?'cursor:pointer':'cursor:default'}" ${editable?`onclick="sgChPutt(${h},${p},-1)"`:''}  ${editAttr}>−</button>
         <div style="min-width:32px;height:30px;display:flex;align-items:center;justify-content:center;
           font-size:14px;font-weight:${puttRecorded?'700':'400'};
           color:${putt===0?'var(--orange)':puttRecorded?'var(--lbl)':'var(--lbl3)'};
-          cursor:pointer;user-select:none" onclick="sgSetPutt1(${h},${p})">
+          ${editable?'cursor:pointer;':''}user-select:none" ${editable?`onclick="sgSetPutt1(${h},${p})"`:''}>
           ${putt===0?'C':puttRecorded?putt:'—'}
         </div>
         <button style="width:28px;height:30px;background:none;border:none;color:var(--blue);
-          font-size:18px;font-weight:300;cursor:pointer" onclick="sgChPutt(${h},${p},1)">+</button>
+          font-size:18px;font-weight:300;${editable?'cursor:pointer':'cursor:default'}" ${editable?`onclick="sgChPutt(${h},${p},1)"`:''}  ${editAttr}>+</button>
       </div>
       <div style="font-size:10px;color:var(--lbl2);min-width:28px;text-align:center">
         ${putt===0?'Chip':puttRecorded?putt+'พัต':'ยังไม่จด'}

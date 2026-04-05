@@ -247,3 +247,30 @@ body.light .tbl-wrap{background:#fff;border:0.5px solid rgba(0,0,0,0.08);box-sha
 }
 .pg-dr.pg-on-dbl{background:rgba(48,209,88,0.2); color:var(--green);font-weight:800}
 .pg-dr.pg-on-re {background:rgba(255,159,10,0.2);color:var(--orange,#ff9f0a);font-weight:800}
+
+/* ============================================================
+   FONT SCALE — ปรับขนาดตัวอักษรและปุ่มทุกส่วน
+   ============================================================ */
+/* ชื่อผู้เล่น */
+.s-name-text{ font-size:calc(17px * var(--fs)) }
+/* สกอร์ + ปุ่ม −/+ */
+.sv{ font-size:calc(19px * var(--fs)) !important; min-width:calc(36px * var(--fs)) }
+.sv.e{ font-size:calc(14px * var(--fs)) !important }
+.sb{ width:calc(34px * var(--fs)) !important; height:calc(38px * var(--fs)) !important; font-size:calc(22px * var(--fs)) !important }
+/* pill group ทีม/เบิ้ล/รี */
+.pg-tb-btn{ font-size:calc(10px * var(--fs)); padding:calc(6px * var(--fs)) 0 }
+.pg-dr{ font-size:calc(10px * var(--fs)); padding:calc(6px * var(--fs)) 0 }
+/* ปุ่มเกม (game toggles) */
+.gt-btn{ font-size:calc(12px * var(--fs)); padding:calc(7px * var(--fs)) calc(10px * var(--fs)) }
+/* DQ / Chip / ลง / ไม่ลง */
+.skip-btn,.down-btn{ font-size:calc(11px * var(--fs)) !important }
+/* Olympic */
+.ob{ font-size:calc(12px * var(--fs)) }
+.ob.ob-rank .rn{ font-size:calc(18px * var(--fs)) }
+/* Srikrung FW/GIR/PUTT */
+.sg-btn{ font-size:calc(12px * var(--fs)) !important }
+/* พาร์ nav */
+#nav-par-val{ font-size:calc(15px * var(--fs)) }
+#nav-hole-num{ font-size:calc(18px * var(--fs)) }
+/* ปุ่มพาร์ทุกคน */
+#nav-par-all{ font-size:calc(13px * var(--fs)) }

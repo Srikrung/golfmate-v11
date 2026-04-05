@@ -201,7 +201,9 @@ export function showHole(h){
       </div>
     </div>`:''}
     ${G.farNear.on&&pars[h]===3?`<div class="fn-wrap"><div class="fn-section-label">🎯 Far-Near</div><select id="fn-mode-${h}" onchange="fnChangeMode(${h},this.value)" style="width:100%;padding:8px 12px;font-size:14px;border-radius:9px;margin-bottom:8px"><option value="none">-- เลือกโหมด --</option><option value="multi">ออน 2 คนขึ้นไป</option><option value="solo">เหมาออนคนเดียว</option></select><div id="fn-ui-${h}" style="display:flex;flex-direction:column;gap:7px"></div></div>`:''}
-    ${G.srikrung.on?`<div class="sg-wrap" id="sg-wrap-${h}"><div class="section-label" style="color:var(--green)">⛳ Srikrung Golf Day</div><div id="sg-players-${h}"></div></div>`:''}
+    ${G.srikrung.on?`<div class="sg-wrap" id="sg-wrap-${h}">
+      <div class="section-label" style="color:var(--green)">⛳ Srikrung Golf Day</div>
+      <div id="sg-players-${h}"></div></div>`:''}
     <div id="hc-sum-${h}" style="border-top:0.5px solid var(--sep)">
       <div onclick="toggleMatrixSection(${h})"
         style="display:flex;align-items:center;justify-content:space-between;padding:9px 14px;cursor:pointer">
@@ -413,6 +415,41 @@ export function buildResults(){
   statRows.forEach(sr=>{tblHTML+=`<tr style="border-bottom:0.5px solid var(--sep)"><td colspan="2" style="text-align:left;font-size:${hfs};font-weight:700;color:${sr.color};padding-left:10px">${sr.label}</td>${stats.map(st=>`<td style="text-align:center;font-size:${fs};color:${st[sr.key]>0?sr.color:'var(--lbl3)'};font-weight:${st[sr.key]>0?700:400};padding:5px 2px">${st[sr.key]>0?st[sr.key]:'—'}</td>`).join('')}</tr>`;});
   tblHTML+=`</tbody></table></div>`;
 
+  // ── Srikrung Summary ──
+  let sgHTML = '';
+  if(G.srikrung.on && srikrungData.length){
+    const sgSt = players.map((pl,p)=>{
+      let fw=0,gir=0,putt=0,chip=0,holes=0;
+      srikrungData.forEach(hd=>{
+        const d=hd[p]; if(!d) return;
+        if(d.fw===true) fw++;
+        if(d.gir===true) gir++;
+        if(d.putt!==null && d.putt!==undefined){ if(d.putt===0) chip++; else putt+=d.putt; holes++; }
+      });
+      return{name:pl.name,fw,gir,putt,chip,holes};
+    });
+    const sgTh=`padding:7px 4px;font-size:${hfs};font-weight:600;color:var(--lbl2);text-align:center;background:var(--bg3);border-bottom:0.5px solid var(--sep)`;
+    sgHTML=`
+    <div class="tbl-wrap"><table class="tbl-inner">
+      <thead><tr>
+        <th style="${sgTh};text-align:left;padding-left:10px">ผู้เล่น</th>
+        <th style="${sgTh}">FW</th>
+        <th style="${sgTh}">GIR</th>
+        <th style="${sgTh}">พัต</th>
+        <th style="${sgTh}">Chip</th>
+      </tr></thead>
+      <tbody>
+        ${sgSt.map(s=>`<tr style="border-bottom:0.5px solid var(--sep)">
+          <td style="font-size:${fs};font-weight:600;color:var(--lbl);padding:6px 4px 6px 10px;white-space:nowrap">${s.name}</td>
+          <td style="text-align:center;font-size:${fs};font-weight:700;color:${s.fw>0?'var(--green)':'var(--lbl3)'};padding:6px 2px">${s.fw>0?s.fw:'—'}</td>
+          <td style="text-align:center;font-size:${fs};font-weight:700;color:${s.gir>0?'var(--blue)':'var(--lbl3)'};padding:6px 2px">${s.gir>0?s.gir:'—'}</td>
+          <td style="text-align:center;font-size:${fs};font-weight:700;color:${s.holes>0?'var(--lbl)':'var(--lbl3)'};padding:6px 2px">${s.holes>0?s.putt:'—'}</td>
+          <td style="text-align:center;font-size:${fs};font-weight:700;color:${s.chip>0?'var(--orange)':'var(--lbl3)'};padding:6px 2px">${s.chip>0?s.chip:'—'}</td>
+        </tr>`).join('')}
+      </tbody>
+    </table></div>`;
+  }
+
   document.getElementById('res-content').innerHTML=`
     <div style="text-align:center;margin-bottom:14px;padding-bottom:12px;border-bottom:0.5px solid var(--sep)">
       <div style="font-size:11px;font-weight:600;color:var(--lbl2);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">⛳ ผลการแข่งขัน</div>
@@ -428,6 +465,17 @@ export function buildResults(){
       <div style="font-size:15px;font-weight:700;color:var(--lbl);margin-bottom:8px">🏆 อันดับ</div>
       ${rankHTML}
     </div>
+    ${sgHTML ? `
+    <div style="margin-top:12px">
+      <button onclick="var b=document.getElementById('sg-res');b.style.display=b.style.display==='none'?'block':'none';this.querySelector('.arr').style.transform=b.style.display==='block'?'rotate(180deg)':''"
+        style="width:100%;display:flex;align-items:center;justify-content:space-between;
+        padding:12px 14px;background:rgba(52,209,88,0.08);border:1.5px solid rgba(52,209,88,0.25);
+        border-radius:12px;cursor:pointer;font-family:inherit">
+        <span style="font-size:14px;font-weight:700;color:var(--green)">⛳ สถิติ Srikrung Golf Day</span>
+        <span class="arr" style="font-size:13px;color:var(--lbl3);transition:transform .2s">▼</span>
+      </button>
+      <div id="sg-res" style="display:none;margin-top:6px">${sgHTML}</div>
+    </div>` : ''}
     <div class="ad-banner" data-html2canvas-ignore="true">
       <div style="font-size:14px;color:var(--lbl)">⛳ ประกันกอล์ฟครอบคลุม Hole-in-One</div>
       <a href="https://insure.724.co.th/golf-insure/u/AM00035138" target="_blank" class="ad-btn">ดูรายละเอียด → www.ศรีกรุง.com</a>

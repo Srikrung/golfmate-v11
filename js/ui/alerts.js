@@ -7,6 +7,7 @@ import { getRoomCode, getApiUrl } from '../firebase/init.js';
 import { getHoleMoney } from '../modules/games.js';
 
 const THEME_KEY='golfmate_theme';
+const FS_KEY='golfmate_fs';
 let exportWho='mine';
 
 export function applyTheme(t){
@@ -20,6 +21,24 @@ export function toggleTheme(){
 }
 export function initTheme(){
   try{applyTheme(localStorage.getItem(THEME_KEY)||'dark');}catch(e){applyTheme('dark');}
+}
+
+// ── Font Scale ──
+export function applyFontScale(fs){
+  document.documentElement.setAttribute('data-fs',fs||'S');
+  // อัปเดต UI ปุ่ม
+  ['S','M','L','XL'].forEach(k=>{
+    const btn=document.getElementById('fs-btn-'+k);
+    if(!btn)return;
+    const on=k===(fs||'S');
+    btn.style.background=on?'rgba(10,132,255,0.18)':'transparent';
+    btn.style.color=on?'var(--blue)':'var(--lbl2)';
+    btn.style.borderColor=on?'rgba(10,132,255,0.5)':'var(--bg4)';
+  });
+  try{localStorage.setItem(FS_KEY,fs||'S');}catch(e){}
+}
+export function initFontScale(){
+  try{applyFontScale(localStorage.getItem(FS_KEY)||'S');}catch(e){applyFontScale('S');}
 }
 
 export function showExportModal(){

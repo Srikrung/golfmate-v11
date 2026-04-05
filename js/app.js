@@ -10,7 +10,7 @@ import { players, scores, pars, G,
          isGameStarted, getCurrentHole, LS_KEY } from './config.js';
 
 // ── ui ──
-import { initTheme, toggleTheme,
+import { initTheme, toggleTheme, applyFontScale, initFontScale,
          showExportModal, hideExportModal,
          setExportWho, doExport } from './ui/alerts.js';
 import { initSwipe, goTab, goGuide, goResults, goMoney,
@@ -28,7 +28,8 @@ import { initHcapPairs, addHcapPairsForPlayer, buildHcapUI,
 import { updateBiteMultUI, toggleBiteMult,
          toggleGameMidPlay, olyAct, olyReset, olyRenderHole,
          fnChangeMode, fnToggleSank, fnSelectPlayer, fnRenderHole } from './modules/games.js';
-import { sgToggle, sgChPutt, sgSetPutt1 } from './modules/srikrung.js';
+import { sgToggle, sgChPutt, sgSetPutt1, sgRenderHole,
+         sgToggleFocus, getSgFocusPlayer } from './modules/srikrung.js';
 import { joinRoomLookup, selectJoinPlayer, restoreJoinSrikrung,
          loadOnlineRooms, joinFromRoomList } from './modules/join.js';
 import { chScore, startRpt, stopRpt, sws, swm, swe,
@@ -47,6 +48,7 @@ import { registerAllPlayers, syncFullBackup, restoreFromFirebase,
 // ============================================================
 document.addEventListener('DOMContentLoaded', () => {
   initTheme();
+  initFontScale();
   setTimeout(() => document.getElementById('splash')?.classList.add('hide'), 1200);
   setToday();
   const preset = document.getElementById('course-preset');
@@ -100,6 +102,7 @@ document.addEventListener('DOMContentLoaded', () => {
     hcapTogglePair, hcapSetStroke, hcapSetField, buildHcapUI,
     // srikrung
     sgToggle, sgChPutt, sgSetPutt1,
+    sgSetFocusAll, sgSetFocusMe,
     // leaderboard
     goLeaderboard, lbGoPrev, lbGoNext, lbSetTab, lbSetRoom, lbFetch,
     // firebase
@@ -112,7 +115,7 @@ document.addEventListener('DOMContentLoaded', () => {
     loadOnlineRooms, joinFromRoomList,
     // export / share
     showExportModal, hideExportModal, setExportWho, doExport,
-    toggleTheme,
+    toggleTheme, applyFontScale,
     // collapse
     toggleSkipSection, toggleMatrixSection, chParNav,
   });
@@ -141,11 +144,18 @@ export function toggleSw(id){
   document.getElementById(`sw-${id}`)?.classList.toggle('on', G[id].on);
   const body = document.getElementById(`gb-${id}`);
   if(body) body.style.display = G[id].on ? 'block' : 'none';
+  // Srikrung: แสดง/ซ่อน focus row และสร้างปุ่มเลือกคน
+  if(id === 'srikrung'){
+    const row = document.getElementById('sg-focus-row');
+    if(row) row.style.display = G.srikrung.on ? 'block' : 'none';
+    if(G.srikrung.on) _sgBuildFocusBtns();
+  }
   if(isGameStarted()){
     const sy = window.scrollY;
     showHole(getCurrentHole());
     requestAnimationFrame(() => window.scrollTo(0, sy));
   }
+  autoSave();
 }
 
 // ============================================================
@@ -230,6 +240,37 @@ export function setH2HSize(sz){}
 // ============================================================
 // NEW GAME
 // ============================================================
+export function sgSetFocusAll(){
+  sgToggleFocus(null); // รีเซ็ตเป็น ทุกคน
+  _sgUpdateFocusBtns(null);
+  // re-render ทุกหลุม
+  for(let h=0;h<18;h++){ if(document.getElementById('sg-players-'+h)) sgRenderHole(h); }
+}
+export function sgSetFocusMe(p){
+  sgToggleFocus(p);
+  _sgUpdateFocusBtns(p);
+  for(let h=0;h<18;h++){ if(document.getElementById('sg-players-'+h)) sgRenderHole(h); }
+}
+function _sgBuildFocusBtns(){
+  const wrap=document.getElementById('sg-focus-btns'); if(!wrap) return;
+  const focus=getSgFocusPlayer();
+  wrap.innerHTML=`<button onclick="sgSetFocusAll()" id="sg-focus-all"
+    style="padding:6px 14px;border-radius:999px;border:1.5px solid ${focus===null?'rgba(52,199,89,0.45)':'var(--bg4)'};
+    background:${focus===null?'rgba(52,199,89,0.12)':'transparent'};
+    color:${focus===null?'var(--green)':'var(--lbl2)'};
+    font-family:inherit;font-size:12px;font-weight:700;cursor:pointer">ทุกคน (Host)</button>`
+    +players.map((pl,i)=>`<button onclick="sgSetFocusMe(${i})" id="sg-focus-${i}"
+      style="padding:6px 14px;border-radius:999px;border:1.5px solid ${focus===i?'rgba(10,132,255,0.45)':'var(--bg4)'};
+      background:${focus===i?'rgba(10,132,255,0.12)':'transparent'};
+      color:${focus===i?'var(--blue)':'var(--lbl2)'};
+      font-family:inherit;font-size:12px;font-weight:700;cursor:pointer">${pl.name}</button>`).join('');
+}
+function _sgUpdateFocusBtns(focus){
+  const all=document.getElementById('sg-focus-all');
+  if(all){all.style.background=focus===null?'rgba(52,199,89,0.12)':'transparent';all.style.borderColor=focus===null?'rgba(52,199,89,0.45)':'var(--bg4)';all.style.color=focus===null?'var(--green)':'var(--lbl2)';}
+  players.forEach((_,i)=>{const b=document.getElementById('sg-focus-'+i);if(!b)return;const on=focus===i;b.style.background=on?'rgba(10,132,255,0.12)':'transparent';b.style.borderColor=on?'rgba(10,132,255,0.45)':'var(--bg4)';b.style.color=on?'var(--blue)':'var(--lbl2)';});
+}
+
 export function newGame(){
   if(confirm('เริ่มเกมใหม่?')){
     setGameStarted(false);

@@ -218,9 +218,56 @@
       <div class="r-text"><div class="r-title">Srikrung Golf Day</div><div class="r-sub">เก็บคะแนน FW · GIR · PUTT · ตัวแทน 1 คนจดสกอร์ · แต่ละคนจด FW/GIR/PUTT ตัวเอง</div></div>
       <div class="sw" id="sw-srikrung" onclick="toggleSw('srikrung')"></div>
     </div>
+    <!-- กรองดูของฉัน -->
+    <div id="sg-focus-row" style="display:none;padding:10px 14px;border-top:0.5px solid var(--sep)">
+      <div style="font-size:12px;color:var(--lbl2);margin-bottom:8px;font-weight:600">ฉันคือ (จด FW/GIR/PUTT ของตัวเอง)</div>
+      <div id="sg-focus-btns" style="display:flex;flex-wrap:wrap;gap:6px">
+        <button onclick="sgSetFocusAll()" id="sg-focus-all"
+          style="padding:6px 14px;border-radius:999px;border:1.5px solid rgba(52,199,89,0.45);
+          background:rgba(52,199,89,0.12);color:var(--green);
+          font-family:inherit;font-size:12px;font-weight:700;cursor:pointer">
+          ทุกคน (Host)
+        </button>
+      </div>
+    </div>
   </div>
 
-
+  <!-- ── ขนาดตัวอักษร ── -->
+  <div class="sec-h">การแสดงผล</div>
+  <div class="group">
+    <div style="padding:13px 14px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <div>
+          <div class="r-title">ขนาดตัวอักษร</div>
+          <div class="r-sub">เพิ่มขนาดเพื่อให้อ่านง่ายขึ้น</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:6px">
+        <button id="fs-btn-S" onclick="applyFontScale('S')"
+          style="flex:1;padding:9px 0;border-radius:10px;border:1.5px solid var(--bg4);
+          background:rgba(10,132,255,0.18);color:var(--blue);border-color:rgba(10,132,255,0.5);
+          font-family:inherit;font-size:14px;font-weight:700;cursor:pointer">ก</button>
+        <button id="fs-btn-M" onclick="applyFontScale('M')"
+          style="flex:1;padding:9px 0;border-radius:10px;border:1.5px solid var(--bg4);
+          background:transparent;color:var(--lbl2);
+          font-family:inherit;font-size:16px;font-weight:700;cursor:pointer">ก</button>
+        <button id="fs-btn-L" onclick="applyFontScale('L')"
+          style="flex:1;padding:9px 0;border-radius:10px;border:1.5px solid var(--bg4);
+          background:transparent;color:var(--lbl2);
+          font-family:inherit;font-size:19px;font-weight:700;cursor:pointer">ก</button>
+        <button id="fs-btn-XL" onclick="applyFontScale('XL')"
+          style="flex:1;padding:9px 0;border-radius:10px;border:1.5px solid var(--bg4);
+          background:transparent;color:var(--lbl2);
+          font-family:inherit;font-size:23px;font-weight:700;cursor:pointer">ก</button>
+      </div>
+      <div style="display:flex;justify-content:space-between;margin-top:5px;padding:0 4px">
+        <span style="font-size:10px;color:var(--lbl3)">ปกติ</span>
+        <span style="font-size:10px;color:var(--lbl3)">ใหญ่</span>
+        <span style="font-size:10px;color:var(--lbl3)">ใหญ่มาก</span>
+        <span style="font-size:10px;color:var(--lbl3)">ใหญ่สุด</span>
+      </div>
+    </div>
+  </div>
 
   <div class="group" style="margin-bottom:16px;cursor:pointer" onclick="goGuide()">
     <div style="display:flex;align-items:center;padding:13px 14px;gap:12px">
