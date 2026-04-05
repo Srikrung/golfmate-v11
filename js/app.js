@@ -151,22 +151,15 @@ export function toggleSw(id){
 export function toggleTeamScorecard(h, p){
   const isSolo = teamSoloPlayers.has(p);
   const isOut  = skipData[h]?.[p]?.has('team');
-  const cur    = (() => {
-    if(G.team.swapType==='domo') return G.team.domoTeams[h]?.[p]||'A';
-    let base=G.team.baseTeams[p]||'A';
-    const interval=parseInt(G.team.swapType);
-    if(!isNaN(interval)&&interval>0) base=((Math.floor(h/interval)+players.indexOf(players[p]))%2===0)?'A':'B';
-    return base;
-  })();
+  const cur    = G.team.domoTeams[h]?.[p] || 'A';
 
   if(isOut){
-    // ไม่เล่น → กลับ A
+    // ไม่เล่น → กลับ A — เฉพาะหลุมนี้
     skipData[h][p].delete('team');
     teamSoloPlayers.delete(p);
-    if(G.team.swapType==='domo') G.team.domoTeams[h][p]='A';
-    else G.team.baseTeams[p]='A';
+    G.team.domoTeams[h][p] = 'A';
   } else if(isSolo){
-    // Solo → ไม่เล่น
+    // Solo → ไม่เล่น — เฉพาะหลุมนี้
     teamSoloPlayers.delete(p);
     if(!skipData[h]){ skipData[h]=Array(players.length).fill(null).map(()=>new Set()); }
     else { while(skipData[h].length<players.length) skipData[h].push(new Set()); }
@@ -176,10 +169,8 @@ export function toggleTeamScorecard(h, p){
     // B → Solo
     teamSoloPlayers.add(p);
   } else {
-    // A → B
-    const nxt = cur==='A'?'B':'A';
-    if(G.team.swapType==='domo') G.team.domoTeams[h][p]=nxt;
-    else G.team.baseTeams[p]=nxt;
+    // A → B — เฉพาะหลุมนี้
+    G.team.domoTeams[h][p] = 'B';
   }
   // อัปเดต badge เฉพาะจุด ไม่ต้อง render ทั้งหน้า
   const el = document.getElementById(`tb-${h}-${p}`);
@@ -377,7 +368,8 @@ export function loadSession(){
     if(!data?.v || !data.players?.length) return;
     const names = data.players.map(p => p.name).join(', ');
     if(!confirm(`พบเกมเก่า: ${names}\n${fmtDate(data.gameDate)||''}\nต่อจากที่ค้างไว้ไหมครับ?`)){
-      localStorage.removeItem(LS_KEY); return;
+      // กด Cancel → ไม่โหลด แต่ไม่ลบ ข้อมูลยังอยู่ใน localStorage
+      return;
     }
     setPlayers(data.players);
     setScores(data.scores);
