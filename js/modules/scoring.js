@@ -9,7 +9,10 @@ let rptT=null, rptI=null;
 
 export function chScore(h,p,d){
   if(scores[p][h]===null) scores[p][h]=pars[h]+d;
-  else scores[p][h]=Math.max(1,Math.min(20,scores[p][h]+d));
+  else {
+    const next = scores[p][h]+d;
+    scores[p][h] = next < 1 ? null : Math.min(20, next); // กดค้าง − จาก 1 → null
+  }
   refWidget(h,p);updateTotals();autoSave();
 }
 export function startRpt(h,p,d){
