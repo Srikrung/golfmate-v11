@@ -5,9 +5,12 @@ import { FB_URL } from '../config.js';
 import { getRoomCode, getApiUrl, showSyncBar,
          syncEnabled, joinMode, joinPlayerName } from './init.js';
 import { getRoomConfig, lockRoom } from './room.js';
+import { fetchWithTimeout } from './init.js';
 
 // ── state ที่ใช้ร่วมกัน (import จาก config) ──
-import { players, scores, pars, srikrungData, G } from '../config.js';
+import { players, scores, pars, srikrungData, G,
+         olympicData, farNearData, skipData, teamSoloPlayers,
+         LS_KEY, autoSave } from '../config.js';
 
 export async function syncToFirebase(){
   if(!syncEnabled)return;
@@ -111,3 +114,142 @@ export async function registerAllPlayers(){
 
 // import นี้อยู่ด้านล่างเพื่อหลีกเลี่ยง circular import
 import { syncJoinToFirebase } from '../modules/join.js';
+
+// ── ลบห้องทั้งหมดออกจาก Firebase (Host only) ──
+export async function deleteRoomFromFirebase(){
+  const statusEl = document.getElementById('delete-player-status');
+  const show = (msg, color) => {
+    if(!statusEl) return;
+    statusEl.style.display='block';
+    statusEl.style.background=color;
+    statusEl.style.color='#fff';
+    statusEl.textContent=msg;
+  };
+  let room='', safeDateKey='';
+  try{
+    const saved = JSON.parse(localStorage.getItem('golfmate_online')||'{}');
+    room = saved.room||'';
+    const raw = JSON.parse(localStorage.getItem(LS_KEY)||'{}');
+    const gameDate = raw.gameDate || document.getElementById('game-date')?.value
+      || new Date().toISOString().split('T')[0];
+    safeDateKey = gameDate.replace(/-/g,'');
+  }catch(e){}
+  if(!room||room==='DEFAULT'){
+    show('❌ ไม่พบ Room Code — ตั้งค่าออนไลน์ก่อน','rgba(255,69,58,0.9)'); return;
+  }
+  if(!confirm(`ลบห้อง "${room}" ทั้งหมดออกจาก Firebase?\nสกอร์ทุกคนในห้องนี้จะหายถาวร`)) return;
+  show('⟳ กำลังลบ...','rgba(255,69,58,0.9)');
+  try{
+    await fetchWithTimeout(`${FB_URL}/scores/${safeDateKey}/${room}.json`,{method:'DELETE'},8000);
+    await fetchWithTimeout(`${FB_URL}/backup/${safeDateKey}/${room}.json`,{method:'DELETE'},8000);
+    show(`✅ ลบห้อง "${room}" สำเร็จ — สร้างห้องใหม่ได้เลย`,'rgba(48,209,88,0.9)');
+  }catch(e){
+    show(e.name==='AbortError'?'⌛ หมดเวลา':'❌ ลบไม่สำเร็จ','rgba(255,69,58,0.9)');
+  }
+}
+
+export async function syncFullBackup(){
+  if(!syncEnabled) return;
+  const room = getRoomCode();
+  if(!room || room==='DEFAULT') return;
+  const gameDate = document.getElementById('game-date')?.value
+    || new Date().toISOString().split('T')[0];
+  const safeDateKey = gameDate.replace(/-/g,'');
+
+  const payload = {
+    v: 1,
+    players, scores, pars,
+    currentHole: (() => {
+      try{ return JSON.parse(localStorage.getItem(LS_KEY)||'{}').currentHole||0; }catch(e){return 0;}
+    })(),
+    G:{
+      bite:    {on:G.bite.on,    val:G.bite.val,    mults:G.bite.mults},
+      olympic: {on:G.olympic.on, val:G.olympic.val},
+      team:    {on:G.team.on,    val:G.team.val,    chuanVal:G.team.chuanVal,
+                mode:G.team.mode, swapType:G.team.swapType,
+                baseTeams:G.team.baseTeams, domoTeams:G.team.domoTeams},
+      farNear: {on:G.farNear.on, val:G.farNear.val},
+      turbo:   {on:G.turbo.on,   holes:[...G.turbo.holes], mult:G.turbo.mult},
+      doubleRe:{on:G.doubleRe.on,mults:G.doubleRe.mults},
+      srikrung:{on:G.srikrung.on},
+      hcap:    {on:G.hcap.on,    pairs:G.hcap.pairs.map(p=>({...p}))}
+    },
+    olympicData,
+    farNearData,
+    srikrungData,
+    skipData: skipData.map(row => row.map(s => [...s])),
+    teamSoloPlayers: [...teamSoloPlayers],
+    courseName: document.getElementById('course-name')?.value || '—',
+    gameDate,
+    backedUpAt: Date.now()
+  };
+
+  try{
+    await fetchWithTimeout(
+      `${FB_URL}/backup/${safeDateKey}/${room}/session.json`,
+      { method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload) },
+      8000
+    );
+  } catch(e){ /* silent fail — ไม่รบกวน UX */ }
+}
+
+// ── RESTORE จาก Firebase ──
+export async function restoreFromFirebase(){
+  const statusEl = document.getElementById('restore-status');
+  const show = (msg, color) => {
+    if(!statusEl) return;
+    statusEl.style.display='block';
+    statusEl.style.background=color;
+    statusEl.style.color='#fff';
+    statusEl.textContent=msg;
+  };
+
+  show('⟳ กำลังค้นหาข้อมูล...', 'rgba(10,132,255,0.9)');
+
+  // ดึง room + date จาก localStorage อัตโนมัติ
+  let room='', safeDateKey='';
+  try{
+    const saved = JSON.parse(localStorage.getItem('golfmate_online')||'{}');
+    room = saved.room||'';
+    const raw = JSON.parse(localStorage.getItem(LS_KEY)||'{}');
+    const gameDate = raw.gameDate || document.getElementById('game-date')?.value
+      || new Date().toISOString().split('T')[0];
+    safeDateKey = gameDate.replace(/-/g,'');
+  } catch(e){}
+
+  // ถ้าไม่มีใน LS ให้กรอกเอง
+  if(!room || room==='DEFAULT'){
+    room = prompt('กรอก Room Code (เช่น A12):');
+    if(!room){ show('❌ ยกเลิก','rgba(255,69,58,0.9)'); return; }
+    const dateInput = prompt('กรอกวันที่ (YYYY-MM-DD):');
+    if(!dateInput){ show('❌ ยกเลิก','rgba(255,69,58,0.9)'); return; }
+    safeDateKey = dateInput.replace(/-/g,'');
+  }
+
+  try{
+    const res = await fetchWithTimeout(
+      `${FB_URL}/backup/${safeDateKey}/${room}/session.json`,
+      {}, 8000
+    );
+    if(!res.ok){ show('❌ ไม่พบข้อมูล — ตรวจสอบ Room Code หรือวันที่','rgba(255,69,58,0.9)'); return; }
+    const data = await res.json();
+    if(!data?.players?.length){ show('❌ ข้อมูลไม่สมบูรณ์','rgba(255,69,58,0.9)'); return; }
+
+    const names = data.players.map(p=>p.name).join(', ');
+    const holes = data.scores?.[0]?.filter(v=>v!==null).length || 0;
+    const backedAt = data.backedUpAt ? new Date(data.backedUpAt).toLocaleTimeString('th-TH') : '—';
+
+    if(!confirm(`พบข้อมูล:\n👥 ${names}\n⛳ ${holes}/18 หลุม\n🕐 บันทึกเมื่อ ${backedAt}\n\nกู้คืนเกมนี้ไหมครับ?`)){
+      show('ยกเลิกการกู้คืน','rgba(255,159,10,0.9)'); return;
+    }
+
+    // บันทึกลง localStorage แล้ว reload
+    localStorage.setItem(LS_KEY, JSON.stringify({...data, v:1}));
+    show('✅ กู้คืนสำเร็จ! กำลังโหลด...','rgba(48,209,88,0.9)');
+    setTimeout(()=>window.location.reload(), 1200);
+
+  } catch(e){
+    if(e.name==='AbortError') show('⌛ หมดเวลา — ตรวจสอบสัญญาณ','rgba(255,69,58,0.9)');
+    else show('✗ เกิดข้อผิดพลาด','rgba(255,69,58,0.9)');
+  }
+}

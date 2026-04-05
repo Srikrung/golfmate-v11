@@ -167,10 +167,10 @@ export function lbSwipeRoom(dir){
 
 export function lbSetTab(t){
   lbTab=t;
-  ['score','stats','sg'].forEach(k=>{
+  ['score','stats','sg','rooms'].forEach(k=>{
     const el=document.getElementById('lb-t-'+k);if(!el)return;
     const on=k===t;
-    const col=k==='score'?'var(--blue)':k==='stats'?'var(--orange)':'var(--green)';
+    const col=k==='score'?'var(--blue)':k==='stats'?'var(--orange)':k==='rooms'?'var(--green)':'var(--green)';
     el.style.background=on?col:'var(--bg2)';el.style.color=on?'#fff':'var(--lbl2)';
   });
   lbRender();
@@ -184,10 +184,91 @@ export function lbRender(){
     return an-bn;
   });
   const content=document.getElementById('lb-content');
+  if(lbTab==='rooms'){ lbRenderRooms(content); return; }
   if(!list.length){content.innerHTML='<div style="text-align:center;padding:40px 0;color:var(--lbl2);font-size:14px">⛳ ยังไม่มีข้อมูล</div>';return;}
   if(lbTab==='score')lbRenderScore(list,content);
   else if(lbTab==='stats')lbRenderStats(list,content);
   else lbRenderSG(list,content);
+}
+
+export function lbRenderRooms(el){
+  // จัดกลุ่มผู้เล่นตาม room
+  const roomMap={};
+  lbAllP.forEach(p=>{
+    const r=p.room||'—';
+    if(!roomMap[r]) roomMap[r]=[];
+    roomMap[r].push(p);
+  });
+  const rooms=Object.keys(roomMap).sort();
+  if(!rooms.length){
+    el.innerHTML='<div style="text-align:center;padding:40px 0;color:var(--lbl2);font-size:14px">⛳ ยังไม่มีห้องออนไลน์วันนี้</div>';
+    return;
+  }
+  const total=lbAllP.length;
+  const L=document.body.classList.contains('light');
+  const cardBg=L?'#ffffff':'var(--bg2)';
+  const borderBase=L?'rgba(0,0,0,0.06)':'rgba(255,255,255,0.08)';
+
+  let html=`<div style="display:flex;gap:8px;margin-bottom:10px;padding:10px 12px;
+    background:${L?'rgba(0,122,255,0.06)':'rgba(77,163,255,0.08)'};
+    border-radius:12px;border:1px solid ${L?'rgba(0,122,255,0.15)':'rgba(77,163,255,0.2)'}">
+    <div style="flex:1;text-align:center">
+      <div style="font-size:20px;font-weight:800;color:var(--blue)">${rooms.length}</div>
+      <div style="font-size:10px;color:var(--lbl2);font-weight:500">ห้องทั้งหมด</div>
+    </div>
+    <div style="width:0.5px;background:var(--sep)"></div>
+    <div style="flex:1;text-align:center">
+      <div style="font-size:20px;font-weight:800;color:var(--green)">${total}</div>
+      <div style="font-size:10px;color:var(--lbl2);font-weight:500">ผู้เล่น</div>
+    </div>
+  </div>`;
+
+  const colors=['var(--blue)','var(--red)','var(--green)','var(--orange)','var(--purple,#bf5af2)'];
+  rooms.forEach((room,ri)=>{
+    const players=roomMap[room];
+    const holes=Math.max(...players.map(p=>p.holesPlayed||0));
+    const full=players.every(p=>(p.holesPlayed||0)>0);
+    const color=colors[ri%colors.length];
+    const bgColor=`rgba(${color==='var(--blue)'?'77,163,255':color==='var(--red)'?'255,92,82':color==='var(--green)'?'52,209,122':color==='var(--orange)'?'255,159,10':'191,90,242'},0.12)`;
+
+    html+=`<div style="background:${cardBg};border-radius:12px;border:1px solid ${borderBase};
+      margin-bottom:8px;overflow:hidden">
+      <div onclick="var b=this.nextElementSibling;b.style.display=b.style.display==='block'?'none':'block';this.querySelector('.rarr').textContent=b.style.display==='block'?'▼':'▶'"
+        style="display:flex;align-items:center;gap:10px;padding:11px 13px;cursor:pointer">
+        <div style="width:40px;height:40px;border-radius:10px;background:${bgColor};
+          display:flex;align-items:center;justify-content:center;
+          font-size:13px;font-weight:800;color:${color};flex-shrink:0;letter-spacing:-0.5px">${room}</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:14px;font-weight:700;color:var(--lbl)">${players[0]?.course||'ไม่ระบุสนาม'}</div>
+          <div style="font-size:11px;color:var(--lbl2);margin-top:2px">${players.length} คน · หลุม ${holes}/18</div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:3px;flex-shrink:0">
+          <span style="font-size:11px;font-weight:700;padding:3px 8px;border-radius:999px;
+            background:${full?'rgba(52,209,122,0.15)':'rgba(255,159,10,0.15)'};
+            color:${full?'var(--green)':'var(--orange)'}">
+            ${players.length} คน ${full?'✓':''}
+          </span>
+          <span class="rarr" style="font-size:11px;color:var(--lbl3)">▶</span>
+        </div>
+      </div>
+      <div style="display:none;border-top:0.5px solid var(--sep);padding:8px 13px 10px">
+        <div style="display:flex;flex-wrap:wrap;gap:5px">
+          ${players.map((p,i)=>{
+            const isHost = i===0;
+            const hasSynced = (p.holesPlayed||0)>0;
+            const badge = isHost?'🎮 Host':hasSynced?'✓ Sync':'รอ...';
+            const bg = isHost?'rgba(255,214,10,0.12)':hasSynced?'rgba(52,209,122,0.1)':'rgba(255,255,255,0.05)';
+            const cl = isHost?'var(--yellow)':hasSynced?'var(--green)':'var(--lbl3)';
+            return `<span style="display:inline-flex;align-items:center;gap:3px;padding:5px 9px;
+              border-radius:999px;font-size:11px;font-weight:700;background:${bg};color:${cl}">
+              ${badge} ${p.name}</span>`;
+          }).join('')}
+        </div>
+      </div>
+    </div>`;
+  });
+
+  el.innerHTML=html;
 }
 
 export function lbScoreChip(s,par,fs){

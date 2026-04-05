@@ -7,7 +7,7 @@ import { G, players, scores, pars, courseDB,
 import { buildHcapUI } from '../modules/handicap.js';
 import { updateBiteMultUI } from '../modules/games.js';
 import { buildResults, buildMoney, showHole, updateTotals } from './render.js';
-import { syncAll } from '../firebase/sync.js';
+import { syncAll, syncFullBackup } from '../firebase/sync.js';
 import { lbStopTimers } from '../modules/leaderboard.js';
 
 // ── clearSession ไม่ import จาก app.js เพราะ circular
@@ -232,7 +232,9 @@ export function holeNav(dir){
   const next = cur + dir;
   if(next < 0) return;
   if(next > 17){ syncAll(); goResults(); return; }
-  syncAll(); setCurrentHole(next); showHole(next);
+  syncAll();
+  syncFullBackup(); // backup ทุกหลุม
+  setCurrentHole(next); showHole(next);
 }
 
 // ============================================================

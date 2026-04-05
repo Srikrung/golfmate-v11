@@ -69,6 +69,7 @@ export function sgToggle(h, p, field){
   srikrungData[h][p][field] = !srikrungData[h][p][field];
   sgRenderHole(h);
   autoSave();
+  saveSrikrungLocal();
 }
 
 export function sgChPutt(h, p, d){
@@ -77,14 +78,25 @@ export function sgChPutt(h, p, d){
   srikrungData[h][p].putt = Math.max(0, Math.min(6, (cur === null ? 1 : cur) + d));
   sgRenderHole(h);
   autoSave();
+  saveSrikrungLocal();
 }
 
 export function sgSetPutt1(h, p){
   if(!srikrungData[h]?.[p]) return;
-  // กดช่องกลาง: null → 1, 1 → 1 (คงเดิม), อื่น → 1
   srikrungData[h][p].putt = 1;
   sgRenderHole(h);
   autoSave();
+  saveSrikrungLocal();
+}
+
+// บันทึก srikrungData ลง localStorage แยก (ป้องกัน refresh หาย)
+export function saveSrikrungLocal(){
+  try{
+    localStorage.setItem('golfmate_srikrung', JSON.stringify({
+      data: srikrungData,
+      updatedAt: Date.now()
+    }));
+  }catch(e){}
 }
 
 // ─────────────────────────────────────────

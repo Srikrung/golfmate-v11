@@ -20,7 +20,7 @@ import { initSwipe, goTab, goGuide, goResults, goMoney,
 import { showHole, updateTotals, drSet, _refreshOlyInline,
          getTeamBadgeHTML, getTeamBadgeProps,
          setHoleMatrixPill, setMatrixPill, lbToggleMatrix,
-         buildResults, buildMoney } from './ui/render.js';
+         buildResults, buildMoney, showMoneyDetail } from './ui/render.js';
 
 // ── modules ──
 import { initHcapPairs, addHcapPairsForPlayer, buildHcapUI,
@@ -29,16 +29,18 @@ import { updateBiteMultUI, toggleBiteMult,
          toggleGameMidPlay, olyAct, olyReset, olyRenderHole,
          fnChangeMode, fnToggleSank, fnSelectPlayer, fnRenderHole } from './modules/games.js';
 import { sgToggle, sgChPutt, sgSetPutt1 } from './modules/srikrung.js';
-import { joinRoomLookup, selectJoinPlayer } from './modules/join.js';
+import { joinRoomLookup, selectJoinPlayer, restoreJoinSrikrung,
+         loadOnlineRooms, joinFromRoomList } from './modules/join.js';
 import { chScore, startRpt, stopRpt, sws, swm, swe,
          setParAll, chPar } from './modules/scoring.js';
 import { goLeaderboard, lbGoPrev, lbGoNext,
          lbSetTab, lbSetRoom, lbFetch } from './modules/leaderboard.js';
 
 // ── firebase ──
-import { toggleSyncSw, updateRoomCode } from './firebase/init.js';
+import { toggleSyncSw, updateRoomCode, syncEnabled } from './firebase/init.js';
 import { loadOnlineSetting, goOnlineSetup, saveOnlineSetup, testConnection } from './firebase/room.js';
-import { registerAllPlayers } from './firebase/sync.js';
+import { registerAllPlayers, syncFullBackup, restoreFromFirebase,
+         deleteRoomFromFirebase } from './firebase/sync.js';
 
 // ============================================================
 // INIT
@@ -83,7 +85,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // course
     changeCoursePreset, applyParsFromPreset,
     // tabs/nav
-    goTab, goGuide, goResults, goMoney,
+    goTab, goGuide, goResults, goMoney, showMoneyDetail,
     buildParGrid, renderPlayerRows, buildTurboGrid,
     buildProgressBar, updateProgressBar, holeNav, toggleTH,
     // scoring
@@ -103,8 +105,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // firebase
     toggleSyncSw, updateRoomCode,
     goOnlineSetup, saveOnlineSetup, testConnection, registerAllPlayers,
+    restoreFromFirebase, restoreJoinSrikrung,
+    deleteRoomFromFirebase,
     // join
-    joinRoomLookup, selectJoinPlayer,
+    joinRoomLookup, selectJoinPlayer, restoreJoinSrikrung,
+    loadOnlineRooms, joinFromRoomList,
     // export / share
     showExportModal, hideExportModal, setExportWho, doExport,
     toggleTheme,
@@ -316,6 +321,8 @@ export function confirmAddPlayer(){
   }
   updateAddPlayerBtn(); hideAddPlayerModal();
   showHole(getCurrentHole()); autoSave();
+  // auto SAVE GAME ถ้า Sync เปิดอยู่
+  if(syncEnabled) registerAllPlayers();
 }
 export function updateAddPlayerBtn(){
   const btn = document.getElementById('btn-add-player'); if(!btn) return;
@@ -456,7 +463,7 @@ Object.assign(window, {
   updateAddPlayerBtn, saveSession, loadSession, clearSession, autoSave,
   shareToLine,
   changeCoursePreset, applyParsFromPreset,
-  goTab, goGuide, goResults, goMoney,
+  goTab, goGuide, goResults, goMoney, showMoneyDetail,
   buildParGrid, renderPlayerRows, buildTurboGrid,
   buildProgressBar, updateProgressBar, holeNav, toggleTH,
   chScore, startRpt, stopRpt, sws, swm, swe, setParAll, chPar, drSet,

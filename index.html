@@ -63,6 +63,38 @@
     </div>
   </div>
 
+  <!-- ── ปุ่มกู้คืน — มองเห็นได้เลยไม่ต้องกดเข้าเมนู ── -->
+  <div style="display:flex;flex-direction:column;gap:7px;margin-bottom:8px">
+    <button onclick="restoreFromFirebase()"
+      style="width:100%;padding:13px 14px;border-radius:12px;text-align:left;
+      border:1.5px solid rgba(10,132,255,0.35);background:rgba(10,132,255,0.07);
+      color:var(--blue);font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;
+      display:flex;align-items:center;gap:10px">
+      <span style="font-size:18px">🔄</span>
+      <div>
+        <div>กู้คืนเกม</div>
+        <div style="font-size:11px;font-weight:500;color:var(--lbl2);margin-top:1px">สำหรับ Host — ดึงสกอร์+เกมจาก Firebase</div>
+      </div>
+    </button>
+    <div id="restore-status"
+      style="display:none;text-align:center;font-size:13px;font-weight:600;
+      padding:9px 12px;border-radius:10px"></div>
+    <button onclick="restoreJoinSrikrung()"
+      style="width:100%;padding:13px 14px;border-radius:12px;text-align:left;
+      border:1.5px solid rgba(48,209,88,0.35);background:rgba(48,209,88,0.07);
+      color:var(--green);font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;
+      display:flex;align-items:center;gap:10px">
+      <span style="font-size:18px">🔄</span>
+      <div>
+        <div>กู้คืน FW/GIR/PUTT</div>
+        <div style="font-size:11px;font-weight:500;color:var(--lbl2);margin-top:1px">สำหรับ Join — ดึงสถิติจาก Firebase</div>
+      </div>
+    </button>
+    <div id="restore-join-status"
+      style="display:none;text-align:center;font-size:13px;font-weight:600;
+      padding:9px 12px;border-radius:10px"></div>
+  </div>
+
   <div class="sec-h">สนาม & วันที่</div>
   <div class="group">
     <div class="row">
@@ -268,90 +300,47 @@
 
 <!-- ONLINE SETUP -->
 <div class="screen" id="scr-online">
-  <div style="max-width:600px;margin:0 auto;padding-bottom:20px">
+  <div style="max-width:600px;margin:0 auto;padding-bottom:30px">
 
-    <!-- Header -->
-    <div style="text-align:center;padding:10px 0 20px">
-      <div style="font-size:40px;margin-bottom:8px">📡</div>
-      <div style="font-size:22px;font-weight:800;color:var(--lbl)">Online Leaderboard</div>
-      <div style="font-size:13px;color:var(--lbl2);margin-top:4px">ให้ทุกคนดูสกอร์แบบ real-time</div>
-    </div>
-
-    <!-- วิธีใช้งาน -->
-    <div style="background:var(--bg2);border-radius:14px;padding:16px;margin-bottom:12px;box-shadow:var(--card-shadow)">
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
-        <span style="font-size:20px">🚀</span>
-        <div style="font-size:15px;font-weight:700;color:var(--lbl)">วิธีใช้งาน <span style="font-size:12px;font-weight:500;color:var(--lbl2)">(สำหรับผู้จัดกลุ่ม)</span></div>
+    <!-- วิธีใช้งาน Dropdown -->
+    <div style="background:var(--bg2);border-radius:14px;overflow:hidden;margin-bottom:10px;box-shadow:var(--card-shadow)">
+      <div onclick="var b=this.nextElementSibling;b.style.display=b.style.display==='none'?'block':'none';this.querySelector('.arr').style.transform=b.style.display==='block'?'rotate(180deg)':''"
+        style="display:flex;align-items:center;justify-content:space-between;padding:13px 16px;cursor:pointer">
+        <div style="display:flex;align-items:center;gap:10px">
+          <span style="font-size:18px">🚀</span>
+          <div>
+            <div style="font-size:14px;font-weight:700;color:var(--lbl)">วิธีใช้งาน</div>
+            <div style="font-size:11px;color:var(--lbl2);margin-top:1px">กดเพื่อดูขั้นตอน</div>
+          </div>
+        </div>
+        <span class="arr" style="font-size:13px;color:var(--lbl3);transition:transform .2s">▼</span>
       </div>
-      <div style="display:flex;flex-direction:column;gap:14px">
-
-        <!-- ขั้นตอน 1 -->
-        <div style="display:flex;gap:12px;align-items:flex-start">
-          <div style="width:28px;height:28px;border-radius:50%;background:var(--blue);color:#fff;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0">1</div>
-          <div>
-            <div style="font-size:14px;font-weight:700;color:var(--lbl);margin-bottom:3px">ตั้ง Room Code</div>
-            <div style="font-size:13px;color:var(--lbl2);line-height:1.7">เลือก A–Z และตัวเลข 2 หลัก ได้รหัส 4 ตัวอักษร เช่น <span style="font-family:monospace;font-size:13px;font-weight:700;color:var(--blue);background:rgba(10,132,255,0.1);padding:1px 7px;border-radius:5px">A011</span><br>แจ้งให้ทุกคนในกลุ่มใช้รหัสเดียวกัน<br>ถ้ามีหลายกลุ่มให้ตั้งต่างกัน เช่น <span style="font-family:monospace;font-weight:700;color:var(--lbl)">A011</span> · <span style="font-family:monospace;font-weight:700;color:var(--lbl)">A021</span> · <span style="font-family:monospace;font-weight:700;color:var(--lbl)">B051</span></div>
-          </div>
-        </div>
-
+      <div style="display:none">
         <div style="height:0.5px;background:var(--sep)"></div>
-
-        <!-- ขั้นตอน 2 -->
-        <div style="display:flex;gap:12px;align-items:flex-start">
-          <div style="width:28px;height:28px;border-radius:50%;background:var(--blue);color:#fff;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0">2</div>
-          <div>
-            <div style="font-size:14px;font-weight:700;color:var(--lbl);margin-bottom:3px">เปิด Sync อัตโนมัติ</div>
-            <div style="font-size:13px;color:var(--lbl2);line-height:1.7">เปิด toggle <strong style="color:var(--lbl)">"Sync อัตโนมัติ"</strong> ด้านล่าง<br>ระบบจะส่งสกอร์ขึ้น Leaderboard ทุกหลุมโดยอัตโนมัติ</div>
+        <div style="padding:13px 16px;display:flex;flex-direction:column;gap:11px;font-size:12px;color:var(--lbl2);line-height:1.7">
+          <div><span style="color:var(--blue);font-weight:700">① ตั้ง Room Code</span> — ตัวอักษร A–Z + เลข 2 หลัก เช่น A01 · แจ้งให้ทุกคนใช้รหัสเดียวกัน</div>
+          <div><span style="color:var(--blue);font-weight:700">② บันทึกการตั้งค่าและออก</span> — บันทึก Room Code ลงเครื่อง ระบบจำไว้แม้ปิดแอป</div>
+          <div><span style="color:var(--green);font-weight:700">③ 💾 SAVE GAME</span> — ล็อคห้องขึ้น Firebase เมื่อผู้เล่นครบ · คนอื่น Join ได้ทันที</div>
+          <div><span style="color:var(--lbl);font-weight:700">④ เริ่มเกม</span> — สกอร์ sync ขึ้น Leaderboard อัตโนมัติทุกหลุม</div>
+          <div style="padding:8px 10px;background:var(--bg3);border-radius:8px;border-left:3px solid var(--orange)">
+            <span style="color:var(--orange);font-weight:700">⚠️</span> บันทึกการตั้งค่า = บันทึกลงเครื่อง · SAVE GAME = ส่งขึ้น Firebase
           </div>
-        </div>
-
-        <div style="height:0.5px;background:var(--sep)"></div>
-
-        <!-- ขั้นตอน 3 -->
-        <div style="display:flex;gap:12px;align-items:flex-start">
-          <div style="width:28px;height:28px;border-radius:50%;background:var(--blue);color:#fff;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0">3</div>
-          <div>
-            <div style="font-size:14px;font-weight:700;color:var(--lbl);margin-bottom:3px">กด "บันทึกการตั้งค่า"</div>
-            <div style="font-size:13px;color:var(--lbl2);line-height:1.7">กดบันทึกก่อนกลับไปเริ่มเกม<br>ระบบจำค่าไว้แม้ปิดแอปหรือรีเฟรช</div>
-          </div>
-        </div>
-
-        <div style="height:0.5px;background:var(--sep)"></div>
-
-        <!-- ขั้นตอน 4 -->
-        <div style="display:flex;gap:12px;align-items:flex-start">
-          <div style="width:28px;height:28px;border-radius:50%;background:var(--green);color:#fff;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0">4</div>
-          <div>
-            <div style="font-size:14px;font-weight:700;color:var(--lbl);margin-bottom:3px">เริ่มเกมและบันทึกสกอร์ตามปกติ</div>
-            <div style="font-size:13px;color:var(--lbl2);line-height:1.7">สกอร์จะซิงก์ขึ้น Leaderboard แบบ real-time<br>ทุกครั้งที่บันทึกสกอร์ — ดูได้จากแท็บ <strong style="color:var(--lbl)">🏆 อันดับ</strong></div>
-          </div>
-        </div>
-
-      </div>
-
-      <!-- หมายเหตุ -->
-      <div style="margin-top:14px;padding:10px 12px;background:var(--bg3);border-radius:10px;border-left:3px solid var(--orange)">
-        <div style="font-size:11px;font-weight:700;color:var(--orange);margin-bottom:4px;text-transform:uppercase;letter-spacing:0.5px">⚠️ หมายเหตุ</div>
-        <div style="font-size:12px;color:var(--lbl2);line-height:1.8">
-          · ต้องมีสัญญาณอินเทอร์เน็ตขณะซิงก์<br>
-          · Leaderboard แสดงข้อมูลเฉพาะวันนี้เท่านั้น<br>
-          · ถ้าซิงก์ไม่สำเร็จ มีแถบแจ้งเตือนขึ้นด้านบนอัตโนมัติ
-        </div>
-      </div>
-      <!-- หมายเหตุ Srikrung -->
-      <div style="margin-top:8px;padding:10px 12px;background:rgba(48,209,88,0.07);border-radius:10px;border-left:3px solid var(--green)">
-        <div style="font-size:11px;font-weight:700;color:var(--green);margin-bottom:4px;text-transform:uppercase;letter-spacing:0.5px">⛳ Srikrung Golf Day</div>
-        <div style="font-size:12px;color:var(--lbl2);line-height:1.8">
-          · ตั้ง <strong style="color:var(--lbl)">ตัวแทน 1 คน</strong> เป็นผู้จดสกอร์รายหลุมของทุกคน<br>
-          · ส่วน <strong style="color:var(--lbl)">FW · GIR · PUTT</strong> แต่ละคนจดของตัวเองในโทรศัพท์ตัวเอง
         </div>
       </div>
     </div>
 
-    <!-- ฟิลด์ตั้งค่า -->
-    <div style="background:var(--bg2);border-radius:14px;overflow:hidden;margin-bottom:12px;box-shadow:var(--card-shadow)">
+    <!-- ══ HOST SECTION ══ -->
+    <div style="display:flex;align-items:center;gap:8px;padding:10px 0 6px">
+      <div style="font-size:11px;font-weight:700;color:var(--lbl2);text-transform:uppercase;letter-spacing:0.8px">🎮 Host</div>
+      <div style="flex:1;height:0.5px;background:var(--sep)"></div>
+      <div style="font-size:10px;color:var(--lbl3)">ผู้ตั้งห้อง</div>
+    </div>
+
+    <!-- Room Code + Sync + ลบห้อง -->
+    <div style="background:var(--bg2);border-radius:14px;overflow:hidden;margin-bottom:10px;box-shadow:var(--card-shadow)">
+      <!-- Room Code -->
       <div style="padding:12px 14px;border-bottom:0.5px solid var(--sep)">
-        <div style="font-size:12px;font-weight:600;color:var(--lbl2);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px">Room Code</div>
+        <div style="font-size:11px;font-weight:600;color:var(--lbl2);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px">Room Code</div>
         <div style="display:flex;align-items:center;gap:8px;justify-content:center">
           <select id="room-code-letter" onchange="updateRoomCode()" style="flex:1;padding:12px;font-size:22px;font-weight:700;border-radius:10px;text-align:center;color:var(--lbl)">
             <option value="">A-Z</option>
@@ -374,52 +363,91 @@
           <div style="font-size:22px;font-weight:800;color:var(--blue);min-width:56px;text-align:center;letter-spacing:1px" id="room-code-preview">—</div>
         </div>
         <input type="hidden" id="room-code" value="">
-        <div style="font-size:11px;color:var(--lbl2);margin-top:8px;text-align:center">รหัสกลุ่มของคุณ — 26×10×10 = 2,600 ห้อง</div>
+        <div style="font-size:11px;color:var(--lbl2);margin-top:8px;text-align:center">26×10×10 = 2,600 ห้อง</div>
       </div>
-      <div style="padding:12px 14px;border-bottom:0.5px solid var(--sep)">
-        <div style="font-size:12px;font-weight:600;color:var(--lbl2);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px">Apps Script URL</div>
-        <input type="url" id="api-url" placeholder="https://script.google.com/macros/s/..."
-          style="width:100%;border-radius:8px;padding:10px 12px;font-size:12px;color:var(--lbl)">
-        <div style="font-size:11px;color:var(--lbl2);margin-top:5px">ใช้สำหรับลิ้งกับ Google Sheet</div>
+      <!-- Apps Script URL ซ่อน -->
+      <div style="display:none;padding:12px 14px;border-bottom:0.5px solid var(--sep)">
+        <input type="url" id="api-url" placeholder="https://script.google.com/macros/s/..." style="width:100%;border-radius:8px;padding:10px 12px;font-size:12px;color:var(--lbl)">
       </div>
-      <div style="display:flex;align-items:center;justify-content:space-between;padding:13px 14px">
+      <!-- Sync toggle -->
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:13px 14px;border-bottom:0.5px solid var(--sep)">
         <div>
           <div style="font-size:15px;font-weight:600;color:var(--lbl)">Sync อัตโนมัติ</div>
           <div style="font-size:12px;color:var(--lbl2);margin-top:1px">ส่งสกอร์ขึ้น Leaderboard ทุกหลุม</div>
         </div>
         <div class="sw on" id="sw-sync" onclick="toggleSyncSw()"></div>
       </div>
+      <!-- ลบห้อง -->
+      <div style="padding:5px 14px 12px">
+        <button onclick="deleteRoomFromFirebase()" style="width:100%;padding:10px;border-radius:10px;border:1.5px solid rgba(255,69,58,0.35);background:rgba(255,69,58,0.07);color:var(--red);font-family:inherit;font-size:13px;font-weight:700;cursor:pointer">
+          🗑 ลบห้อง
+        </button>
+        <div id="delete-player-status" style="display:none;text-align:center;font-size:12px;font-weight:600;padding:7px 10px;border-radius:8px;margin-top:5px"></div>
+      </div>
     </div>
 
     <!-- ทดสอบการเชื่อมต่อ -->
-    <button onclick="testConnection()" style="width:100%;padding:12px;background:var(--bg2);border:1px solid var(--bg4);border-radius:12px;color:var(--blue);font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;margin-bottom:12px">
+    <button onclick="testConnection()" style="width:100%;padding:11px;background:var(--bg2);border:1px solid var(--bg4);border-radius:12px;color:var(--blue);font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;margin-bottom:10px">
       ทดสอบการเชื่อมต่อ
     </button>
-    <div id="test-result" style="display:none;text-align:center;font-size:13px;padding:8px;border-radius:8px;margin-bottom:12px"></div>
+    <div id="test-result" style="display:none;text-align:center;font-size:13px;padding:8px;border-radius:8px;margin-bottom:10px"></div>
 
-    <!-- Join Room -->
-    <div style="background:var(--bg2);border-radius:14px;overflow:hidden;margin-bottom:12px;box-shadow:var(--card-shadow)">
-      <div style="padding:12px 14px;border-bottom:0.5px solid var(--sep)">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
-          <span style="font-size:18px">🔗</span>
-          <div style="font-size:15px;font-weight:700;color:var(--lbl)">Join Room <span style="font-size:12px;font-weight:500;color:var(--lbl2)">(สำหรับคนเข้าร่วม)</span></div>
-        </div>
-        <div style="font-size:12px;color:var(--lbl2);line-height:1.6">กรอก Room Code เดียวกับคนตั้งห้อง → เลือกชื่อตัวเอง → จด FW/GIR/PUTT เท่านั้น</div>
-      </div>
-      <div style="padding:12px 14px">
-        <button onclick="joinRoomLookup()" style="width:100%;padding:11px;background:rgba(10,132,255,0.12);border:1.5px solid var(--blue);border-radius:10px;color:var(--blue);font-family:inherit;font-size:14px;font-weight:700;cursor:pointer">
-          🔍 ค้นหาห้อง
-        </button>
-        <div id="join-player-list" style="display:none;margin-top:10px">
-          <div style="font-size:12px;color:var(--lbl2);margin-bottom:6px">เลือกชื่อของคุณ:</div>
-          <div id="join-names" style="display:flex;flex-direction:column;gap:6px"></div>
-        </div>
-        <div id="join-status" style="display:none;margin-top:8px;font-size:13px;text-align:center;padding:8px;border-radius:8px"></div>
+    <!-- SAVE GAME -->
+    <div style="background:var(--bg2);border-radius:14px;padding:14px;margin-bottom:10px;box-shadow:var(--card-shadow)">
+      <button onclick="registerAllPlayers()" style="width:100%;padding:13px;border-radius:12px;background:rgba(48,209,88,0.15);border:1.5px solid rgba(48,209,88,0.5);color:var(--green);font-family:inherit;font-size:16px;font-weight:800;cursor:pointer">
+        💾 SAVE GAME
+      </button>
+      <div style="font-size:11px;color:var(--lbl2);text-align:center;margin-top:7px;line-height:1.7">
+        ล็อคห้องเมื่อผู้เล่นครบแล้ว · คนอื่น Join ได้ทันที<br>
+        <span style="color:var(--orange);font-weight:600">⚠️ ถ้าเพิ่มผู้เล่นระหว่างเกม — กด SAVE GAME ใหม่อีกครั้ง</span>
       </div>
     </div>
 
-    <button onclick="saveOnlineSetup()" class="cta">บันทึกการตั้งค่า</button>
-    <button onclick="goTab('setup')" class="nav-b" style="width:100%;margin-top:8px">← กลับหน้าตั้งค่า</button>
+    <!-- ══ JOIN SECTION ══ -->
+    <div style="display:flex;align-items:center;gap:8px;padding:10px 0 6px;margin-top:4px">
+      <div style="font-size:11px;font-weight:700;color:var(--lbl2);text-transform:uppercase;letter-spacing:0.8px">🔗 Join</div>
+      <div style="flex:1;height:0.5px;background:var(--sep)"></div>
+      <div style="font-size:10px;color:var(--lbl3)">คนเข้าร่วม</div>
+    </div>
+
+    <!-- ห้องออนไลน์ + manual search -->
+    <div style="background:var(--bg2);border-radius:14px;overflow:hidden;margin-bottom:10px;box-shadow:var(--card-shadow)">
+      <!-- Header -->
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:0.5px solid var(--sep)">
+        <div>
+          <div style="font-size:15px;font-weight:700;color:var(--lbl)">🟢 ห้องออนไลน์วันนี้</div>
+          <div style="font-size:11px;color:var(--lbl2);margin-top:1px">กดชื่อตัวเองเพื่อ Join ได้เลย</div>
+        </div>
+        <button onclick="loadOnlineRooms()" style="padding:6px 12px;border-radius:999px;border:1px solid var(--bg4);background:var(--bg3);color:var(--blue);font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">
+          🔄 โหลด
+        </button>
+      </div>
+      <!-- Room list -->
+      <div id="online-rooms-list" style="padding:10px 14px">
+        <div style="text-align:center;color:var(--lbl3);font-size:13px;padding:12px 0">กด "โหลด" เพื่อดูห้องออนไลน์</div>
+      </div>
+      <!-- manual search link -->
+      <div style="border-top:0.5px solid var(--sep)">
+        <div onclick="var b=document.getElementById('manual-join');b.style.display=b.style.display==='none'?'block':'none'"
+          style="text-align:center;padding:9px 14px;font-size:12px;color:var(--lbl2);cursor:pointer">
+          ไม่เห็นห้องของคุณ? <span style="color:var(--blue);font-weight:600;text-decoration:underline">ค้นหาด้วย Room Code ›</span>
+        </div>
+        <div id="manual-join" style="display:none;padding:0 14px 12px">
+          <button onclick="joinRoomLookup()" style="width:100%;padding:10px;border-radius:10px;background:rgba(10,132,255,0.1);border:1.5px solid rgba(10,132,255,0.35);color:var(--blue);font-family:inherit;font-size:13px;font-weight:700;cursor:pointer">
+            🔍 ค้นหาห้อง
+          </button>
+          <div id="join-player-list" style="display:none;margin-top:10px">
+            <div style="font-size:12px;color:var(--lbl2);margin-bottom:6px">เลือกชื่อของคุณ:</div>
+            <div id="join-names" style="display:flex;flex-direction:column;gap:6px"></div>
+          </div>
+          <div id="join-status" style="display:none;margin-top:8px;font-size:13px;text-align:center;padding:8px;border-radius:8px"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- บันทึกการตั้งค่าและออก — ล่างสุด -->
+    <button onclick="saveOnlineSetup()" class="cta" style="margin-bottom:4px">บันทึกการตั้งค่าและออก</button>
+
   </div>
 </div>
 
@@ -672,39 +700,41 @@
 <div class="screen" id="scr-scorecard">
   <div id="sync-bar" style="display:none;padding:6px 16px;font-size:12px;font-weight:600;text-align:center;transition:all .3s"></div>
   <!-- ── NAV Option B ── -->
-  <div style="display:flex;align-items:center;gap:0;padding:5px 10px;background:var(--bg2);border-bottom:0.5px solid var(--sep)">
-    <button id="btn-prev" onclick="holeNav(-1)"
-      style="width:34px;height:34px;border-radius:999px;border:1.5px solid var(--bg4);
-      background:var(--fill);color:var(--lbl2);font-size:18px;font-weight:700;
-      cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0">‹</button>
-    <div style="flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:0 6px">
-      <div id="nav-hole-badge"
-        style="background:var(--blue);border-radius:9px;padding:3px 10px;text-align:center;
-        box-shadow:0 2px 8px rgba(10,132,255,0.3);flex-shrink:0">
-        <div style="font-size:8px;font-weight:700;color:rgba(255,255,255,0.7);letter-spacing:.5px">HOLE</div>
-        <div id="nav-hole-num" style="font-size:18px;font-weight:800;color:#fff;line-height:1">1</div>
-      </div>
-      <div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0" id="nav-par-wrap">
-        <div style="font-size:9px;color:var(--lbl2);font-weight:600;letter-spacing:.5px">PAR</div>
-        <div style="display:flex;align-items:center;background:var(--bg3);border-radius:999px;border:1px solid var(--bg4);overflow:hidden">
-          <button onclick="chParNav(-1)" style="width:22px;height:22px;background:none;border:none;color:var(--blue);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center">−</button>
-          <div id="nav-par-val" style="min-width:18px;text-align:center;font-size:15px;font-weight:800;color:var(--lbl)">4</div>
-          <button onclick="chParNav(1)" style="width:22px;height:22px;background:none;border:none;color:var(--blue);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center">+</button>
+  <div style="display:flex;flex-direction:column;gap:0;background:var(--bg2);border-bottom:0.5px solid var(--sep)">
+    <div style="display:flex;align-items:center;gap:0;padding:5px 10px">
+      <button id="btn-prev" onclick="holeNav(-1)"
+        style="width:34px;height:34px;border-radius:999px;border:1.5px solid var(--bg4);
+        background:var(--fill);color:var(--lbl2);font-size:18px;font-weight:700;
+        cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0">‹</button>
+      <div style="flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:0 6px">
+        <div id="nav-hole-badge"
+          style="background:var(--blue);border-radius:9px;padding:3px 10px;text-align:center;
+          box-shadow:0 2px 8px rgba(10,132,255,0.3);flex-shrink:0">
+          <div style="font-size:8px;font-weight:700;color:rgba(255,255,255,0.7);letter-spacing:.5px">HOLE</div>
+          <div id="nav-hole-num" style="font-size:18px;font-weight:800;color:#fff;line-height:1">1</div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0" id="nav-par-wrap">
+          <div style="font-size:9px;color:var(--lbl2);font-weight:600;letter-spacing:.5px">PAR</div>
+          <div style="display:flex;align-items:center;background:var(--bg3);border-radius:999px;border:1px solid var(--bg4);overflow:hidden">
+            <button onclick="chParNav(-1)" style="width:22px;height:22px;background:none;border:none;color:var(--blue);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center">−</button>
+            <div id="nav-par-val" style="min-width:18px;text-align:center;font-size:15px;font-weight:800;color:var(--lbl)">4</div>
+            <button onclick="chParNav(1)" style="width:22px;height:22px;background:none;border:none;color:var(--blue);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center">+</button>
+          </div>
         </div>
       </div>
-      <div style="display:flex;flex-direction:column;gap:3px;flex-shrink:0">
-        <button onclick="setParAll(0)" id="nav-par-all"
-          style="padding:3px 8px;border-radius:999px;border:1px solid rgba(10,132,255,0.35);
-          background:rgba(10,132,255,0.1);color:var(--blue);font-size:9px;font-weight:700;cursor:pointer">
-          พาร์ทุกคน
-        </button>
-        <div id="nav-prog-label" style="font-size:9px;color:var(--lbl2);text-align:center">1 / 18</div>
-      </div>
+      <button id="btn-next" onclick="holeNav(1)"
+        style="width:34px;height:34px;border-radius:999px;border:1.5px solid rgba(10,132,255,0.4);
+        background:rgba(10,132,255,0.15);color:var(--blue);font-size:18px;font-weight:700;
+        cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0">›</button>
     </div>
-    <button id="btn-next" onclick="holeNav(1)"
-      style="width:34px;height:34px;border-radius:999px;border:1.5px solid rgba(10,132,255,0.4);
-      background:rgba(10,132,255,0.15);color:var(--blue);font-size:18px;font-weight:700;
-      cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0">›</button>
+    <!-- พาร์ทุกคน เต็มบรรทัด ใต้ nav -->
+    <div style="padding:0 10px 7px">
+      <button onclick="setParAll(0)" id="nav-par-all"
+        style="width:100%;padding:8px 0;border-radius:999px;border:1.5px solid rgba(10,132,255,0.45);
+        background:rgba(10,132,255,0.13);color:var(--blue);font-size:13px;font-weight:700;cursor:pointer">
+        พาร์ทุกคน
+      </button>
+    </div>
   </div>
   <div class="prog-wrap" style="padding:4px 12px 5px">
     <div class="prog" id="progress-dots"></div>
@@ -765,10 +795,12 @@
       </button>
     </div>
 
-    <!-- Apps Script URL -->
+    <!-- Apps Script URL — ซ่อนไว้ก่อน ใช้ในอนาคต -->
+    <div style="display:none">
     <div style="font-size:13px;font-weight:600;color:var(--lbl2);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px">Apps Script URL</div>
     <input type="url" id="export-api-url" placeholder="https://script.google.com/macros/s/..."
       style="width:100%;border-radius:8px;padding:10px 12px;font-size:12px;color:var(--lbl);margin-bottom:16px">
+    </div>
 
     <div id="export-status" style="display:none;text-align:center;font-size:13px;padding:8px;border-radius:8px;margin-bottom:12px"></div>
 

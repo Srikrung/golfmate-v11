@@ -486,7 +486,7 @@ export function buildMoney(){
     </div>
     <div style="font-size:15px;font-weight:700;color:var(--lbl);margin-bottom:10px">📊 Matrix พ้อย</div>
     ${buildMatrixHTML(gTot,n,fs,hfs)}
-    <button class="nav-b pr" style="width:100%;margin:14px 0 4px;font-size:16px;padding:14px" onclick="showMoneyDetail()">💵 คำนวณเงิน</button>
+    <button class="nav-b pr" style="width:100%;margin:14px 0 4px;font-size:16px;padding:14px" onclick="showMoneyDetail(this)">💵 คำนวณเงิน</button>
     <div id="money-detail" style="display:none;margin-top:4px">
       ${netHTML}${transfersHTML}
       <div style="font-size:15px;font-weight:700;color:var(--lbl);margin:14px 0 8px">📋 MASTER รายหลุม (฿)</div>
@@ -494,10 +494,10 @@ export function buildMoney(){
     </div>`;
 }
 
-export function showMoneyDetail(){
+export function showMoneyDetail(btn){
   const el=document.getElementById('money-detail');if(!el)return;
   const isHidden=el.style.display==='none';el.style.display=isHidden?'block':'none';
-  event.target.textContent=isHidden?'💵 ซ่อนยอดเงิน':'💵 คำนวณเงิน';
+  if(btn) btn.textContent=isHidden?'💵 ซ่อนยอดเงิน':'💵 คำนวณเงิน';
 }
 
 export function buildMatrixHTML(gTot,n,fs,hfs){

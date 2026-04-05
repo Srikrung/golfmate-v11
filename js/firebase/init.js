@@ -34,3 +34,11 @@ export function showSyncBar(msg,color,duration=2500){
   bar.textContent=msg;
   if(duration>0)setTimeout(()=>{bar.style.display='none';},duration);
 }
+
+// ── fetch with timeout ──
+export function fetchWithTimeout(url, opts={}, ms=8000){
+  const ctrl = new AbortController();
+  const timer = setTimeout(()=>ctrl.abort(), ms);
+  return fetch(url, {...opts, signal:ctrl.signal})
+    .finally(()=>clearTimeout(timer));
+}
