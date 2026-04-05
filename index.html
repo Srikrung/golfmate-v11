@@ -366,11 +366,11 @@
         <div style="height:0.5px;background:var(--sep)"></div>
         <div style="padding:13px 16px;display:flex;flex-direction:column;gap:11px;font-size:12px;color:var(--lbl2);line-height:1.7">
           <div><span style="color:var(--blue);font-weight:700">① ตั้ง Room Code</span> — ตัวอักษร A–Z + เลข 2 หลัก เช่น A01 · แจ้งให้ทุกคนใช้รหัสเดียวกัน</div>
-          <div><span style="color:var(--blue);font-weight:700">② บันทึกการตั้งค่าและออก</span> — บันทึก Room Code ลงเครื่อง ระบบจำไว้แม้ปิดแอป</div>
-          <div><span style="color:var(--green);font-weight:700">③ 💾 SAVE GAME</span> — ล็อคห้องขึ้น Firebase เมื่อผู้เล่นครบ · คนอื่น Join ได้ทันที</div>
-          <div><span style="color:var(--lbl);font-weight:700">④ เริ่มเกม</span> — สกอร์ sync ขึ้น Leaderboard อัตโนมัติทุกหลุม</div>
-          <div style="padding:8px 10px;background:var(--bg3);border-radius:8px;border-left:3px solid var(--orange)">
-            <span style="color:var(--orange);font-weight:700">⚠️</span> บันทึกการตั้งค่า = บันทึกลงเครื่อง · SAVE GAME = ส่งขึ้น Firebase
+          <div><span style="color:var(--blue);font-weight:700">② กด "🏠 สร้างห้อง"</span> — ห้องปรากฏใน Firebase ทันที · คนอื่นค้นหาเจอและ Join ได้เลย</div>
+          <div><span style="color:var(--lbl);font-weight:700">③ กด "บันทึกการตั้งค่าและออก"</span> — บันทึก Room Code ลงเครื่อง</div>
+          <div><span style="color:var(--green);font-weight:700">④ เริ่มเกม</span> — สกอร์ sync ขึ้น Leaderboard อัตโนมัติทุกหลุม</div>
+          <div style="padding:8px 10px;background:var(--bg3);border-radius:8px;border-left:3px solid var(--blue)">
+            <span style="color:var(--blue);font-weight:700">💡</span> ถ้าเพิ่มผู้เล่นระหว่างเกม → กด สร้างห้อง อีกครั้งเพื่ออัปเดต
           </div>
         </div>
       </div>
@@ -439,14 +439,17 @@
     </button>
     <div id="test-result" style="display:none;text-align:center;font-size:13px;padding:8px;border-radius:8px;margin-bottom:10px"></div>
 
-    <!-- SAVE GAME -->
+    <!-- สร้างห้อง -->
     <div style="background:var(--bg2);border-radius:14px;padding:14px;margin-bottom:10px;box-shadow:var(--card-shadow)">
-      <button onclick="registerAllPlayers()" style="width:100%;padding:13px;border-radius:12px;background:rgba(48,209,88,0.15);border:1.5px solid rgba(48,209,88,0.5);color:var(--green);font-family:inherit;font-size:16px;font-weight:800;cursor:pointer">
-        💾 SAVE GAME
+      <button onclick="createRoom()"
+        style="width:100%;padding:13px;border-radius:12px;
+        background:rgba(10,132,255,0.15);border:1.5px solid rgba(10,132,255,0.5);
+        color:var(--blue);font-family:inherit;font-size:16px;font-weight:800;cursor:pointer">
+        🏠 สร้างห้อง
       </button>
       <div style="font-size:11px;color:var(--lbl2);text-align:center;margin-top:7px;line-height:1.7">
-        ล็อคห้องเมื่อผู้เล่นครบแล้ว · คนอื่น Join ได้ทันที<br>
-        <span style="color:var(--orange);font-weight:600">⚠️ ถ้าเพิ่มผู้เล่นระหว่างเกม — กด SAVE GAME ใหม่อีกครั้ง</span>
+        สร้างห้องขึ้น Firebase · คนอื่นค้นหาเจอและ Join ได้ทันที<br>
+        <span style="color:var(--lbl3)">ถ้าเพิ่มผู้เล่นระหว่างเกม — กด สร้างห้อง ใหม่อีกครั้ง</span>
       </div>
     </div>
 

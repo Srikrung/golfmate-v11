@@ -232,14 +232,25 @@ export async function loadOnlineRooms(){
     const data = await res.json();
     if(!data){ wrap.innerHTML='<div style="text-align:center;color:var(--lbl3);font-size:13px;padding:12px 0">ยังไม่มีห้องออนไลน์วันนี้</div>'; return; }
 
-    // จัดกลุ่มตาม room
+    // จัดกลุ่มตาม room — ใช้ _room_config เป็น source หลัก
     const roomMap={};
-    Object.entries(data).forEach(([room,players])=>{
-      if(!players) return;
-      const pList=Object.entries(players)
-        .filter(([k])=>k!=='_room_config')
-        .map(([,v])=>v).filter(v=>v&&v.name);
-      if(!pList.length) return;
+    Object.entries(data).forEach(([room,roomData])=>{
+      if(!roomData) return;
+      // ดึงชื่อจาก _room_config ก่อน (มีทันทีหลัง SAVE GAME)
+      const cfg = roomData['_room_config'];
+      const names = cfg?.players || [];
+      if(!names.length) return;
+      // ดึงข้อมูลสกอร์/หลุมเสริม (มีหลังจากกดสกอร์)
+      const scoreMap={};
+      Object.entries(roomData).forEach(([k,v])=>{
+        if(k==='_room_config'||!v||!v.name) return;
+        scoreMap[v.name]=v;
+      });
+      const pList = names.map(name=>({
+        name,
+        course: scoreMap[name]?.course || cfg?.course || 'ไม่ระบุสนาม',
+        holesPlayed: scoreMap[name]?.holesPlayed || 0,
+      }));
       roomMap[room]=pList;
     });
 

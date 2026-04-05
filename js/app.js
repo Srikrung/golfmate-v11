@@ -40,7 +40,7 @@ import { goLeaderboard, lbGoPrev, lbGoNext,
 // ── firebase ──
 import { toggleSyncSw, updateRoomCode, syncEnabled } from './firebase/init.js';
 import { loadOnlineSetting, goOnlineSetup, saveOnlineSetup, testConnection } from './firebase/room.js';
-import { registerAllPlayers, syncFullBackup, restoreFromFirebase,
+import { createRoom, syncFullBackup, restoreFromFirebase,
          deleteRoomFromFirebase } from './firebase/sync.js';
 
 // ============================================================
@@ -107,7 +107,7 @@ document.addEventListener('DOMContentLoaded', () => {
     goLeaderboard, lbGoPrev, lbGoNext, lbSetTab, lbSetRoom, lbFetch,
     // firebase
     toggleSyncSw, updateRoomCode,
-    goOnlineSetup, saveOnlineSetup, testConnection, registerAllPlayers,
+    goOnlineSetup, saveOnlineSetup, testConnection, createRoom,
     restoreFromFirebase, restoreJoinSrikrung,
     deleteRoomFromFirebase,
     // join
@@ -314,7 +314,7 @@ export function startGame(){
   initHcapPairs(n);
   setGameStarted(true); setCurrentHole(0);
   buildProgressBar(); showHole(0); goTab('scorecard');
-  autoSave(); registerAllPlayers();
+  autoSave();
 }
 
 // ============================================================
@@ -362,8 +362,8 @@ export function confirmAddPlayer(){
   }
   updateAddPlayerBtn(); hideAddPlayerModal();
   showHole(getCurrentHole()); autoSave();
-  // auto SAVE GAME ถ้า Sync เปิดอยู่
-  if(syncEnabled) registerAllPlayers();
+  // auto อัปเดต _room_config ถ้าห้องเปิดอยู่
+  if(syncEnabled) createRoom();
 }
 export function updateAddPlayerBtn(){
   const btn = document.getElementById('btn-add-player'); if(!btn) return;
@@ -516,7 +516,7 @@ Object.assign(window, {
   sgToggle, sgChPutt, sgSetPutt1,
   goLeaderboard, lbGoPrev, lbGoNext, lbSetTab, lbSetRoom, lbFetch,
   toggleSyncSw, updateRoomCode,
-  goOnlineSetup, saveOnlineSetup, testConnection, registerAllPlayers,
+  goOnlineSetup, saveOnlineSetup, testConnection, createRoom,
   joinRoomLookup, selectJoinPlayer,
   showExportModal, hideExportModal, setExportWho, doExport,
   toggleTheme, _refreshOlyInline, toggleSkipSection, toggleMatrixSection, chParNav,

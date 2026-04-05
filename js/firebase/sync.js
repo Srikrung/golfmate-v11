@@ -4,7 +4,7 @@
 import { FB_URL } from '../config.js';
 import { getRoomCode, getApiUrl, showSyncBar,
          syncEnabled, joinMode, joinPlayerName } from './init.js';
-import { getRoomConfig, lockRoom } from './room.js';
+import {} from './room.js';
 import { fetchWithTimeout } from './init.js';
 
 // ── state ที่ใช้ร่วมกัน (import จาก config) ──
@@ -19,17 +19,6 @@ export async function syncToFirebase(){
   const cn=document.getElementById('course-name').value||'—';
   const gameDate=document.getElementById('game-date').value||new Date().toISOString().split('T')[0];
   const safeDateKey=gameDate.replace(/-/g,'');
-
-  const config=await getRoomConfig(room,safeDateKey);
-  if(config&&config.dateKey===safeDateKey){
-    const lockedNames=config.players||[];
-    const myNames=players.map(p=>p.name);
-    const notAllowed=myNames.filter(n=>!lockedNames.includes(n));
-    if(notAllowed.length>0){
-      showSyncBar(`🔒 ห้อง ${room} ถูกล็อคแล้ว ชื่อ "${notAllowed[0]}" ไม่ได้รับอนุญาต`,'rgba(255,69,58,0.9)',4000);
-      return;
-    }
-  }
 
   players.forEach(async(pl,p)=>{
     const scores18=scores[p];
@@ -80,35 +69,28 @@ export function syncAll(){
   syncToSheets();
 }
 
-export async function registerAllPlayers(){
+export async function createRoom(){
   const room=getRoomCode();
-  if(!room||room==='DEFAULT')return;
+  if(!room||room==='DEFAULT'){
+    showSyncBar('⚠ กรุณาเลือก Room Code ก่อน','rgba(255,159,10,0.9)',3000); return;
+  }
   const cn=document.getElementById('course-name').value||'—';
   const gameDate=document.getElementById('game-date').value||new Date().toISOString().split('T')[0];
   const safeDateKey=gameDate.replace(/-/g,'');
-  showSyncBar('⟳ กำลังเช็คห้อง...','rgba(10,132,255,0.9)',0);
-  const config=await getRoomConfig(room,safeDateKey);
-  if(config&&config.dateKey===safeDateKey){
-    showSyncBar(`🔒 ห้อง ${room} ถูกใช้แล้ววันนี้ ไม่สามารถเพิ่มผู้เล่นใหม่ได้`,'rgba(255,69,58,0.9)',4000);
-    return;
-  }
-  const myNames=players.map(p=>p.name);
-  await lockRoom(room,safeDateKey,myNames);
-  for(const pl of players){
-    const safeName=pl.name.replace(/[.#$/[\]]/g,'_');
-    try{
-      await fetch(`${FB_URL}/players/${safeDateKey}/${room}/${safeName}.json`,{
-        method:'PUT',headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({name:pl.name,hcp:pl.hcp||0,course:cn,room,registeredAt:Date.now()})
-      });
-    }catch(e){}
-  }
-  showSyncBar(`🔒 ล็อคห้อง ${room} สำเร็จ · ${myNames.length} คน`,'rgba(48,209,88,0.9)',3000);
-  const url=getApiUrl();
-  if(url&&url.startsWith('http')){
-    for(const pl of players){
-      try{await fetch(url,{method:'POST',body:JSON.stringify({action:'register',room,name:pl.name,hcp:pl.hcp||0,course:cn})});}catch(e){}
-    }
+  showSyncBar('⟳ กำลังสร้างห้อง...','rgba(10,132,255,0.9)',0);
+  try{
+    // บันทึก _room_config พร้อมชื่อผู้เล่นปัจจุบัน
+    const myNames=players.map(p=>p.name);
+    await fetchWithTimeout(`${FB_URL}/scores/${safeDateKey}/${room}/_room_config.json`,{
+      method:'PUT',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({players:myNames,course:cn,createdAt:Date.now(),dateKey:safeDateKey})
+    },8000);
+    showSyncBar(`✅ สร้างห้อง ${room} สำเร็จ · คนอื่นค้นหาเจอแล้ว`,'rgba(48,209,88,0.9)',3000);
+    // sync สกอร์ขึ้นด้วยเพื่อให้ holesPlayed อัปเดต
+    syncToFirebase();
+  }catch(e){
+    showSyncBar('❌ สร้างห้องไม่สำเร็จ — ตรวจสอบสัญญาณ','rgba(255,69,58,0.9)',3000);
   }
 }
 
@@ -143,6 +125,17 @@ export async function deleteRoomFromFirebase(){
     await fetchWithTimeout(`${FB_URL}/scores/${safeDateKey}/${room}.json`,{method:'DELETE'},8000);
     await fetchWithTimeout(`${FB_URL}/backup/${safeDateKey}/${room}.json`,{method:'DELETE'},8000);
     show(`✅ ลบห้อง "${room}" สำเร็จ — สร้างห้องใหม่ได้เลย`,'rgba(48,209,88,0.9)');
+    // รีเซ็ต Room Code กลับค่าเริ่มต้น
+    const el1=document.getElementById('room-code-letter');
+    const el2=document.getElementById('room-code-num');
+    const el3=document.getElementById('room-code-num2');
+    const preview=document.getElementById('room-code-preview');
+    const hidden=document.getElementById('room-code');
+    if(el1) el1.value='';
+    if(el2) el2.value='';
+    if(el3) el3.value='';
+    if(preview) preview.textContent='—';
+    if(hidden) hidden.value='';
   }catch(e){
     show(e.name==='AbortError'?'⌛ หมดเวลา':'❌ ลบไม่สำเร็จ','rgba(255,69,58,0.9)');
   }

@@ -7,7 +7,7 @@
   --sep:rgba(255,255,255,0.1);
   --blue:#0a84ff;--green:#30d158;--red:#ff453a;
   --yellow:#ffd60a;--orange:#ff9f0a;--purple:#bf5af2;
-  --lbl:rgba(255,255,255,0.88);--lbl2:rgba(255,255,255,0.5);--lbl3:rgba(255,255,255,0.22);
+  --lbl:rgba(255,255,255,0.88);--lbl2:rgba(255,255,255,0.65);--lbl3:rgba(255,255,255,0.30);
   --fill:rgba(255,255,255,0.07);--fill2:rgba(255,255,255,0.12);
   --win:#30d158;--lose:#ff453a;
   --hole-row:#0d0d1a;--sum-bg:#0d0d1a;--oly-bg:#0d0d1a;
@@ -21,12 +21,14 @@ body.light{
   --sep:rgba(0,0,0,0.08);
   --blue:#007aff;--green:#1a8a3a;--red:#cc3030;
   --yellow:#c8a000;--orange:#e08800;--purple:#8944c8;
-  --lbl:#1c1c1e;--lbl2:rgba(0,0,0,0.45);--lbl3:rgba(0,0,0,0.18);
+  --lbl:#1c1c1e;--lbl2:rgba(0,0,0,0.62);--lbl3:rgba(0,0,0,0.35);
   --fill:rgba(0,0,0,0.04);--fill2:rgba(0,0,0,0.07);
   --win:#1a8a3a;--lose:#cc3030;
   --hole-row:#f9f9fb;--sum-bg:#f9f9fb;--oly-bg:#f0f0f8;
   --row-a:#ffffff;--row-b:#eef1f8;
   --card-shadow:0 1px 3px rgba(0,0,0,0.08);
+  --sep:rgba(0,0,0,0.12);
+  --bg4:rgba(0,0,0,0.13);
 }
 /* ── Font Scale Levels ── */
 html[data-fs="M"]{ --fs:1.2; }
