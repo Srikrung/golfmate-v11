@@ -76,8 +76,20 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
   }catch(e){}
-  loadSession();
+  setTimeout(()=>{
+    const hadLocal = loadSession();
+    if(!hadLocal){
+      // ไม่มีข้อมูลในเครื่อง → ลองดึง Firebase อัตโนมัติ
+      try{
+        const online = JSON.parse(localStorage.getItem('golfmate_online')||'{}');
+        if(online.room && online.room !== 'DEFAULT'){
+          restoreFromFirebase(true); // silent=true ไม่ถาม
+        }
+      }catch(e){}
+    }
+  }, 400);
   loadOnlineSetting();
+  initRestoreBtn();
   initSwipe();
   updateBiteMultUI();
 
@@ -102,7 +114,7 @@ document.addEventListener('DOMContentLoaded', () => {
     setToday, fmtDate, toggleSw, toggleSkipPlayer, toggleSkipGame,
     toggleTeamSolo, toggleTeamScorecard, setTeamMode, setH2HSize, startGame, newGame,
     showAddPlayerModal, hideAddPlayerModal, confirmAddPlayer,
-    updateAddPlayerBtn, saveSession, loadSession, clearSession, autoSave,
+    updateAddPlayerBtn, saveSession, loadSession, clearSession, clearGameData, initRestoreBtn, autoSave,
     shareToLine,
     // course
     changeCoursePreset, applyParsFromPreset,
@@ -440,14 +452,9 @@ export function saveSession(){
 
 export function loadSession(){
   try{
-    const raw = localStorage.getItem(LS_KEY); if(!raw) return;
+    const raw = localStorage.getItem(LS_KEY); if(!raw) return false;
     const data = JSON.parse(raw);
-    if(!data?.v || !data.players?.length) return;
-    const names = data.players.map(p => p.name).join(', ');
-    if(!confirm(`พบเกมเก่า: ${names}\n${fmtDate(data.gameDate)||''}\nต่อจากที่ค้างไว้ไหมครับ?`)){
-      // กด Cancel → ไม่โหลด แต่ไม่ลบ ข้อมูลยังอยู่ใน localStorage
-      return;
-    }
+    if(!data?.v || !data.players?.length) return false;
     setPlayers(data.players);
     setScores(data.scores);
     pars.splice(0, pars.length, ...data.pars);
@@ -490,15 +497,59 @@ export function loadSession(){
     if(data.courseName && cnEl) cnEl.value = data.courseName;
     if(data.gameDate   && gdEl) gdEl.value = data.gameDate;
 
+    // ── ใส่ชื่อ/HCP กลับเข้าช่อง Setup ──
+    const numEl = document.getElementById('num-players');
+    if(numEl) numEl.value = players.length;
+    renderPlayerRows();
+    setTimeout(()=>{
+      const pns = document.querySelectorAll('.pn');
+      const phs = document.querySelectorAll('.ph');
+      players.forEach((p,i)=>{
+        if(pns[i]) pns[i].value = p.name;
+        if(phs[i]) phs[i].value = p.hcp ?? 0;
+      });
+    }, 50);
+
     updateBiteMultUI();
     buildParGrid();
     buildProgressBar();
     showHole(getCurrentHole());
     goTab('scorecard');
-  } catch(e){ localStorage.removeItem(LS_KEY); }
+    return true;
+  } catch(e){ localStorage.removeItem(LS_KEY); return false; }
 }
 
 export function clearSession(){ try{ localStorage.removeItem(LS_KEY); } catch(e){} }
+
+export async function initRestoreBtn(){
+  try{
+    const online = JSON.parse(localStorage.getItem('golfmate_online')||'{}');
+    const room = online.room || '';
+    if(!room || room==='DEFAULT') return;
+    const today = new Date().toISOString().split('T')[0].replace(/-/g,'');
+    const FB_URL_VAL = (await import('./firebase/init.js')).FB_URL;
+    const res = await fetch(`${FB_URL_VAL}/backup/${today}/${room}/session.json`);
+    if(!res.ok) return;
+    const data = await res.json();
+    if(!data?.players?.length) return;
+    const names = data.players.map(p=>p.name).join(', ');
+    const holes = data.scores?.[0]?.filter(v=>v!==null).length||0;
+    const dateStr = data.gameDate ? new Date(data.gameDate).toLocaleDateString('th-TH',{day:'numeric',month:'short'}) : '';
+    const btn=document.getElementById('restore-game-btn');
+    const roomLbl=document.getElementById('restore-room-lbl');
+    const infoLbl=document.getElementById('restore-info-lbl');
+    if(btn){ btn.style.display='block'; }
+    if(roomLbl) roomLbl.textContent = room;
+    if(infoLbl) infoLbl.textContent = `${dateStr} · ${names} · ${holes}/18 หลุม`;
+  }catch(e){}
+}
+
+export function clearGameData(){
+  if(!confirm('ล้างข้อมูลเกมเก่า?\n\nสกอร์ในเครื่องจะหาย\n(Firebase backup ยังอยู่ — กู้คืนได้ภายหลัง)')) return;
+  localStorage.removeItem(LS_KEY);
+  setPlayers([]); setScores([]); setCurrentHole(0); setGameStarted(false);
+  location.reload();
+}
 export function autoSave(){ saveSession(); }
 
 // ============================================================
@@ -530,7 +581,7 @@ Object.assign(window, {
   setToday, fmtDate, toggleSw, toggleSkipPlayer, toggleSkipGame,
   toggleTeamSolo, toggleTeamScorecard, setTeamMode, setH2HSize, startGame, newGame,
   showAddPlayerModal, hideAddPlayerModal, confirmAddPlayer,
-  updateAddPlayerBtn, saveSession, loadSession, clearSession, autoSave,
+  updateAddPlayerBtn, saveSession, loadSession, clearSession, clearGameData, initRestoreBtn, autoSave,
   shareToLine,
   changeCoursePreset, applyParsFromPreset,
   goTab, goGuide, goResults, goMoney, showMoneyDetail,

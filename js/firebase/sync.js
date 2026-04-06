@@ -13,7 +13,6 @@ import { players, scores, pars, srikrungData, G,
          LS_KEY, autoSave } from '../config.js';
 
 export async function syncToFirebase(){
-  if(!syncEnabled)return;
   const room=getRoomCode();
   if(!room||room==='DEFAULT')return;
   const cn=document.getElementById('course-name').value||'—';
@@ -47,7 +46,6 @@ export async function syncToFirebase(){
 }
 
 export async function syncToSheets(){
-  if(!syncEnabled)return;
   const url=getApiUrl();
   if(!url||!url.startsWith('http'))return;
   const room=getRoomCode();
@@ -156,7 +154,6 @@ export async function deleteRoomFromFirebase(roomParam){
 }
 
 export async function syncFullBackup(){
-  if(!syncEnabled) return;
   const room = getRoomCode();
   if(!room || room==='DEFAULT') return;
   const gameDate = document.getElementById('game-date')?.value
@@ -201,7 +198,7 @@ export async function syncFullBackup(){
 }
 
 // ── RESTORE จาก Firebase ──
-export async function restoreFromFirebase(){
+export async function restoreFromFirebase(silent=false){
   const statusEl = document.getElementById('restore-status');
   const show = (msg, color) => {
     if(!statusEl) return;
@@ -224,8 +221,9 @@ export async function restoreFromFirebase(){
     safeDateKey = gameDate.replace(/-/g,'');
   } catch(e){}
 
-  // ถ้าไม่มีใน LS ให้กรอกเอง
+  // ถ้าไม่มีใน LS
   if(!room || room==='DEFAULT'){
+    if(silent) return; // auto mode — ไม่ถาม
     room = prompt('กรอก Room Code (เช่น A12):');
     if(!room){ show('❌ ยกเลิก','rgba(255,69,58,0.9)'); return; }
     const dateInput = prompt('กรอกวันที่ (YYYY-MM-DD):');
@@ -246,7 +244,7 @@ export async function restoreFromFirebase(){
     const holes = data.scores?.[0]?.filter(v=>v!==null).length || 0;
     const backedAt = data.backedUpAt ? new Date(data.backedUpAt).toLocaleTimeString('th-TH') : '—';
 
-    if(!confirm(`พบข้อมูล:\n👥 ${names}\n⛳ ${holes}/18 หลุม\n🕐 บันทึกเมื่อ ${backedAt}\n\nกู้คืนเกมนี้ไหมครับ?`)){
+    if(!silent && !confirm(`พบข้อมูล:\n👥 ${names}\n⛳ ${holes}/18 หลุม\n🕐 บันทึกเมื่อ ${backedAt}\n\nกู้คืนเกมนี้ไหมครับ?`)){
       show('ยกเลิกการกู้คืน','rgba(255,159,10,0.9)'); return;
     }
 
