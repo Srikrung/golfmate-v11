@@ -7,7 +7,7 @@
 import { players, scores, pars, G,
          olympicData, farNearData, srikrungData, skipData, teamSoloPlayers,
          setPlayers, setScores, setGameStarted, setCurrentHole,
-         isGameStarted, getCurrentHole, LS_KEY } from './config.js';
+         isGameStarted, getCurrentHole, LS_KEY, FB_URL } from './config.js';
 
 // ── ui ──
 import { initTheme, toggleTheme, applyFontScale, initFontScale,
@@ -527,8 +527,7 @@ export async function initRestoreBtn(){
     const room = online.room || '';
     if(!room || room==='DEFAULT') return;
     const today = new Date().toISOString().split('T')[0].replace(/-/g,'');
-    const FB_URL_VAL = (await import('./firebase/init.js')).FB_URL;
-    const res = await fetch(`${FB_URL_VAL}/backup/${today}/${room}/session.json`);
+    const res = await fetch(`${FB_URL}/backup/${today}/${room}/session.json`);
     if(!res.ok) return;
     const data = await res.json();
     if(!data?.players?.length) return;
