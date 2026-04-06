@@ -275,7 +275,12 @@ export async function loadOnlineRooms(){
             <div style="font-size:11px;color:var(--lbl2);margin-top:1px">${pList.length} คน · หลุม ${holes}/18</div>
             <div style="font-size:10px;color:var(--lbl3);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${names}</div>
           </div>
-          <span style="font-size:11px;color:var(--lbl3)">▼</span>
+          <button onclick="event.stopPropagation();deleteRoomFromFirebase('${room}')"
+            style="width:32px;height:32px;border-radius:8px;border:none;
+            background:rgba(255,69,58,0.1);color:var(--red);font-size:16px;
+            cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center">
+            🗑
+          </button>
         </div>
         <div style="display:none;padding:8px 12px 10px;display:flex;flex-wrap:wrap;gap:5px">
           ${pList.map(p=>`

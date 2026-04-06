@@ -74,21 +74,31 @@ export async function createRoom(){
   if(!room||room==='DEFAULT'){
     showSyncBar('⚠ กรุณาเลือก Room Code ก่อน','rgba(255,159,10,0.9)',3000); return;
   }
-  const cn=document.getElementById('course-name').value||'—';
-  const gameDate=document.getElementById('game-date').value||new Date().toISOString().split('T')[0];
+  const cn=document.getElementById('course-name')?.value||'—';
+  const gameDate=document.getElementById('game-date')?.value||new Date().toISOString().split('T')[0];
   const safeDateKey=gameDate.replace(/-/g,'');
+
+  // ดึงชื่อจาก players array ถ้ามี ถ้าไม่มีดึงจาก DOM
+  let myNames=players.map(p=>p.name).filter(Boolean);
+  if(!myNames.length){
+    myNames=[...document.querySelectorAll('.pn')]
+      .map(el=>el.value.trim()||el.placeholder||'')
+      .filter(Boolean)
+      .slice(0, +document.getElementById('num-players')?.value||4);
+  }
+
   showSyncBar('⟳ กำลังสร้างห้อง...','rgba(10,132,255,0.9)',0);
   try{
-    // บันทึก _room_config พร้อมชื่อผู้เล่นปัจจุบัน
-    const myNames=players.map(p=>p.name);
     await fetchWithTimeout(`${FB_URL}/scores/${safeDateKey}/${room}/_room_config.json`,{
       method:'PUT',
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify({players:myNames,course:cn,createdAt:Date.now(),dateKey:safeDateKey})
     },8000);
-    showSyncBar(`✅ สร้างห้อง ${room} สำเร็จ · คนอื่นค้นหาเจอแล้ว`,'rgba(48,209,88,0.9)',3000);
-    // sync สกอร์ขึ้นด้วยเพื่อให้ holesPlayed อัปเดต
-    syncToFirebase();
+    showSyncBar(`✅ สร้างห้อง ${room} สำเร็จ · ${myNames.length} คน · คนอื่นค้นหาเจอแล้ว`,'rgba(48,209,88,0.9)',4000);
+    // sync สกอร์ขึ้นด้วยถ้าเกมเริ่มแล้ว
+    if(players.length) syncToFirebase();
+    // auto-reload room list
+    setTimeout(()=>{ if(window.loadOnlineRooms) window.loadOnlineRooms(); }, 800);
   }catch(e){
     showSyncBar('❌ สร้างห้องไม่สำเร็จ — ตรวจสอบสัญญาณ','rgba(255,69,58,0.9)',3000);
   }
@@ -98,7 +108,7 @@ export async function createRoom(){
 import { syncJoinToFirebase } from '../modules/join.js';
 
 // ── ลบห้องทั้งหมดออกจาก Firebase (Host only) ──
-export async function deleteRoomFromFirebase(){
+export async function deleteRoomFromFirebase(roomParam){
   const statusEl = document.getElementById('delete-player-status');
   const show = (msg, color) => {
     if(!statusEl) return;
@@ -109,8 +119,8 @@ export async function deleteRoomFromFirebase(){
   };
   let room='', safeDateKey='';
   try{
-    const saved = JSON.parse(localStorage.getItem('golfmate_online')||'{}');
-    room = saved.room||'';
+    // ใช้ roomParam ถ้ามี (กดจาก room list) ไม่งั้นดึงจาก localStorage
+    room = roomParam || JSON.parse(localStorage.getItem('golfmate_online')||'{}').room || '';
     const raw = JSON.parse(localStorage.getItem(LS_KEY)||'{}');
     const gameDate = raw.gameDate || document.getElementById('game-date')?.value
       || new Date().toISOString().split('T')[0];
@@ -119,13 +129,17 @@ export async function deleteRoomFromFirebase(){
   if(!room||room==='DEFAULT'){
     show('❌ ไม่พบ Room Code — ตั้งค่าออนไลน์ก่อน','rgba(255,69,58,0.9)'); return;
   }
-  if(!confirm(`ลบห้อง "${room}" ทั้งหมดออกจาก Firebase?\nสกอร์ทุกคนในห้องนี้จะหายถาวร`)) return;
+  if(!confirm(`ลบห้อง "${room}" ?\n\n• สกอร์บน Firebase — หายถาวร\n• สกอร์ในเครื่องนี้ — หายด้วย\n\nยืนยันลบ?`)) return;
   show('⟳ กำลังลบ...','rgba(255,69,58,0.9)');
   try{
     await fetchWithTimeout(`${FB_URL}/scores/${safeDateKey}/${room}.json`,{method:'DELETE'},8000);
     await fetchWithTimeout(`${FB_URL}/backup/${safeDateKey}/${room}.json`,{method:'DELETE'},8000);
     show(`✅ ลบห้อง "${room}" สำเร็จ — สร้างห้องใหม่ได้เลย`,'rgba(48,209,88,0.9)');
-    // รีเซ็ต Room Code กลับค่าเริ่มต้น
+    // ล้าง localStorage (สกอร์ในเครื่อง)
+    try{ localStorage.removeItem(LS_KEY); }catch(e){}
+    // auto-reload room list
+    setTimeout(()=>{ if(window.loadOnlineRooms) window.loadOnlineRooms(); }, 800);
+    // รีเซ็ต Room Code กลับค่าเริ่มต้น (เฉพาะถ้าลบห้องตัวเอง)
     const el1=document.getElementById('room-code-letter');
     const el2=document.getElementById('room-code-num');
     const el3=document.getElementById('room-code-num2');

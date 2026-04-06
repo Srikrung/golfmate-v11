@@ -37,6 +37,17 @@
 
 <!-- SETUP -->
 <div class="screen active" id="scr-setup">
+  <div class="group" style="margin-bottom:16px;cursor:pointer" onclick="goGuide()">
+    <div style="display:flex;align-items:center;padding:13px 14px;gap:12px">
+      <div class="r-icon" style="background:rgba(10,132,255,0.15)">📖</div>
+      <div class="r-text">
+        <div class="r-title" style="color:var(--blue);font-weight:600">เรียนรู้ทุกกติกาและวิธีใช้งาน</div>
+        <div class="r-sub">คู่มือ GolfMate ฉบับสมบูรณ์</div>
+      </div>
+      <div style="font-size:16px;color:var(--lbl3)">›</div>
+    </div>
+  </div>
+
   <div class="sec-h">ผู้เล่น</div>
   <div class="group">
     <div class="row">
@@ -50,50 +61,6 @@
     </div>
   </div>
   <div id="player-rows"></div>
-
-  <div class="sec-h">ออนไลน์ / Leaderboard</div>
-  <div class="group" style="margin-bottom:8px;cursor:pointer" onclick="goOnlineSetup()">
-    <div style="display:flex;align-items:center;padding:13px 14px;gap:12px">
-      <div class="r-icon" style="background:rgba(48,209,88,0.15)">📡</div>
-      <div class="r-text">
-        <div class="r-title" style="color:var(--green);font-weight:600">ตั้งค่า Online Leaderboard</div>
-        <div class="r-sub" id="online-status-lbl">ยังไม่ได้ตั้งค่า</div>
-      </div>
-      <div style="font-size:16px;color:var(--lbl3)">›</div>
-    </div>
-  </div>
-
-  <!-- ── ปุ่มกู้คืน — มองเห็นได้เลยไม่ต้องกดเข้าเมนู ── -->
-  <div style="display:flex;flex-direction:column;gap:7px;margin-bottom:8px">
-    <button onclick="restoreFromFirebase()"
-      style="width:100%;padding:13px 14px;border-radius:12px;text-align:left;
-      border:1.5px solid rgba(10,132,255,0.35);background:rgba(10,132,255,0.07);
-      color:var(--blue);font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;
-      display:flex;align-items:center;gap:10px">
-      <span style="font-size:18px">🔄</span>
-      <div>
-        <div>กู้คืนเกม</div>
-        <div style="font-size:11px;font-weight:500;color:var(--lbl2);margin-top:1px">สำหรับ Host — ดึงสกอร์+เกมจาก Firebase</div>
-      </div>
-    </button>
-    <div id="restore-status"
-      style="display:none;text-align:center;font-size:13px;font-weight:600;
-      padding:9px 12px;border-radius:10px"></div>
-    <button onclick="restoreJoinSrikrung()"
-      style="width:100%;padding:13px 14px;border-radius:12px;text-align:left;
-      border:1.5px solid rgba(48,209,88,0.35);background:rgba(48,209,88,0.07);
-      color:var(--green);font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;
-      display:flex;align-items:center;gap:10px">
-      <span style="font-size:18px">🔄</span>
-      <div>
-        <div>กู้คืน FW/GIR/PUTT</div>
-        <div style="font-size:11px;font-weight:500;color:var(--lbl2);margin-top:1px">สำหรับ Join — ดึงสถิติจาก Firebase</div>
-      </div>
-    </button>
-    <div id="restore-join-status"
-      style="display:none;text-align:center;font-size:13px;font-weight:600;
-      padding:9px 12px;border-radius:10px"></div>
-  </div>
 
   <div class="sec-h">สนาม & วันที่</div>
   <div class="group">
@@ -135,7 +102,18 @@
     <div class="par-grid" id="par-back"></div>
   </div>
 
-  <div class="sec-h">เกมพนัน</div>
+  <div onclick="(function(s){var b=document.getElementById('gb-games-sec');b.style.display=b.style.display==='none'?'block':'none';s.querySelector('.arr').style.transform=b.style.display==='block'?'rotate(0)':'rotate(-90deg)';})(this)"
+    style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-radius:12px;cursor:pointer;margin-bottom:6px;background:rgba(239,159,39,0.08);border:1.5px solid rgba(239,159,39,0.4)">
+    <div style="display:flex;align-items:center;gap:10px">
+      <div style="width:36px;height:36px;border-radius:10px;background:rgba(239,159,39,0.2);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">🎰</div>
+      <div>
+        <div style="font-size:15px;font-weight:700;color:#633806">เกมพนัน</div>
+        <div style="font-size:11px;color:#854F0B;margin-top:1px">หมากัด · โอลิมปิก · ทีม · Far-Near · Turbo</div>
+      </div>
+    </div>
+    <span class="arr" style="font-size:12px;color:#854F0B;transition:transform .2s;transform:rotate(-90deg)">▼</span>
+  </div>
+  <div id="gb-games-sec" style="display:none">
   <div class="group">
     <div class="row" id="gr-bite">
       <div class="r-icon" style="background:rgba(255,159,10,0.18)">🐶</div>
@@ -211,7 +189,19 @@
     </div>
   </div>
 
-  <div class="sec-h">สถิติ</div>
+  </div>
+  <div onclick="(function(s){var b=document.getElementById('gb-stats-sec');b.style.display=b.style.display==='none'?'block':'none';s.querySelector('.arr').style.transform=b.style.display==='block'?'rotate(0)':'rotate(-90deg)';})(this)"
+    style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-radius:12px;cursor:pointer;margin-bottom:6px;background:rgba(29,158,117,0.08);border:1.5px solid rgba(29,158,117,0.4)">
+    <div style="display:flex;align-items:center;gap:10px">
+      <div style="width:36px;height:36px;border-radius:10px;background:rgba(29,158,117,0.2);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">⛳</div>
+      <div>
+        <div style="font-size:15px;font-weight:700;color:#085041">สถิติ</div>
+        <div style="font-size:11px;color:#0F6E56;margin-top:1px">Srikrung Golf Day · FW · GIR · PUTT</div>
+      </div>
+    </div>
+    <span class="arr" style="font-size:12px;color:#0F6E56;transition:transform .2s;transform:rotate(-90deg)">▼</span>
+  </div>
+  <div id="gb-stats-sec" style="display:none">
   <div class="group">
     <div class="row" id="gr-srikrung">
       <div class="r-icon" style="background:rgba(52,199,89,0.15)">⛳</div>
@@ -232,7 +222,12 @@
     </div>
   </div>
 
-  <!-- ── ขนาดตัวอักษร ── -->
+  </div>
+
+
+
+
+
   <div class="sec-h">การแสดงผล</div>
   <div class="group">
     <div style="padding:13px 14px">
@@ -266,18 +261,66 @@
         <span style="font-size:10px;color:var(--lbl3)">ใหญ่มาก</span>
         <span style="font-size:10px;color:var(--lbl3)">ใหญ่สุด</span>
       </div>
+      <!-- Preview box -->
+      <div style="margin-top:12px;background:var(--bg3);border-radius:10px;overflow:hidden;border:0.5px solid var(--sep)">
+        <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:0.5px solid var(--sep)">
+          <div id="fs-prev-name" style="flex:1;font-weight:700;color:var(--lbl);font-size:17px;transition:font-size .2s">สมชาย</div>
+          <div style="display:flex;align-items:center;background:var(--bg4);border-radius:8px;overflow:hidden;border:1px solid var(--bg4)">
+            <div id="fs-prev-sb" style="width:34px;height:38px;display:flex;align-items:center;justify-content:center;color:var(--blue);font-size:22px;font-weight:300;transition:all .2s">−</div>
+            <div id="fs-prev-sv" style="min-width:36px;text-align:center;font-size:19px;font-weight:700;color:var(--lbl);transition:all .2s">5</div>
+            <div id="fs-prev-sb2" style="width:34px;height:38px;display:flex;align-items:center;justify-content:center;color:var(--blue);font-size:22px;font-weight:300;transition:all .2s">+</div>
+          </div>
+        </div>
+        <div style="padding:6px 12px;font-size:10px;color:var(--lbl3);text-align:center" id="fs-prev-lbl">ตัวอย่าง — ปกติ</div>
+      </div>
     </div>
   </div>
 
-  <div class="group" style="margin-bottom:16px;cursor:pointer" onclick="goGuide()">
+
+
+
+  <div class="sec-h">ออนไลน์ / Leaderboard</div>
+  <div class="group" style="margin-bottom:8px;cursor:pointer" onclick="goOnlineSetup()">
     <div style="display:flex;align-items:center;padding:13px 14px;gap:12px">
-      <div class="r-icon" style="background:rgba(10,132,255,0.15)">📖</div>
+      <div class="r-icon" style="background:rgba(48,209,88,0.15)">📡</div>
       <div class="r-text">
-        <div class="r-title" style="color:var(--blue);font-weight:600">เรียนรู้ทุกกติกาและวิธีใช้งาน</div>
-        <div class="r-sub">คู่มือ GolfMate ฉบับสมบูรณ์</div>
+        <div class="r-title" style="color:var(--green);font-weight:600">☁️ สำรองข้อมูล & Leaderboard</div>
+        <div class="r-sub" id="online-status-lbl">ยังไม่ได้ตั้งค่า</div>
       </div>
       <div style="font-size:16px;color:var(--lbl3)">›</div>
     </div>
+  </div>
+
+  <!-- ── ปุ่มกู้คืน — มองเห็นได้เลยไม่ต้องกดเข้าเมนู ── -->
+  <div style="display:flex;flex-direction:column;gap:7px;margin-bottom:8px">
+    <button onclick="restoreFromFirebase()"
+      style="width:100%;padding:13px 14px;border-radius:12px;text-align:left;
+      border:1.5px solid rgba(10,132,255,0.35);background:rgba(10,132,255,0.07);
+      color:var(--blue);font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;
+      display:flex;align-items:center;gap:10px">
+      <span style="font-size:18px">🔄</span>
+      <div>
+        <div>กู้คืนเกม</div>
+        <div style="font-size:11px;font-weight:500;color:var(--lbl2);margin-top:1px">สำหรับ Host — ดึงสกอร์+เกมจาก Firebase</div>
+      </div>
+    </button>
+    <div id="restore-status"
+      style="display:none;text-align:center;font-size:13px;font-weight:600;
+      padding:9px 12px;border-radius:10px"></div>
+    <button onclick="restoreJoinSrikrung()"
+      style="width:100%;padding:13px 14px;border-radius:12px;text-align:left;
+      border:1.5px solid rgba(48,209,88,0.35);background:rgba(48,209,88,0.07);
+      color:var(--green);font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;
+      display:flex;align-items:center;gap:10px">
+      <span style="font-size:18px">🔄</span>
+      <div>
+        <div>กู้คืน FW/GIR/PUTT</div>
+        <div style="font-size:11px;font-weight:500;color:var(--lbl2);margin-top:1px">สำหรับ Join — ดึงสถิติจาก Firebase</div>
+      </div>
+    </button>
+    <div id="restore-join-status"
+      style="display:none;text-align:center;font-size:13px;font-weight:600;
+      padding:9px 12px;border-radius:10px"></div>
   </div>
 
   <button class="cta" onclick="startGame()">เริ่มบันทึกสกอร์ ⛳</button>
@@ -424,20 +467,10 @@
         </div>
         <div class="sw on" id="sw-sync" onclick="toggleSyncSw()"></div>
       </div>
-      <!-- ลบห้อง -->
-      <div style="padding:5px 14px 12px">
-        <button onclick="deleteRoomFromFirebase()" style="width:100%;padding:10px;border-radius:10px;border:1.5px solid rgba(255,69,58,0.35);background:rgba(255,69,58,0.07);color:var(--red);font-family:inherit;font-size:13px;font-weight:700;cursor:pointer">
-          🗑 ลบห้อง
-        </button>
-        <div id="delete-player-status" style="display:none;text-align:center;font-size:12px;font-weight:600;padding:7px 10px;border-radius:8px;margin-top:5px"></div>
-      </div>
+      <div id="delete-player-status" style="display:none;text-align:center;font-size:12px;font-weight:600;padding:7px 10px 0;border-radius:8px;margin:0 14px"></div>
     </div>
 
-    <!-- ทดสอบการเชื่อมต่อ -->
-    <button onclick="testConnection()" style="width:100%;padding:11px;background:var(--bg2);border:1px solid var(--bg4);border-radius:12px;color:var(--blue);font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;margin-bottom:10px">
-      ทดสอบการเชื่อมต่อ
-    </button>
-    <div id="test-result" style="display:none;text-align:center;font-size:13px;padding:8px;border-radius:8px;margin-bottom:10px"></div>
+
 
     <!-- สร้างห้อง -->
     <div style="background:var(--bg2);border-radius:14px;padding:14px;margin-bottom:10px;box-shadow:var(--card-shadow)">
@@ -447,9 +480,9 @@
         color:var(--blue);font-family:inherit;font-size:16px;font-weight:800;cursor:pointer">
         🏠 สร้างห้อง
       </button>
-      <div style="font-size:11px;color:var(--lbl2);text-align:center;margin-top:7px;line-height:1.7">
-        สร้างห้องขึ้น Firebase · คนอื่นค้นหาเจอและ Join ได้ทันที<br>
-        <span style="color:var(--lbl3)">ถ้าเพิ่มผู้เล่นระหว่างเกม — กด สร้างห้อง ใหม่อีกครั้ง</span>
+      <div style="margin-top:8px;padding:8px 10px;background:rgba(255,159,10,0.1);border-radius:8px;border-left:3px solid var(--orange)">
+        <div style="font-size:11px;color:var(--orange);font-weight:700;margin-bottom:2px">⚠️ สร้างห้องเพื่อบันทึกข้อมูล</div>
+        <div style="font-size:11px;color:var(--lbl2);line-height:1.6">ต้องสร้างห้องก่อนเริ่มเกม — ข้อมูลสกอร์จะ backup ขึ้น Cloud ทุก 10 วินาที<br>ถ้าเพิ่มผู้เล่นระหว่างเกม → กด สร้างห้อง ใหม่อีกครั้ง</div>
       </div>
     </div>
 
@@ -713,7 +746,7 @@
     </div>
 
     <!-- Online Leaderboard -->
-    <div style="font-size:15px;font-weight:700;color:var(--lbl);margin:18px 0 8px">📡 Online Leaderboard</div>
+    <div style="font-size:15px;font-weight:700;color:var(--lbl);margin:18px 0 8px">☁️ สำรองข้อมูล & Leaderboard</div>
     <div style="background:var(--bg2);border-radius:14px;padding:16px;margin-bottom:10px;box-shadow:var(--card-shadow)">
       <div style="font-size:13px;color:var(--lbl);display:flex;flex-direction:column;gap:8px;line-height:1.6">
         <div style="display:flex;align-items:baseline;gap:8px"><span style="width:18px;height:18px;border-radius:50%;background:var(--blue);color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0">1</span>ตั้ง <strong>Room Code</strong> (A–Z + 00–99) เช่น A011 แจ้งทุกคนใช้รหัสเดียวกัน</div>

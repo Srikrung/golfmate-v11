@@ -38,10 +38,18 @@ import { goLeaderboard, lbGoPrev, lbGoNext,
          lbSetTab, lbSetRoom, lbFetch } from './modules/leaderboard.js';
 
 // ── firebase ──
-import { toggleSyncSw, updateRoomCode, syncEnabled } from './firebase/init.js';
+import { toggleSyncSw, updateRoomCode, syncEnabled, getRoomCode } from './firebase/init.js';
 import { loadOnlineSetting, goOnlineSetup, saveOnlineSetup, testConnection } from './firebase/room.js';
 import { createRoom, syncFullBackup, restoreFromFirebase,
          deleteRoomFromFirebase } from './firebase/sync.js';
+
+// ── Debounce backup 10 วินาที หลัง autoSave ──
+let _backupTimer = null;
+function scheduleBackup(){
+  if(!navigator.onLine) return; // ออฟไลน์ → ข้าม
+  clearTimeout(_backupTimer);
+  _backupTimer = setTimeout(()=>{ syncFullBackup(); }, 10000);
+}
 
 // ============================================================
 // INIT
@@ -56,6 +64,18 @@ document.addEventListener('DOMContentLoaded', () => {
   buildParGrid();
   renderPlayerRows();
   buildTurboGrid();
+  // ── Auto-expire: ล้างเกมเก่าช่วง 04:00–05:59 ──
+  try{
+    const saved = JSON.parse(localStorage.getItem(LS_KEY)||'{}');
+    if(saved.gameDate){
+      const now   = new Date();
+      const hour  = now.getHours();
+      const today = now.toISOString().split('T')[0];
+      if(saved.gameDate !== today && hour >= 4 && hour < 6){
+        localStorage.removeItem(LS_KEY);
+      }
+    }
+  }catch(e){}
   loadSession();
   loadOnlineSetting();
   initSwipe();
@@ -283,6 +303,14 @@ export function newGame(){
 // START GAME
 // ============================================================
 export function startGame(){
+  // เตือนถ้าไม่มี Room Code
+  const room = getRoomCode();
+  if(!room || room==='DEFAULT'){
+    const go = confirm(
+      '⚠️ ยังไม่ได้ตั้ง Room Code\n\nข้อมูลสกอร์จะไม่ถูก backup ขึ้น Cloud\nถ้ารีเฟรชพลาดข้อมูลอาจหาย\n\nกด ตกลง เพื่อเล่นต่อโดยไม่ backup\nกด ยกเลิก เพื่อไปตั้ง Room Code ก่อน'
+    );
+    if(!go){ goOnlineSetup(); return; }
+  }
   const n = +document.getElementById('num-players').value;
   setPlayers([...document.querySelectorAll('.pn')].slice(0,n).map((el,i) => ({
     name: el.value.trim() || el.placeholder || `ผู้เล่น ${i+1}`,
@@ -406,6 +434,7 @@ export function saveSession(){
       courseName: document.getElementById('course-name')?.value,
       gameDate:   document.getElementById('game-date')?.value
     }));
+    scheduleBackup(); // debounce backup 10 วิ
   } catch(e){}
 }
 

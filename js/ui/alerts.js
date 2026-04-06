@@ -35,6 +35,19 @@ export function applyFontScale(fs){
     btn.style.color=on?'var(--blue)':'var(--lbl2)';
     btn.style.borderColor=on?'rgba(10,132,255,0.5)':'var(--bg4)';
   });
+  // อัปเดต preview box
+  const cfg={S:{name:17,score:19,btn:34,h:38,lbl:'ปกติ'},M:{name:20,score:23,btn:41,h:46,lbl:'ใหญ่'},L:{name:25,score:28,btn:49,h:55,lbl:'ใหญ่มาก'},XL:{name:30,score:33,btn:60,h:66,lbl:'ใหญ่สุด — เหมาะสายตาไม่ดี'}};
+  const c=cfg[fs||'S'];
+  const pn=document.getElementById('fs-prev-name');
+  const sv=document.getElementById('fs-prev-sv');
+  const sb=document.getElementById('fs-prev-sb');
+  const sb2=document.getElementById('fs-prev-sb2');
+  const lb=document.getElementById('fs-prev-lbl');
+  if(pn) pn.style.fontSize=c.name+'px';
+  if(sv){ sv.style.fontSize=c.score+'px'; sv.style.minWidth=c.btn+'px'; }
+  if(sb){ sb.style.width=c.btn+'px'; sb.style.height=c.h+'px'; sb.style.fontSize=(c.score+3)+'px'; }
+  if(sb2){ sb2.style.width=c.btn+'px'; sb2.style.height=c.h+'px'; sb2.style.fontSize=(c.score+3)+'px'; }
+  if(lb) lb.textContent='ตัวอย่าง — '+c.lbl;
   try{localStorage.setItem(FS_KEY,fs||'S');}catch(e){}
 }
 export function initFontScale(){

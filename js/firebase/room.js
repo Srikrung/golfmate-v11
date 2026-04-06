@@ -4,22 +4,22 @@
 import { FB_URL } from '../config.js';
 import { showSyncBar, getRoomCode, getApiUrl, syncEnabled,
          joinMode, joinPlayerName, setJoinMode, setJoinPlayerName,
-         setSyncEnabled, updateRoomCode } from './init.js';
+         setSyncEnabled, updateRoomCode, fetchWithTimeout } from './init.js';
 import { goTab } from '../ui/tabs.js';
 
 export async function getRoomPlayers(room,safeDateKey){
   try{
-    const r=await fetch(`${FB_URL}/scores/${safeDateKey}/${room}.json`);
+    const r=await fetchWithTimeout(`${FB_URL}/scores/${safeDateKey}/${room}.json`);
     if(!r.ok)return[];
     const d=await r.json();
     if(!d)return[];
     return Object.entries(d).filter(([k,v])=>k!=='_room_config'&&v&&v.name).map(([,v])=>v.name);
-  }catch(e){return[];}
+  }catch(e){return[];} 
 }
 
 export async function getRoomConfig(room,safeDateKey){
   try{
-    const r=await fetch(`${FB_URL}/scores/${safeDateKey}/${room}/_room_config.json`);
+    const r=await fetchWithTimeout(`${FB_URL}/scores/${safeDateKey}/${room}/_room_config.json`);
     if(!r.ok)return null;
     const d=await r.json();
     return d||null;
@@ -74,10 +74,14 @@ export function saveOnlineSetup(){
 
 export function updateOnlineStatusLabel(){
   const lbl=document.getElementById('online-status-lbl');if(!lbl)return;
-  const room=getRoomCode();const url=getApiUrl();
-  if(url&&url.startsWith('http')&&room&&room!=='DEFAULT'){
-    lbl.textContent=`Room: ${room} · Sync ${syncEnabled?'ON':'OFF'}`;lbl.style.color='var(--green)';
-  } else {lbl.textContent='ยังไม่ได้ตั้งค่า';lbl.style.color='';}
+  const room=getRoomCode();
+  if(room&&room!=='DEFAULT'){
+    lbl.textContent=`Room: ${room} · Sync ${syncEnabled?'ON':'OFF'} · ☁️ backup พร้อม`;
+    lbl.style.color='var(--green)';
+  } else {
+    lbl.textContent='⚠️ ยังไม่ตั้ง Room Code — ข้อมูลไม่ได้ backup!';
+    lbl.style.color='var(--orange,#ff9f0a)';
+  }
 }
 
 export async function testConnection(){
