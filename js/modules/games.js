@@ -255,7 +255,7 @@ export function fnRenderHole(h){
   const opts=`<option value="">-เลือก-</option>`+players.map((p,i)=>`<option value="${i}">${p.name}</option>`).join('');
   const rowStyle=`display:flex;align-items:center;gap:6px;padding:7px 0;border-bottom:0.5px solid var(--sep)`;
   const lblStyle=`color:var(--purple);font-size:13px;width:72px;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis`;
-  const selStyle=`flex:1;padding:7px 0;font-size:13px;border-radius:8px;background:var(--bg4);border:none;color:var(--lbl);font-family:inherit`;
+  const selStyle=`flex:1;padding:7px 10px;font-size:13px;border-radius:8px;background:var(--bg4);border:none;color:var(--lbl);font-family:inherit;text-align:center;text-align-last:center`;
   const btnSt=(cond,val,role,st,lbl)=>`<button class="oly-btn${val===st?' ob-sank on':''} ${cond?'ob-dis':''}" onclick="fnToggleSank(${h},'${role}','${st}')">${lbl}</button>`;
   if(d.mode==='multi'){
     ui.innerHTML=`

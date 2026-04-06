@@ -7,7 +7,7 @@
 // ── FIREBASE ──
 export const FB_URL = 'https://golfmate-4d819-default-rtdb.asia-southeast1.firebasedatabase.app';
 export const ROOM_MAX = 8;
-export const LS_KEY = 'golfmate_v10';
+export const LS_KEY = 'golfmate_v11';
 export const THEME_KEY = 'golfmate_theme';
 export const ICONS = {bite:'🐶',olympic:'🏅',team:'🤝',farNear:'🎯',hcap:'🎯'};
 

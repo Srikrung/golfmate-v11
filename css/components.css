@@ -63,13 +63,13 @@ input:focus,select:focus{border-color:var(--blue)}
 .score-row{display:flex;align-items:center;padding:11px 14px;border-bottom:0.5px solid var(--sep);gap:10px;background:var(--hole-row)}
 .score-row:last-child{border:none}
 .s-name{flex:1;display:flex;align-items:center;gap:8px;min-width:0}
-.s-name-text{font-size:17px;font-weight:600;color:var(--lbl);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.s-name-text{font-size:18px;font-weight:600;color:var(--lbl);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .stepper{display:flex;align-items:center;background:var(--bg3);border-radius:10px;overflow:hidden;flex-shrink:0;border:1px solid var(--bg4)}
 .sb{width:34px;height:38px;background:none;border:none;color:var(--blue);font-size:22px;font-weight:300;cursor:pointer;display:flex;align-items:center;justify-content:center}
 .ss{width:0.5px;height:20px;background:var(--sep)}
 .sv{min-width:36px;text-align:center;font-size:19px;font-weight:700;color:var(--lbl)}
 .sv.e{font-size:14px;color:var(--lbl3)}
-.s-badge{font-size:11px;font-weight:700;min-width:44px;text-align:right;flex-shrink:0}
+.s-badge{font-size:12px;font-weight:700;min-width:44px;text-align:right;flex-shrink:0}
 
 /* ── OLYMPIC ROWS ── */
 .oly-r-row{display:flex;align-items:center;gap:6px;padding:7px 0;border-bottom:0.5px solid var(--sep)}
@@ -97,7 +97,7 @@ body.light .rank-card{background:#fff;border:0.5px solid rgba(0,0,0,0.08);box-sh
 .money-card{background:#0a0a14;border-radius:14px;overflow:hidden;margin-bottom:10px;border:0.5px solid rgba(255,255,255,0.08)}
 body.light .money-card{background:#fff;border:0.5px solid rgba(0,0,0,0.08);box-shadow:0 1px 3px rgba(0,0,0,0.08)}
 .mc-hdr{padding:10px 14px;border-bottom:0.5px solid var(--sep)}
-.mc-lbl{font-size:11px;font-weight:600;color:var(--lbl2);text-transform:uppercase;letter-spacing:0.5px}
+.mc-lbl{font-size:12px;font-weight:600;color:var(--lbl2);text-transform:uppercase;letter-spacing:0.5px}
 .m-row{display:flex;align-items:center;padding:11px 14px;border-bottom:0.5px solid var(--sep)}
 .m-row:last-child{border:none}
 .m-name{flex:1;font-size:15px;color:var(--lbl)}
@@ -145,7 +145,7 @@ body.light .tbl-wrap{background:#fff;border:0.5px solid rgba(0,0,0,0.08);box-sha
 .ob{
   padding:6px 0;border-radius:999px;
   border:1px solid var(--bg4);background:var(--bg3);
-  color:var(--lbl2);font-size:9px;font-weight:600;
+  color:var(--lbl2);font-size:11px;font-weight:600;
   text-align:center;cursor:pointer;font-family:inherit;transition:all .12s;
 }
 .ob.ob-rank{
@@ -155,7 +155,7 @@ body.light .tbl-wrap{background:#fff;border:0.5px solid rgba(0,0,0,0.08);box-sha
   gap:1px;min-height:68px;
 }
 .ob.ob-rank .rn{font-size:18px;font-weight:800;line-height:1;display:block}
-.ob.ob-rank .rl{font-size:8px;color:var(--lbl2);font-weight:500;display:block}
+.ob.ob-rank .rl{font-size:10px;color:var(--lbl2);font-weight:500;display:block}
 .ob.ob-dq.ob-on  {background:rgba(255,69,58,0.15); color:var(--red);   border-color:rgba(255,69,58,0.35);font-weight:700}
 .ob.ob-chip.ob-on{background:rgba(255,214,10,0.1);  color:var(--yellow);border-color:rgba(255,214,10,0.28);font-weight:700}
 .ob.ob-rank.ob-on{background:rgba(10,132,255,0.15); color:var(--blue);  border-color:rgba(10,132,255,0.35);font-weight:800}
@@ -198,7 +198,7 @@ body.light .tbl-wrap{background:#fff;border:0.5px solid rgba(0,0,0,0.08);box-sha
   border-radius:999px;
   border:1.5px solid var(--bg4);
   cursor:pointer;font-family:inherit;
-  font-size:10px;font-weight:700;
+  font-size:11px;font-weight:700;
   background:var(--bg3);
   color:var(--lbl3);
   text-align:center;
@@ -233,7 +233,7 @@ body.light .tbl-wrap{background:#fff;border:0.5px solid rgba(0,0,0,0.08);box-sha
 .pg-tb-btn{
   flex:1.2;
   padding:6px 0;
-  font-size:10px;font-weight:800;
+  font-size:11px;font-weight:800;
   text-align:center;
   cursor:pointer;border:none;font-family:inherit;
   border-radius:999px;
@@ -241,7 +241,7 @@ body.light .tbl-wrap{background:#fff;border:0.5px solid rgba(0,0,0,0.08);box-sha
 }
 .pg-dr{
   flex:1;padding:6px 0;
-  font-size:10px;font-weight:700;text-align:center;cursor:pointer;
+  font-size:11px;font-weight:700;text-align:center;cursor:pointer;
   border-radius:999px;border:none;
   background:transparent;color:var(--lbl2);font-family:inherit;
 }
@@ -252,14 +252,14 @@ body.light .tbl-wrap{background:#fff;border:0.5px solid rgba(0,0,0,0.08);box-sha
    FONT SCALE — ปรับขนาดตัวอักษรและปุ่มทุกส่วน
    ============================================================ */
 /* ชื่อผู้เล่น */
-.s-name-text{ font-size:calc(17px * var(--fs)) }
+.s-name-text{ font-size:calc(18px * var(--fs)) }
 /* สกอร์ + ปุ่ม −/+ */
 .sv{ font-size:calc(19px * var(--fs)) !important; min-width:calc(36px * var(--fs)) }
 .sv.e{ font-size:calc(14px * var(--fs)) !important }
 .sb{ width:calc(34px * var(--fs)) !important; height:calc(38px * var(--fs)) !important; font-size:calc(22px * var(--fs)) !important }
 /* pill group ทีม/เบิ้ล/รี */
 .pg-tb-btn{ font-size:calc(10px * var(--fs)); padding:calc(6px * var(--fs)) 0 }
-.pg-dr{ font-size:calc(10px * var(--fs)); padding:calc(6px * var(--fs)) 0 }
+.pg-dr{ font-size:calc(11px * var(--fs)); padding:calc(6px * var(--fs)) 0 }
 /* ปุ่มเกม (game toggles) */
 .gt-btn{ font-size:calc(12px * var(--fs)); padding:calc(7px * var(--fs)) calc(10px * var(--fs)) }
 /* DQ / Chip / ลง / ไม่ลง */
