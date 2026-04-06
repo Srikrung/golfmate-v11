@@ -61,6 +61,40 @@
       <span style="font-size:20px;color:rgba(255,255,255,0.8)">›</span>
     </div>
   </div>
+  <div class="sec-h">ออนไลน์ / Leaderboard</div>
+  <div class="group" style="margin-bottom:8px;cursor:pointer" onclick="goOnlineSetup()">
+    <div style="display:flex;align-items:center;padding:13px 14px;gap:12px">
+      <div class="r-icon" style="background:rgba(48,209,88,0.15)">📡</div>
+      <div class="r-text">
+        <div class="r-title" style="color:var(--green);font-weight:600">☁️ สำรองข้อมูล & Leaderboard</div>
+        <div class="r-sub" id="online-status-lbl">ยังไม่ได้ตั้งค่า</div>
+      </div>
+      <div style="font-size:16px;color:var(--lbl3)">›</div>
+    </div>
+  </div>
+
+  <!-- ── ปุ่มกู้คืน FW/GIR/PUTT — สำหรับ Join ── -->
+  <div style="display:flex;flex-direction:column;gap:7px;margin-bottom:8px">
+    <div id="restore-status"
+      style="display:none;text-align:center;font-size:13px;font-weight:600;
+      padding:9px 12px;border-radius:10px"></div>
+    <button onclick="restoreJoinSrikrung()"
+      style="width:100%;padding:13px 14px;border-radius:12px;text-align:left;
+      border:1.5px solid rgba(48,209,88,0.35);background:rgba(48,209,88,0.07);
+      color:var(--green);font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;
+      display:flex;align-items:center;gap:10px">
+      <span style="font-size:18px">🔄</span>
+      <div>
+        <div>กู้คืน FW/GIR/PUTT</div>
+        <div style="font-size:11px;font-weight:500;color:var(--lbl2);margin-top:1px">สำหรับ Join — ดึงสถิติจาก Firebase</div>
+      </div>
+    </button>
+    <div id="restore-join-status"
+      style="display:none;text-align:center;font-size:13px;font-weight:600;
+      padding:9px 12px;border-radius:10px"></div>
+  </div>
+
+
 
   <div class="sec-h">ผู้เล่น</div>
   <div class="group">
@@ -292,39 +326,6 @@
 
 
 
-
-  <div class="sec-h">ออนไลน์ / Leaderboard</div>
-  <div class="group" style="margin-bottom:8px;cursor:pointer" onclick="goOnlineSetup()">
-    <div style="display:flex;align-items:center;padding:13px 14px;gap:12px">
-      <div class="r-icon" style="background:rgba(48,209,88,0.15)">📡</div>
-      <div class="r-text">
-        <div class="r-title" style="color:var(--green);font-weight:600">☁️ สำรองข้อมูล & Leaderboard</div>
-        <div class="r-sub" id="online-status-lbl">ยังไม่ได้ตั้งค่า</div>
-      </div>
-      <div style="font-size:16px;color:var(--lbl3)">›</div>
-    </div>
-  </div>
-
-  <!-- ── ปุ่มกู้คืน FW/GIR/PUTT — สำหรับ Join ── -->
-  <div style="display:flex;flex-direction:column;gap:7px;margin-bottom:8px">
-    <div id="restore-status"
-      style="display:none;text-align:center;font-size:13px;font-weight:600;
-      padding:9px 12px;border-radius:10px"></div>
-    <button onclick="restoreJoinSrikrung()"
-      style="width:100%;padding:13px 14px;border-radius:12px;text-align:left;
-      border:1.5px solid rgba(48,209,88,0.35);background:rgba(48,209,88,0.07);
-      color:var(--green);font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;
-      display:flex;align-items:center;gap:10px">
-      <span style="font-size:18px">🔄</span>
-      <div>
-        <div>กู้คืน FW/GIR/PUTT</div>
-        <div style="font-size:11px;font-weight:500;color:var(--lbl2);margin-top:1px">สำหรับ Join — ดึงสถิติจาก Firebase</div>
-      </div>
-    </button>
-    <div id="restore-join-status"
-      style="display:none;text-align:center;font-size:13px;font-weight:600;
-      padding:9px 12px;border-radius:10px"></div>
-  </div>
 
   <button class="cta" onclick="startGame()">เริ่มบันทึกสกอร์ ⛳</button>
   <button onclick="clearGameData()"
