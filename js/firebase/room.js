@@ -26,15 +26,6 @@ export async function getRoomConfig(room,safeDateKey){
   }catch(e){return null;}
 }
 
-export async function lockRoom(room,safeDateKey,playerNames){
-  try{
-    await fetch(`${FB_URL}/scores/${safeDateKey}/${room}/_room_config.json`,{
-      method:'PUT',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({players:playerNames,lockedAt:Date.now(),dateKey:safeDateKey})
-    });
-  }catch(e){}
-}
 
 export function goOnlineSetup(){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
@@ -61,7 +52,7 @@ export function goOnlineSetup(){
 
 export function saveOnlineSetup(){
   const room=getRoomCode();const url=getApiUrl();
-  try{localStorage.setItem('golfmate_online',JSON.stringify({room,url,sync:syncEnabled,joinMode,joinPlayerName}));}catch(e){}
+  try{localStorage.setItem('golfmate_online',JSON.stringify({room,url,joinMode,joinPlayerName}));}catch(e){}
   updateOnlineStatusLabel();
   if(joinMode){
     const s=document.getElementById('join-status');
@@ -76,7 +67,7 @@ export function updateOnlineStatusLabel(){
   const lbl=document.getElementById('online-status-lbl');if(!lbl)return;
   const room=getRoomCode();
   if(room&&room!=='DEFAULT'){
-    lbl.textContent=`Room: ${room} · Sync ${syncEnabled?'ON':'OFF'} · ☁️ backup พร้อม`;
+    lbl.textContent=`Room: ${room} · ☁️ backup พร้อม`;
     lbl.style.color='var(--green)';
   } else {
     lbl.textContent='⚠️ ยังไม่ตั้ง Room Code — ข้อมูลไม่ได้ backup!';
