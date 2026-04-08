@@ -24,7 +24,8 @@ export function updateRoomCode(){
   document.getElementById('room-code-preview').textContent=code||'—';
 }
 export function getRoomCode(){return(document.getElementById('room-code')?.value||'').trim()||'DEFAULT';}
-export function getApiUrl(){return(document.getElementById('api-url')?.value||'').trim()||FB_URL;}
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbytrMvvaaZ_AsJ2aeEGLDqN23rRVm7Xs6fYzWFSWorDXEf-IPIzB86Roz1nDnE5Us_GHg/exec';
+export function getApiUrl(){return(document.getElementById('api-url')?.value||'').trim()||APPS_SCRIPT_URL;}
 export function showSyncBar(msg,color,duration=2500){
   const bar=document.getElementById('sync-bar');
   if(!bar)return;
