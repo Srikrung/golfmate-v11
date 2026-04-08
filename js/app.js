@@ -201,12 +201,14 @@ export function toggleTeamScorecard(h, p){
   const cur    = G.team.domoTeams[h]?.[p] || 'A';
 
   if(isOut){
-    // ไม่เล่น → กลับ A — เฉพาะหลุมนี้
+    // ไม่เล่น → กลับ A
     skipData[h][p].delete('team');
     teamSoloPlayers.delete(p);
     G.team.domoTeams[h][p] = 'A';
+    // propagate A ไปหลุมถัดไป
+    for(let i=h+1;i<18;i++) G.team.domoTeams[i][p]='A';
   } else if(isSolo){
-    // Solo → ไม่เล่น — เฉพาะหลุมนี้
+    // Solo → ไม่เล่น
     teamSoloPlayers.delete(p);
     if(!skipData[h]){ skipData[h]=Array(players.length).fill(null).map(()=>new Set()); }
     else { while(skipData[h].length<players.length) skipData[h].push(new Set()); }
@@ -216,16 +218,17 @@ export function toggleTeamScorecard(h, p){
     // B → Solo
     teamSoloPlayers.add(p);
   } else {
-    // A → B — เฉพาะหลุมนี้
+    // A → B — propagate ไปทุกหลุมถัดไป
     G.team.domoTeams[h][p] = 'B';
+    for(let i=h+1;i<18;i++) G.team.domoTeams[i][p]='B';
   }
-  // อัปเดต badge เฉพาะจุด ไม่ต้อง render ทั้งหน้า
-  const el = document.getElementById(`tb-${h}-${p}`);
-  if(el){
-    const {bg,cl,label} = getTeamBadgeProps(h,p);
-    el.style.background = bg;
-    el.style.color = cl;
-    el.textContent = label;
+  // อัปเดต badge ทุกหลุมที่เปลี่ยน
+  for(let i=h;i<18;i++){
+    const el=document.getElementById(`tb-${i}-${p}`);
+    if(el){
+      const {bg,cl,label}=getTeamBadgeProps(i,p);
+      el.style.background=bg; el.style.color=cl; el.textContent=label;
+    }
   }
   updateTotals(); autoSave();
 }
