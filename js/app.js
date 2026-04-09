@@ -25,7 +25,7 @@ import { showHole, updateTotals, drSet, _refreshOlyInline,
 // ── modules ──
 import { initHcapPairs, addHcapPairsForPlayer, buildHcapUI,
          hcapTogglePair, hcapSetStroke, hcapSetField } from './modules/handicap.js';
-import { updateBiteMultUI, toggleBiteMult,
+import { updateBiteMultUI, toggleBiteMult, setBiteMult,
          toggleGameMidPlay, olyAct, olyReset, olyRenderHole,
          fnChangeMode, fnToggleSank, fnSelectPlayer, fnRenderHole } from './modules/games.js';
 import { sgToggle, sgChPutt, sgSetPutt1, sgRenderHole,
@@ -128,7 +128,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // games
     toggleGameMidPlay, olyAct, olyReset, olyRenderHole,
     fnChangeMode, fnToggleSank, fnSelectPlayer, fnRenderHole,
-    toggleBiteMult, updateBiteMultUI,
+    toggleBiteMult, setBiteMult, updateBiteMultUI,
     setHoleMatrixPill, setMatrixPill, lbToggleMatrix,
     // handicap
     hcapTogglePair, hcapSetStroke, hcapSetField, buildHcapUI,
@@ -592,7 +592,7 @@ Object.assign(window, {
   chScore, startRpt, stopRpt, sws, swm, swe, setParAll, chPar, drSet,
   toggleGameMidPlay, olyAct, olyReset, olyRenderHole,
   fnChangeMode, fnToggleSank, fnSelectPlayer, fnRenderHole,
-  toggleBiteMult, updateBiteMultUI,
+  toggleBiteMult, setBiteMult, updateBiteMultUI,
   setHoleMatrixPill, setMatrixPill, lbToggleMatrix,
   hcapTogglePair, hcapSetStroke, hcapSetField, buildHcapUI,
   sgToggle, sgChPutt, sgSetPutt1,
