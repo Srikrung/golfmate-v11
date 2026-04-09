@@ -8,7 +8,7 @@ import { showHole } from '../ui/render.js';
 import { autoSave } from '../config.js';
 import { getTeamForHole } from '../ui/render.js';
 
-export const BITE_MULT_DEFAULT={hio:50,albatross:4,eagle:3,birdie:2};
+export const BITE_MULT_DEFAULT={hio:10,albatross:5,eagle:3,birdie:2};
 
 export function setBiteMult(key, val){
   if(!G.bite.mults) G.bite.mults={...BITE_MULT_DEFAULT};
@@ -41,7 +41,7 @@ export function updateBiteMultUI(){
   }
 }
 export function getBiteMult(s,p){
-  const bm=G.bite.mults||{hio:50,albatross:4,eagle:3,birdie:2};
+  const bm=G.bite.mults||{hio:10,albatross:5,eagle:3,birdie:2};
   if(s===1)return bm.hio;
   const d=s-p;
   if(d<=-3)return bm.albatross;

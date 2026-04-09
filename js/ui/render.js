@@ -8,7 +8,7 @@ import { players, scores, pars, G, getCurrentHole, setCurrentHole,
 
 import { updateProgressBar } from './tabs.js';
 
-import { getHoleMoney } from '../modules/games.js';
+import { getHoleMoney, getBiteMult } from '../modules/games.js';
 import { olyRenderHole, fnRenderHole, toggleGameMidPlay } from '../modules/games.js';
 import { sgRenderHole } from '../modules/srikrung.js';
 import { computeHcapLiveAll, calcHcapFinalEnd, calcHcapHole } from '../modules/handicap.js';
@@ -143,63 +143,42 @@ export function showHole(h){
   }).join('');
 
   wrap.innerHTML=`<div class="hole-card">
-    <div id="game-toggles-${h}" style="display:flex;flex-direction:column;gap:5px;padding:8px 12px;border-bottom:0.5px solid var(--sep)">
-      ${(()=>{
-        const icons ={bite:'🐶',olympic:'🏅',team:'🤝',doubleRe:'🎲',farNear:'🎯'};
-        const names ={bite:'หมากัด',olympic:'โอลิมปิก',team:'ทีม',doubleRe:'เบิ้ล-รี',farNear:'Far-Near'};
-        const btn=(k)=>{
-          const on=G[k].on;
-          return`<button id="gt-${h}-${k}" onclick="toggleGameMidPlay('${k}',${h})"
-            style="flex:1;padding:7px 4px;border-radius:999px;font-size:11px;font-weight:700;
-            cursor:pointer;font-family:inherit;text-align:center;
-            border:1.5px solid ${on?'rgba(77,163,255,0.5)':'var(--bg4)'};
-            background:${on?'rgba(77,163,255,0.13)':'var(--bg3)'};
-            color:${on?'#4da3ff':'var(--lbl3)'};"
-            >${icons[k]} ${names[k]}</button>`;
-        };
-        const turboHoleOn=G.turbo.on&&G.turbo.holes.has(h);
-        const turboBtn=G.turbo.on
-          ?`<button id="tc2-${h}" onclick="toggleTH(${h})"
-              style="flex:1;padding:7px 4px;border-radius:999px;font-size:11px;font-weight:700;
-              cursor:pointer;font-family:inherit;text-align:center;
-              border:1.5px solid ${turboHoleOn?'rgba(255,159,10,0.6)':'var(--bg4)'};
-              background:${turboHoleOn?'rgba(255,159,10,0.18)':'var(--bg3)'};
-              color:${turboHoleOn?'#ff9f0a':'var(--lbl3)'};">⚡ ${turboHoleOn?'หลุมเทอร์โบ':'Turbo'}</button>`
-          :'';
-        const row2=turboBtn
-          ?`<div style="display:flex;gap:5px">${btn('farNear')}${btn('team')}${turboBtn}</div>`
-          :`<div style="display:flex;gap:5px">${btn('farNear')}${btn('team')}</div>`;
-        return`<div style="display:flex;gap:5px">${btn('bite')}${btn('olympic')}</div>
-               ${row2}`;
-      })()}
-    </div>
-    <div class="score-rows">${scoreRowsHTML}</div>
-    ${['bite','olympic','farNear'].filter(k=>G[k].on).length>0?`
-    <div style="border-top:0.5px solid var(--sep)">
-      <div onclick="toggleSkipSection(${h})"
-        style="display:flex;align-items:center;justify-content:space-between;padding:8px 14px;cursor:pointer">
-        <span style="font-size:11px;color:var(--lbl2);font-weight:700">👤 คนไม่เล่น</span>
-        <span id="skip-arr-${h}" style="font-size:10px;color:var(--lbl3)">▶</span>
-      </div>
-      <div id="skip-body-${h}" style="display:none;padding:0 14px 8px">
-        <div style="display:flex;flex-direction:column;gap:6px">
-          ${(()=>{
-            const gnames={bite:'🐶 หมากัด',olympic:'🏅 โอลิมปิก',farNear:'🎯 Far-Near'};
-            return ['bite','olympic','farNear'].filter(k=>G[k].on).map(k=>{
-              const btns=players.map((pl,p)=>{
-                const sk=skipData[h]?.[p]?.has(k);
-                const bc=sk?'rgba(255,69,58,0.5)':'var(--bg4)';
-                const bg=sk?'rgba(255,69,58,0.12)':'var(--fill)';
-                const cl=sk?'var(--red)':'var(--lbl2)';
-                const lbl=sk?'✕ '+pl.name:pl.name;
-                return '<button onclick="toggleSkipGame('+h+','+p+",'"+k+"')\" style=\"padding:3px 10px;border-radius:999px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;border:1.5px solid "+bc+';background:'+bg+';color:'+cl+'"> '+lbl+'</button>';
-              }).join('');
-              return '<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap"><span style="font-size:11px;font-weight:700;color:var(--lbl2);min-width:76px">'+gnames[k]+'</span>'+btns+'</div>';
-            }).join('');
-          })()}
+    <div style="border-bottom:0.5px solid var(--sep)">
+      <div onclick="(function(el){var b=document.getElementById('gt-panel-${h}');var open=b.style.display!=='none';b.style.display=open?'none':'block';el.querySelector('.ctrl-arr').style.transform=open?'rotate(-90deg)':'rotate(0)'})(this)"
+        style="display:flex;align-items:center;justify-content:space-between;padding:9px 14px;cursor:pointer">
+        <span style="font-size:12px;font-weight:700;color:var(--lbl)">⚙️ ตั้งค่าหลุมนี้</span>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span id="gt-summary-${h}" style="font-size:10px;color:var(--lbl2)"></span>
+          <span class="ctrl-arr" style="font-size:10px;color:var(--lbl3);transition:transform .2s">▼</span>
         </div>
       </div>
-    </div>`:''}
+      <div id="gt-panel-${h}" style="display:none">
+        <div style="padding:0 14px 10px;border-top:0.5px solid var(--sep)">
+          <div style="font-size:10px;font-weight:600;color:var(--lbl3);letter-spacing:0.5px;text-transform:uppercase;padding:8px 0 5px">เกม</div>
+          ${(()=>{
+            const icons={bite:'🐶',olympic:'🏅',team:'🤝',doubleRe:'🎲',farNear:'🎯'};
+            const names={bite:'หมากัด',olympic:'โอลิมปิก',team:'ทีม',doubleRe:'เบิ้ล-รี',farNear:'Far-Near'};
+            const btn=(k)=>{const on=G[k].on;return`<button id="gt-${h}-${k}" onclick="toggleGameMidPlay('${k}',${h})" style="flex:1;padding:7px 4px;border-radius:999px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;text-align:center;border:1.5px solid ${on?'rgba(77,163,255,0.5)':'var(--bg4)'};background:${on?'rgba(77,163,255,0.13)':'var(--bg3)'};color:${on?'#4da3ff':'var(--lbl3)'}">${icons[k]} ${names[k]}</button>`;};
+            const turboHoleOn=G.turbo.on&&G.turbo.holes.has(h);
+            const turboBtn=G.turbo.on?`<button id="tc2-${h}" onclick="toggleTH(${h})" style="flex:1;padding:7px 4px;border-radius:999px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;text-align:center;border:1.5px solid ${turboHoleOn?'rgba(255,159,10,0.6)':'var(--bg4)'};background:${turboHoleOn?'rgba(255,159,10,0.18)':'var(--bg3)'};color:${turboHoleOn?'#ff9f0a':'var(--lbl3)'}">⚡ ${turboHoleOn?'หลุมเทอร์โบ':'Turbo'}</button>`:'';
+            const row2=turboBtn?`<div style="display:flex;gap:5px;margin-top:5px">${btn('farNear')}${btn('team')}${turboBtn}</div>`:`<div style="display:flex;gap:5px;margin-top:5px">${btn('farNear')}${btn('team')}</div>`;
+            return`<div style="display:flex;gap:5px">${btn('bite')}${btn('olympic')}</div>${row2}`;
+          })()}
+          ${['bite','olympic','farNear'].filter(k=>G[k].on).length>0?`
+          <div style="font-size:10px;font-weight:600;color:var(--lbl3);letter-spacing:0.5px;text-transform:uppercase;padding:10px 0 5px">👤 คนไม่เล่น</div>
+          <div style="display:flex;flex-direction:column;gap:6px">
+            ${(()=>{
+              const gnames={bite:'🐶 หมากัด',olympic:'🏅 โอลิมปิก',farNear:'🎯 Far-Near'};
+              return ['bite','olympic','farNear'].filter(k=>G[k].on).map(k=>{
+                const btns=players.map((pl,p)=>{const sk=skipData[h]?.[p]?.has(k);const bc=sk?'rgba(255,69,58,0.5)':'var(--bg4)';const bg=sk?'rgba(255,69,58,0.12)':'var(--fill)';const cl=sk?'var(--red)':'var(--lbl2)';const lbl=sk?'✕ '+pl.name:pl.name;return '<button onclick="toggleSkipGame('+h+','+p+`,'`+k+`')" style="padding:3px 10px;border-radius:999px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;border:1.5px solid `+bc+';background:'+bg+';color:'+cl+'">'+lbl+'</button>';}).join('');
+                return '<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap"><span style="font-size:11px;font-weight:700;color:var(--lbl2);min-width:76px">'+gnames[k]+'</span>'+btns+'</div>';
+              }).join('');
+            })()}
+          </div>`:''}
+        </div>
+      </div>
+    </div>
+    <div class="score-rows">${scoreRowsHTML}</div>
     ${G.farNear.on&&pars[h]===3?`<div class="fn-wrap"><div class="fn-section-label">🎯 Far-Near</div><select id="fn-mode-${h}" onchange="fnChangeMode(${h},this.value)" style="width:100%;padding:8px 12px;font-size:14px;border-radius:9px;margin-bottom:8px"><option value="none">-- เลือกโหมด --</option><option value="multi">ออน 2 คนขึ้นไป</option><option value="solo">เหมาออนคนเดียว</option></select><div id="fn-ui-${h}" style="display:flex;flex-direction:column;gap:7px"></div></div>`:''}
     ${G.srikrung.on?`<div class="sg-wrap" id="sg-wrap-${h}">
       <div class="section-label" style="color:var(--green)">⛳ Srikrung Golf Day</div>
@@ -285,8 +264,22 @@ export function updateTotals(){
   const gameIcons={bite:'🐶',olympic:'🏅',team:'🤝',farNear:'🎯'};
   const gameNames={bite:'หมากัด',olympic:'โอลิมปิก',team:'ทีม',farNear:'Far-Near'};
   const perPairByGame={};
-  games.forEach(k=>{
-    perPairByGame[k]=Array.from({length:n},()=>Array(n).fill(0));
+  const turboMult=(G.turbo.on&&G.turbo.holes.has(h))?2:1;
+  const drMult=(G.doubleRe.on&&G.doubleRe.mults)?G.doubleRe.mults[h]||1:1;
+  games.forEach(k=>{ perPairByGame[k]=Array.from({length:n},()=>Array(n).fill(0)); });
+  // bite — pair-by-pair จากสกอร์โดยตรง (แก้ bug net=0)
+  if(G.bite.on){
+    for(let i=0;i<n;i++) for(let j=i+1;j<n;j++){
+      const si=scores[i]?.[h], sj=scores[j]?.[h];
+      if(si===null||si===undefined||sj===null||sj===undefined||si===sj) continue;
+      if(skipData[h]?.[i]?.has('bite')||skipData[h]?.[j]?.has('bite')) continue;
+      const wi=si<sj?i:j, lo=si<sj?j:i;
+      const m=getBiteMult(scores[wi][h],pars[h])*turboMult*drMult;
+      perPairByGame['bite'][wi][lo]+=m; perPairByGame['bite'][lo][wi]-=m;
+    }
+  }
+  // olympic / team / farNear — ใช้ net money (logic ซับซ้อน ยังถูกต้อง)
+  ['olympic','team','farNear'].filter(k=>games.includes(k)).forEach(k=>{
     const arr=mh[k],val=gameVal[k]||1;
     const wins=players.map((_,i)=>i).filter(i=>arr[i]>0);
     const loses=players.map((_,i)=>i).filter(i=>arr[i]<0);
@@ -557,8 +550,26 @@ export function buildMatrixHTML(gTot,n,fs,hfs){
   const perPairByGame={};
   games.forEach(k=>{perPairByGame[k]=Array.from({length:n},()=>Array(n).fill(0));});
   for(let h=0;h<18;h++){
+    const turboMult=(G.turbo.on&&G.turbo.holes.has(h))?2:1;
+    const drMult=(G.doubleRe.on&&G.doubleRe.mults)?G.doubleRe.mults[h]||1:1;
+    for(let i=0;i<n;i++) for(let j=0;j<n;j++){
+      if(i>=j) continue;
+      const si=scores[i]?.[h], sj=scores[j]?.[h];
+      if(si===null||si===undefined||sj===null||sj===undefined) continue;
+      if(si===sj) continue;
+      const winner=si<sj?i:j, loser=si<sj?j:i;
+      const sw=scores[winner][h];
+      // bite
+      if(G.bite.on&&!skipData[h]?.[winner]?.has('bite')&&!skipData[h]?.[loser]?.has('bite')){
+        const m=getBiteMult(sw,pars[h])*turboMult*drMult;
+        perPairByGame['bite'][winner][loser]+=m;
+        perPairByGame['bite'][loser][winner]-=m;
+      }
+      // olympic — ใช้ getHoleMoney สำหรับ oly/team/farNear (complex logic)
+    }
+    // olympic / team / farNear — ยังใช้ logic เดิม (net money / val / pairs)
     const mh=getHoleMoney(h);
-    games.forEach(k=>{
+    ['olympic','team','farNear'].filter(k=>games.includes(k)).forEach(k=>{
       const val=gameVal[k]||1,arr=mh[k];
       const wins=players.map((_,i)=>i).filter(i=>arr[i]>0);
       const loses=players.map((_,i)=>i).filter(i=>arr[i]<0);

@@ -484,7 +484,10 @@ export function loadSession(){
     const gd = data.G;
     if(gd){
       Object.assign(G.bite,    gd.bite);
-      G.bite.mults = {...{hio:50,albatross:4,eagle:3,birdie:2}, ...(gd.bite?.mults||{})};
+      G.bite.mults = {...{hio:10,albatross:5,eagle:3,birdie:2}, ...(gd.bite?.mults||{})};
+      // migrate: ถ้า mults เป็น default เก่า → อัปเกรดเป็น default ใหม่
+      if(G.bite.mults.hio===50) G.bite.mults.hio=10;
+      if(G.bite.mults.albatross===4) G.bite.mults.albatross=5;
       Object.assign(G.olympic, gd.olympic);
       Object.assign(G.team,    gd.team);
       Object.assign(G.farNear, gd.farNear);
@@ -561,12 +564,43 @@ export async function shareToLine(tid){
   const ov = document.getElementById('saving-ov');
   if(ov) ov.classList.add('show');
   try{
-    const c = await html2canvas(document.getElementById(tid),{
-      backgroundColor:'#000', scale:2, useCORS:true, logging:false,
+    const src = document.getElementById(tid);
+    // A4 width = 794px (96dpi) เพื่อให้ชื่อยาวไม่ขาด
+    const A4_W = 794;
+
+    // สร้าง wrapper ชั่วคราวนอกหน้าจอ
+    const wrap = document.createElement('div');
+    wrap.style.cssText = `position:fixed;left:-9999px;top:0;width:${A4_W}px;background:${getComputedStyle(src).background||'#1a1a2e'};z-index:-1;`;
+
+    // clone element และปลด overflow/ellipsis ทั้งหมด
+    const clone = src.cloneNode(true);
+    clone.style.cssText = `width:${A4_W}px;min-width:${A4_W}px;max-width:none;overflow:visible;`;
+
+    // ปลด text-overflow ทุก element ใน clone
+    clone.querySelectorAll('*').forEach(el=>{
+      const s = el.style;
+      s.whiteSpace = 'normal';
+      s.overflow = 'visible';
+      s.textOverflow = 'unset';
+      s.maxWidth = 'none';
+    });
+
+    wrap.appendChild(clone);
+    document.body.appendChild(wrap);
+
+    const c = await html2canvas(wrap, {
+      backgroundColor: null,
+      scale: 2,
+      useCORS: true,
+      logging: false,
+      width: A4_W,
       ignoreElements: el => el.hasAttribute('data-html2canvas-ignore')
     });
+
+    document.body.removeChild(wrap);
+
     c.toBlob(async b => {
-      const f = new File([b], 'golfmate.png', {type:'image/png'});
+      const f = new File([b], 'golfmate-a4.png', {type:'image/png'});
       if(ov) ov.classList.remove('show');
       if(navigator.canShare && navigator.canShare({files:[f]})){
         try{ await navigator.share({files:[f]}); } catch(e){}

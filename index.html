@@ -165,7 +165,7 @@
   <div class="group">
     <div class="row" id="gr-bite">
       <div class="r-icon" style="background:rgba(255,159,10,0.18)">🐶</div>
-      <div class="r-text"><div class="r-title">หมากัด</div><div class="r-sub" id="bite-sub-lbl">HIO×50 Eagle×3 Birdie×2</div></div>
+      <div class="r-text"><div class="r-title">หมากัด</div><div class="r-sub" id="bite-sub-lbl">HIO×10 Eagle×3 Birdie×2</div></div>
       <div class="sw on" id="sw-bite" onclick="toggleSw('bite')"></div>
     </div>
     <div id="gb-bite" style="padding:8px 14px 12px;border-bottom:0.5px solid var(--sep)">
@@ -190,14 +190,14 @@
         <div style="display:flex;align-items:center;gap:8px">
           <span style="font-size:13px;color:var(--lbl2);width:100px">🌟 Albatross</span>
           <span style="font-size:13px;color:var(--lbl2)">×</span>
-          <input type="number" id="bm-val-albatross" value="4" min="1" max="99"
+          <input type="number" id="bm-val-albatross" value="5" min="1" max="99"
             onchange="setBiteMult('albatross',+this.value)"
             style="width:60px;border-radius:8px;padding:6px;text-align:center;font-size:15px;font-weight:700;color:#ffa500;border:1.5px solid rgba(255,159,10,0.5);background:rgba(255,159,10,0.08)">
         </div>
         <div style="display:flex;align-items:center;gap:8px">
           <span style="font-size:13px;color:var(--lbl2);width:100px">🏆 HIO</span>
           <span style="font-size:13px;color:var(--lbl2)">×</span>
-          <input type="number" id="bm-val-hio" value="50" min="1" max="999"
+          <input type="number" id="bm-val-hio" value="10" min="1" max="999"
             onchange="setBiteMult('hio',+this.value)"
             style="width:60px;border-radius:8px;padding:6px;text-align:center;font-size:15px;font-weight:700;color:#ffa500;border:1.5px solid rgba(255,159,10,0.5);background:rgba(255,159,10,0.08)">
         </div>
@@ -794,17 +794,17 @@
 <div class="screen" id="scr-scorecard">
   <div id="sync-bar" style="display:none;padding:6px 16px;font-size:12px;font-weight:600;text-align:center;transition:all .3s"></div>
   <!-- NAV -->
-  <div style="display:flex;align-items:center;gap:0;padding:5px 10px;background:var(--bg2);border-bottom:0.5px solid var(--sep)">
+  <div style="display:flex;align-items:stretch;gap:0;background:var(--bg2);border-bottom:0.5px solid var(--sep);overflow:hidden">
     <button id="btn-prev" onclick="holeNav(-1)"
-      style="width:34px;height:34px;border-radius:999px;border:1.5px solid var(--bg4);
-      background:var(--fill);color:var(--lbl2);font-size:18px;font-weight:700;
+      style="width:52px;border:none;border-right:0.5px solid var(--sep);
+      background:var(--bg3);color:var(--lbl2);font-size:26px;font-weight:700;
       cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0">‹</button>
-    <div style="flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:0 6px">
+    <div style="flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:10px 6px">
       <div id="nav-hole-badge"
-        style="background:var(--blue);border-radius:9px;padding:3px 10px;text-align:center;
+        style="background:var(--blue);border-radius:9px;padding:4px 12px;text-align:center;
         box-shadow:0 2px 8px rgba(10,132,255,0.3);flex-shrink:0">
         <div style="font-size:8px;font-weight:700;color:rgba(255,255,255,0.7);letter-spacing:.5px">HOLE</div>
-        <div id="nav-hole-num" style="font-size:18px;font-weight:800;color:#fff;line-height:1">1</div>
+        <div id="nav-hole-num" style="font-size:22px;font-weight:800;color:#fff;line-height:1">1</div>
       </div>
       <div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0" id="nav-par-wrap">
         <div style="font-size:9px;color:var(--lbl2);font-weight:600;letter-spacing:.5px">PAR</div>
@@ -823,8 +823,8 @@
       </div>
     </div>
     <button id="btn-next" onclick="holeNav(1)"
-      style="width:34px;height:34px;border-radius:999px;border:1.5px solid rgba(10,132,255,0.4);
-      background:rgba(10,132,255,0.15);color:var(--blue);font-size:18px;font-weight:700;
+      style="width:52px;border:none;border-left:0.5px solid rgba(10,132,255,0.3);
+      background:var(--blue);color:#fff;font-size:26px;font-weight:800;
       cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0">›</button>
   </div>
   <div class="prog-wrap" style="padding:4px 12px 5px">
