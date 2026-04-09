@@ -170,13 +170,37 @@
     </div>
     <div id="gb-bite" style="padding:8px 14px 12px;border-bottom:0.5px solid var(--sep)">
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px"><span style="font-size:13px;color:var(--lbl2)">1 พอยต์ =</span><input type="number" id="gv-bite" value="20" min="1" style="width:68px;border-radius:8px;padding:7px;text-align:center;font-size:15px"><span style="font-size:13px;color:var(--lbl2)">บาท</span></div>
-      <!-- #11 ตัวคูณหลัก -->
-      <div style="font-size:11px;font-weight:600;color:var(--lbl2);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px">ตัวคูณ — กดปิดได้</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
-        <button id="bm-birdie" onclick="toggleBiteMult('birdie')" style="padding:8px 10px;border-radius:10px;border:1.5px solid rgba(255,159,10,0.5);background:rgba(255,159,10,0.12);color:#ffa500;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;text-align:left">🐦 Birdie ×2</button>
-        <button id="bm-eagle" onclick="toggleBiteMult('eagle')" style="padding:8px 10px;border-radius:10px;border:1.5px solid rgba(255,159,10,0.5);background:rgba(255,159,10,0.12);color:#ffa500;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;text-align:left">🦅 Eagle ×3</button>
-        <button id="bm-albatross" onclick="toggleBiteMult('albatross')" style="padding:8px 10px;border-radius:10px;border:1.5px solid rgba(255,159,10,0.5);background:rgba(255,159,10,0.12);color:#ffa500;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;text-align:left">🌟 Alb ×4</button>
-        <button id="bm-hio" onclick="toggleBiteMult('hio')" style="padding:8px 10px;border-radius:10px;border:1.5px solid rgba(255,159,10,0.5);background:rgba(255,159,10,0.12);color:#ffa500;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;text-align:left">🏆 HIO ×50</button>
+      <!-- ตัวคูณ — แก้ค่าได้ -->
+      <div style="font-size:11px;font-weight:600;color:var(--lbl2);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px">ตัวคูณ — แก้ค่าได้</div>
+      <div style="display:flex;flex-direction:column;gap:6px">
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:13px;color:var(--lbl2);width:100px">🐦 Birdie</span>
+          <span style="font-size:13px;color:var(--lbl2)">×</span>
+          <input type="number" id="bm-val-birdie" value="2" min="1" max="99"
+            onchange="setBiteMult('birdie',+this.value)"
+            style="width:60px;border-radius:8px;padding:6px;text-align:center;font-size:15px;font-weight:700;color:#ffa500;border:1.5px solid rgba(255,159,10,0.5);background:rgba(255,159,10,0.08)">
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:13px;color:var(--lbl2);width:100px">🦅 Eagle</span>
+          <span style="font-size:13px;color:var(--lbl2)">×</span>
+          <input type="number" id="bm-val-eagle" value="3" min="1" max="99"
+            onchange="setBiteMult('eagle',+this.value)"
+            style="width:60px;border-radius:8px;padding:6px;text-align:center;font-size:15px;font-weight:700;color:#ffa500;border:1.5px solid rgba(255,159,10,0.5);background:rgba(255,159,10,0.08)">
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:13px;color:var(--lbl2);width:100px">🌟 Albatross</span>
+          <span style="font-size:13px;color:var(--lbl2)">×</span>
+          <input type="number" id="bm-val-albatross" value="4" min="1" max="99"
+            onchange="setBiteMult('albatross',+this.value)"
+            style="width:60px;border-radius:8px;padding:6px;text-align:center;font-size:15px;font-weight:700;color:#ffa500;border:1.5px solid rgba(255,159,10,0.5);background:rgba(255,159,10,0.08)">
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:13px;color:var(--lbl2);width:100px">🏆 HIO</span>
+          <span style="font-size:13px;color:var(--lbl2)">×</span>
+          <input type="number" id="bm-val-hio" value="50" min="1" max="999"
+            onchange="setBiteMult('hio',+this.value)"
+            style="width:60px;border-radius:8px;padding:6px;text-align:center;font-size:15px;font-weight:700;color:#ffa500;border:1.5px solid rgba(255,159,10,0.5);background:rgba(255,159,10,0.08)">
+        </div>
       </div>
     </div>
 
