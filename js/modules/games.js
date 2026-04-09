@@ -10,6 +10,12 @@ import { getTeamForHole } from '../ui/render.js';
 
 export const BITE_MULT_DEFAULT={hio:50,albatross:4,eagle:3,birdie:2};
 
+export function setBiteMult(key, val){
+  if(!G.bite.mults) G.bite.mults={...BITE_MULT_DEFAULT};
+  G.bite.mults[key] = Math.max(1, val||1);
+  updateBiteMultUI();
+}
+
 export function toggleBiteMult(key){
   const def=BITE_MULT_DEFAULT[key];
   const cur=G.bite.mults[key];
@@ -17,21 +23,22 @@ export function toggleBiteMult(key){
   updateBiteMultUI();
 }
 export function updateBiteMultUI(){
-  const bm=G.bite.mults;
+  const bm=G.bite.mults||{...BITE_MULT_DEFAULT};
   const keys=['hio','albatross','eagle','birdie'];
-  const labels={hio:'🏆 HIO ×50',albatross:'🌟 Alb ×4',eagle:'🦅 Eagle ×3',birdie:'🐦 Birdie ×2'};
-  const labelsOff={hio:'🏆 HIO ×1',albatross:'🌟 Alb ×1',eagle:'🦅 Eagle ×1',birdie:'🐦 Birdie ×1'};
+  // sync ค่ากับ input fields
   keys.forEach(k=>{
-    const btn=document.getElementById(`bm-${k}`);if(!btn)return;
-    const isOn=bm[k]===BITE_MULT_DEFAULT[k];
-    btn.textContent=isOn?labels[k]:labelsOff[k];
-    btn.style.borderColor=isOn?'rgba(255,159,10,0.5)':'rgba(255,255,255,0.1)';
-    btn.style.background=isOn?'rgba(255,159,10,0.12)':'rgba(255,255,255,0.04)';
-    btn.style.color=isOn?'#ffa500':'rgba(255,255,255,0.3)';
+    const inp=document.getElementById(`bm-val-${k}`);
+    if(inp) inp.value=bm[k];
   });
-  const on=keys.filter(k=>bm[k]>1).map(k=>({hio:'HIO×50',albatross:'Alb×4',eagle:'Eagle×3',birdie:'Birdie×2'}[k]));
+  // อัปเดต sub-label
   const sub=document.getElementById('bite-sub-lbl');
-  if(sub)sub.textContent=on.length?on.join(' '):'Par ×1 เท่านั้น';
+  if(sub){
+    const parts=keys.filter(k=>bm[k]>1).map(k=>({
+      hio:`HIO×${bm.hio}`,albatross:`Alb×${bm.albatross}`,
+      eagle:`Eagle×${bm.eagle}`,birdie:`Birdie×${bm.birdie}`
+    }[k]));
+    sub.textContent=parts.length?parts.join(' '):'Par ×1 เท่านั้น';
+  }
 }
 export function getBiteMult(s,p){
   const bm=G.bite.mults||{hio:50,albatross:4,eagle:3,birdie:2};
