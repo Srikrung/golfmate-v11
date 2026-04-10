@@ -337,24 +337,36 @@ export function lbRenderStats(list,el){
     if(bc.bir!==ac.bir)return bc.bir-ac.bir;if(bc.egl!==ac.egl)return bc.egl-ac.egl;return ac.le-bc.le;
   });
   const ROWS=[
-    {l:'HIO 🏆',k:'hio',c:'#ffd60a'},{l:'Albatross 🌟',k:'alb',c:'#ffd060'},
-    {l:'Eagle 🦅',k:'egl',c:'#60b4ff'},{l:'Birdie 🐦',k:'bir',c:'#ff8080'},
-    {l:'Par',k:'par',c:'var(--blue)'},{l:'Bogey',k:'bog',c:'var(--lbl2)'},
-    {l:'Double',k:'dbl',c:'var(--orange)'},{l:'เละ',k:'le',c:'#ff453a'},
+    {l:'🏆 HIO',k:'hio',dc:'#ffd700',lc:'#b8860b'},
+    {l:'🌟 Albatross',k:'alb',dc:'#ffd700',lc:'#8a6c00'},
+    {l:'🦅 Eagle',k:'egl',dc:'#60b4ff',lc:'#1d5fa0'},
+    {l:'🐦 Birdie',k:'bir',dc:'#34d399',lc:'#16803c'},
+    {l:'Par',k:'par',dc:'rgba(255,215,0,0.7)',lc:'#b8860b'},
+    {l:'Bogey',k:'bog',dc:'#666',lc:'#aaa'},
+    {l:'Double',k:'dbl',dc:'#666',lc:'#aaa'},
+    {l:'เละ',k:'le',dc:'#ff6b61',lc:'#cc2222'},
   ];
   const counts=sorted.map(p=>countScoreTypes(p.scores||[],pars));
-  const n=sorted.length,fs=n<=4?13:12;
+  const n=sorted.length;
   const shortN=name=>n>=5?name.substring(0,4):name;
   const roomLabel=lbRoom?` — ${lbRoom}`:'';
-  let html=`<div style="background:var(--bg2);border-radius:12px;overflow:hidden;margin-bottom:8px"><table style="width:100%;border-collapse:collapse;table-layout:fixed">
+  const L=document.body.classList.contains('light');
+  const thBg=L?'#1a4a8a':'#1a3a6e', thBd=L?'#0d3070':'#2a4a8e';
+  const tdBd=L?'1px solid #dde':'1px solid #1e2d45';
+  const rowO=L?'background:#fff':'background:#131f30';
+  const rowE=L?'background:#f5f7fa':'background:#0f1a28';
+  const wBg=L?'background:#fff':'background:#0d1320';
+  let html=`<div style="${wBg};border-radius:12px;overflow:hidden;margin-bottom:8px"><table style="width:100%;border-collapse:collapse;table-layout:fixed">
     <thead><tr>
-      <th style="padding:7px 8px;font-size:11px;font-weight:600;color:var(--lbl2);background:var(--bg3);text-align:left;width:30%">สถิติ${roomLabel}</th>
-      ${sorted.map(p=>`<th style="padding:7px 2px;font-size:11px;font-weight:600;color:var(--lbl2);background:var(--bg3);text-align:center">${shortN(p.name)}</th>`).join('')}
+      <th style="padding:10px 12px;font-size:12px;font-weight:700;color:${L?'#fff':'#ffd700'};background:${thBg};text-align:left;width:32%;border:1px solid ${thBd}">📊 สถิติ${roomLabel}</th>
+      ${sorted.map(p=>`<th style="padding:10px 3px;font-size:12px;font-weight:700;color:${L?'#fff':'#ffd700'};background:${thBg};text-align:center;border:1px solid ${thBd}">${shortN(p.name)}</th>`).join('')}
     </tr></thead><tbody>`;
-  ROWS.forEach(r=>{
-    html+=`<tr style="border-bottom:0.5px solid var(--sep)">
-      <td style="padding:6px 8px;font-size:${fs}px;font-weight:600;color:${r.c};text-align:left">${r.l}</td>
-      ${counts.map(c=>{const v=c[r.k];return`<td style="text-align:center;font-size:${fs}px;font-weight:700;padding:6px 2px;color:${v>0?r.c:'var(--lbl3)'}">${v||'—'}</td>`;}).join('')}
+  ROWS.forEach((r,ri)=>{
+    const rowBg=ri%2===0?rowO:rowE;
+    const sc=L?r.lc:r.dc;
+    html+=`<tr style="${rowBg}">
+      <td style="padding:8px 12px;font-size:13px;font-weight:700;color:${sc};text-align:left;border:${tdBd}">${r.l}</td>
+      ${counts.map(c=>{const v=c[r.k];return`<td style="text-align:center;font-size:13px;font-weight:${v>0?700:400};padding:8px 3px;color:${v>0?sc:'var(--lbl3)'};border:${tdBd}">${v||'—'}</td>`;}).join('')}
     </tr>`;
   });
   html+='</tbody></table></div>';

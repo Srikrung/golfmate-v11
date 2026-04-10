@@ -63,7 +63,7 @@ input:focus,select:focus{border-color:var(--blue)}
 .score-row{display:flex;align-items:center;padding:11px 14px;border-bottom:0.5px solid var(--sep);gap:10px;background:var(--hole-row)}
 .score-row:last-child{border:none}
 .s-name{flex:1;display:flex;align-items:center;gap:8px;min-width:0}
-.s-name-text{font-size:18px;font-weight:600;color:var(--lbl);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.s-name-text{font-size:19px;font-weight:600;color:var(--lbl);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .stepper{display:flex;align-items:center;background:var(--bg3);border-radius:10px;overflow:hidden;flex-shrink:0;border:1px solid var(--bg4)}
 .sb{width:34px;height:38px;background:none;border:none;color:var(--blue);font-size:22px;font-weight:300;cursor:pointer;display:flex;align-items:center;justify-content:center}
 .ss{width:0.5px;height:20px;background:var(--sep)}
@@ -111,6 +111,9 @@ body.light .tbl-wrap{background:#fff;border:0.5px solid rgba(0,0,0,0.08);box-sha
 .tbl-inner th{font-size:10px;font-weight:600;color:var(--lbl2);text-align:center;padding:7px 2px;background:var(--bg3);border-bottom:0.5px solid var(--sep)}
 .tbl-inner td{text-align:center;border-bottom:0.5px solid var(--sep);padding:0}
 .tbl-inner tr:last-child td{border:none}
+/* tbl-new — ตารางสกอร์ใหม่ มี border ทุกช่อง */
+.tbl-new{width:100%;border-collapse:collapse;table-layout:fixed}
+.tbl-new th,.tbl-new td{text-align:center}
 
 
 /* ══════════════════════════════════

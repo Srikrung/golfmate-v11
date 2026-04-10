@@ -30,18 +30,19 @@ export function ptCell(v,fs){
 }
 export function tblFs(n){return`clamp(11px, calc(85vw / ${n+2}), 20px)`;}
 export function hdrFs(n){return`clamp(9px, calc(68vw / ${n+2}), 13px)`;}
-export function scoreCell(s,par,fs){
-  if(s===null)return`<td style="text-align:center;font-size:${fs};color:var(--lbl3);padding:8px 2px">—</td>`;
-  const d=s-par,L=document.body.classList.contains('light'),pd='9px 2px';
-  const n=players.length,wh=`clamp(18px, calc(82vw / ${n+2}), 28px)`,sz=`clamp(10px, calc(78vw / ${n+2}), 19px)`;
-  if(d>=1){const tc=L?'#444':'rgba(255,255,255,0.6)';return`<td style="text-align:center;padding:${pd}"><span style="font-size:${fs};font-weight:600;color:${tc}">${s}</span></td>`;}
-  if(d===0){const tc=L?'#004fc4':'#4da3ff';return`<td style="text-align:center;padding:${pd}"><span style="font-size:${fs};font-weight:700;color:${tc}">${s}</span></td>`;}
+export function scoreCell(s,par,fs,bd){
+  const border=bd?`;border:${bd}`:'';
+  if(s===null)return`<td style="text-align:center;font-size:${fs};color:var(--lbl3);padding:10px 3px${border}">—</td>`;
+  const d=s-par,L=document.body.classList.contains('light'),pd='10px 3px';
+  const n=players.length,wh=`clamp(20px, calc(82vw / ${n+2}), 28px)`,sz=`clamp(11px, calc(78vw / ${n+2}), 15px)`;
+  if(d>=1){const tc=L?'#444':'rgba(255,255,255,0.55)';return`<td style="text-align:center;padding:${pd}${border}"><span style="font-size:${fs};font-weight:600;color:${tc}">${s}</span></td>`;}
+  if(d===0){const tc=L?'#004fc4':'#4da3ff';return`<td style="text-align:center;padding:${pd}${border}"><span style="font-size:${fs};font-weight:700;color:${tc}">${s}</span></td>`;}
   let bg,tc,fw='800';
   if(s===1){bg='#c8a000';tc=L?'#fff':'#000';}
   else if(d<=-3){bg=L?'#8a5c00':'#7a5800';tc='#fff';}
   else if(d===-2){bg=L?'#004fc4':'#1a3560';tc=L?'#fff':'#60b4ff';}
   else{bg=L?'#cc0000':'#7a1a1a';tc=L?'#fff':'#ff8080';}
-  return`<td style="text-align:center;padding:${pd}"><span style="display:inline-flex;align-items:center;justify-content:center;width:${wh};height:${wh};border-radius:50%;font-size:${sz};font-weight:${fw};background:${bg};color:${tc}">${s}</span></td>`;
+  return`<td style="text-align:center;padding:${pd}${border}"><span style="display:inline-flex;align-items:center;justify-content:center;width:${wh};height:${wh};border-radius:50%;font-size:${sz};font-weight:${fw};background:${bg};color:${tc}">${s}</span></td>`;
 }
 
 // ── TEAM HELPERS ──
@@ -314,7 +315,7 @@ export function updateTotals(){
     t+='</tr></thead><tbody>';
     players.forEach((pl,i)=>{
       t+='<tr>';
-      t+='<td style="padding:7px 4px 7px 8px;font-size:'+fs+';font-weight:700;color:var(--lbl);background:var(--bg3);border-bottom:0.5px solid var(--sep)">'+shortName(pl.name,n)+'</td>';
+      t+='<td style="padding:7px 4px 7px 8px;font-size:'+hfs+';font-weight:700;color:var(--lbl);background:var(--bg3);border-bottom:0.5px solid var(--sep)">'+shortName(pl.name,n)+'</td>';
       players.forEach((_,j)=>{
         if(i===j){ t+='<td style="background:var(--bg4);border-bottom:0.5px solid var(--sep)"></td>'; return; }
         t+=renderCell(pp[i][j]);
@@ -355,7 +356,7 @@ export function setHoleMatrixPill(key){
   players.forEach(pl=>{ t+='<th style="'+thS+'">'+shortName(pl.name,n)+'</th>'; });
   t+='<th style="'+thS+';background:rgba(77,163,255,0.2);border-left:2px solid rgba(77,163,255,0.35)">รวม pt</th></tr></thead><tbody>';
   players.forEach((pl,i)=>{
-    t+='<tr><td style="padding:7px 4px 7px 8px;font-size:'+fs+';font-weight:700;color:var(--lbl);background:var(--bg3);border-bottom:0.5px solid var(--sep)">'+shortName(pl.name,n)+'</td>';
+    t+='<tr><td style="padding:7px 4px 7px 8px;font-size:'+hfs+';font-weight:700;color:var(--lbl);background:var(--bg3);border-bottom:0.5px solid var(--sep)">'+shortName(pl.name,n)+'</td>';
     players.forEach((_,j)=>{
       if(i===j){ t+='<td style="background:var(--bg4);border-bottom:0.5px solid var(--sep)"></td>'; return; }
       t+=cell(pp[i][j]);
@@ -393,19 +394,59 @@ export function buildResults(){
       <div><div class="rank-name">${st.name}</div><div class="rank-sub">HCP ${st.hcp}</div></div>
       <div class="rank-net" style="color:${st.net<0?'var(--red)':st.net>0?'var(--green)':'var(--lbl2)'}">${st.tot>0?st.net:'—'}</div>
     </div>`).join('');
-  const thS=`padding:7px 2px;font-size:${hfs};font-weight:600;color:var(--lbl2);text-align:center;background:var(--bg3);border-bottom:0.5px solid var(--sep)`;
-  let tblHTML=`<div class="tbl-wrap"><table class="tbl-inner"><thead><tr><th style="${thS};width:${n<=3?'14%':'10%'}">H</th><th style="${thS};width:${n<=3?'12%':'9%'}">P</th>${players.map(p=>`<th style="${thS}">${shortName(p.name,n)}</th>`).join('')}</tr></thead><tbody>`;
+  const L=document.body.classList.contains('light');
+  const thBg=L?'#1a4a8a':'#1a3a6e';
+  const thBd=L?'#0d3070':'#2a4a8e';
+  const thS=`padding:10px 3px;font-size:${hfs};font-weight:700;color:${L?'#fff':'#ffd700'};text-align:center;background:${thBg};border:1px solid ${thBd}`;
+  const tdBd=L?'1px solid #dde':'1px solid #1e2d45';
+  const rowOdd=L?'background:#fff':'background:#131f30';
+  const rowEven=L?'background:#f5f7fa':'background:#0f1a28';
+  const hColStyle=`text-align:center;font-size:${hfs};font-weight:600;color:${L?'#555':'#ffd700'};padding:10px 3px;${L?'background:#eef2fa':'background:#0a1520'};border:${tdBd}`;
+  const wrapBg=L?'background:#fff':'background:#0d1320';
+  let tblHTML=`<div class="tbl-wrap" style="${wrapBg}"><table class="tbl-new" style="border-collapse:collapse;width:100%"><thead><tr><th style="${thS};width:${n<=3?'12%':'9%'}">H</th><th style="${thS};width:${n<=3?'11%':'8%'}">P</th>${players.map(p=>`<th style="${thS}">${shortName(p.name,n)}</th>`).join('')}</tr></thead><tbody>`;
   for(let h=0;h<18;h++){
-    tblHTML+=`<tr style="border-bottom:0.5px solid var(--sep)"><td style="text-align:center;font-size:${fs};color:var(--lbl2);padding:${fs<=12?5:6}px 2px">${h+1}</td><td style="text-align:center;font-size:${fs};color:var(--lbl2);padding:${fs<=12?5:6}px 2px">${pars[h]}</td>${players.map((_,p)=>scoreCell(scores[p][h],pars[h],fs)).join('')}</tr>`;
-    if(h===8){tblHTML+=`<tr style="background:rgba(10,132,255,0.08);border-top:1px solid rgba(10,132,255,0.3)"><td colspan="2" style="text-align:center;font-size:${fs};font-weight:700;color:var(--blue);padding:7px 2px">9 แรก</td>${players.map((_,p)=>{const f9=scores[p].slice(0,9).reduce((s,v)=>s+(v||0),0);const f9valid=scores[p].slice(0,9).some(v=>v!==null);return`<td style="text-align:center;font-size:${fs};font-weight:700;color:var(--blue);padding:7px 2px">${f9valid?f9:'—'}</td>`;}).join('')}</tr>`;}
+    const rowBg=h%2===0?rowOdd:rowEven;
+    tblHTML+=`<tr style="${rowBg}"><td style="${hColStyle}">${h+1}</td><td style="${hColStyle}">${pars[h]}</td>${players.map((_,p)=>scoreCell(scores[p][h],pars[h],fs,tdBd)).join('')}</tr>`;
+    if(h===8){
+      const subBg=L?'background:#ddeeff':'background:rgba(255,215,0,0.1)';
+      const subCl=L?'#1a4a8a':'#ffd700';
+      tblHTML+=`<tr style="${subBg}"><td colspan="2" style="text-align:center;font-size:${fs};font-weight:800;color:${subCl};padding:8px 2px;border:${tdBd}">9 แรก</td>${players.map((_,p)=>{const f9=scores[p].slice(0,9).reduce((s,v)=>s+(v||0),0);const f9valid=scores[p].slice(0,9).some(v=>v!==null);return`<td style="text-align:center;font-size:${fs};font-weight:800;color:${subCl};padding:8px 2px;border:${tdBd}">${f9valid?f9:'—'}</td>`;}).join('')}</tr>`;
+    }
     if(h===17){
-      tblHTML+=`<tr style="background:rgba(10,132,255,0.08);border-top:1px solid rgba(10,132,255,0.2)"><td colspan="2" style="text-align:center;font-size:${fs};font-weight:700;color:var(--blue);padding:7px 2px">9 หลัง</td>${players.map((_,p)=>{const b9=scores[p].slice(9,18).reduce((s,v)=>s+(v||0),0);const b9valid=scores[p].slice(9,18).some(v=>v!==null);return`<td style="text-align:center;font-size:${fs};font-weight:700;color:var(--blue);padding:7px 2px">${b9valid?b9:'—'}</td>`;}).join('')}</tr>`;
-      tblHTML+=`<tr style="background:rgba(10,132,255,0.15);border-top:1.5px solid var(--blue)"><td colspan="2" style="text-align:center;font-size:${fs};font-weight:800;color:var(--blue);padding:8px 2px">รวม</td>${players.map((_,p)=>{const tot=scores[p].reduce((s,v)=>s+(v||0),0);const hcp=players[p].hcp||0;const net=tot-hcp;const valid=scores[p].some(v=>v!==null);const netColor=net<0?'var(--green)':net>0?'var(--red)':'var(--lbl)';return`<td style="text-align:center;font-size:${fs};font-weight:800;padding:8px 2px"><div style="color:var(--lbl)">${valid?tot:'—'}</div>${valid&&hcp>0?`<div style="font-size:${fs};color:${netColor}">Net ${net}</div>`:''}</td>`;}).join('')}</tr>`;
+      const subBg=L?'background:#ddeeff':'background:rgba(255,215,0,0.1)';
+      const subCl=L?'#1a4a8a':'#ffd700';
+      const totBg=L?'background:#1a4a8a':'background:rgba(255,215,0,0.22)';
+      const totCl=L?'#fff':'#ffd700';
+      tblHTML+=`<tr style="${subBg}"><td colspan="2" style="text-align:center;font-size:${fs};font-weight:800;color:${subCl};padding:8px 2px;border:${tdBd}">9 หลัง</td>${players.map((_,p)=>{const b9=scores[p].slice(9,18).reduce((s,v)=>s+(v||0),0);const b9valid=scores[p].slice(9,18).some(v=>v!==null);return`<td style="text-align:center;font-size:${fs};font-weight:800;color:${subCl};padding:8px 2px;border:${tdBd}">${b9valid?b9:'—'}</td>`;}).join('')}</tr>`;
+      tblHTML+=`<tr style="${totBg}"><td colspan="2" style="text-align:center;font-size:${fs};font-weight:800;color:${totCl};padding:10px 2px;border:${tdBd}">รวม</td>${players.map((_,p)=>{const tot=scores[p].reduce((s,v)=>s+(v||0),0);const hcp=players[p].hcp||0;const net=tot-hcp;const valid=scores[p].some(v=>v!==null);const netColor=net<0?'var(--green)':net>0?'var(--red)':'var(--lbl)';return`<td style="text-align:center;font-size:${fs};font-weight:800;padding:10px 2px;border:${tdBd}"><div style="color:${totCl}">${valid?tot:'—'}</div>${valid&&hcp>0?`<div style="font-size:${hfs};color:${netColor}">Net ${net}</div>`:''}</td>`;}).join('')}</tr>`;
     }
   }
-  const statRows=[{label:'HIO',key:'hio',color:'var(--yellow)'},{label:'Alba',key:'alba',color:'var(--yellow)'},{label:'Eagle',key:'e',color:'var(--yellow)'},{label:'Birdie',key:'bi',color:'var(--green)'},{label:'Par',key:'pa',color:'rgba(255,215,0,0.8)'},{label:'Bogey',key:'bo',color:'var(--lbl2)'},{label:'Double',key:'db',color:'var(--lbl2)'},{label:'เละ',key:'mx',color:'var(--red)'}];
-  tblHTML+=`<tr><td colspan="${n+2}" style="height:8px;background:var(--bg3)"></td></tr><tr style="background:var(--bg3)"><td colspan="${n+2}" style="text-align:left;padding:8px 10px;font-size:16px;font-weight:700;color:var(--lbl)">📊 สถิติ</td></tr>`;
-  statRows.forEach(sr=>{tblHTML+=`<tr style="border-bottom:0.5px solid var(--sep)"><td colspan="2" style="text-align:left;font-size:${hfs};font-weight:700;color:${sr.color};padding-left:10px">${sr.label}</td>${stats.map(st=>`<td style="text-align:center;font-size:${fs};color:${st[sr.key]>0?sr.color:'var(--lbl3)'};font-weight:${st[sr.key]>0?700:400};padding:5px 2px">${st[sr.key]>0?st[sr.key]:'—'}</td>`).join('')}</tr>`;});
+  // ── stats table ใหม่ มีเส้น border ──
+  const statRows=[
+    {label:'🏆 HIO',key:'hio',dc:'#ffd700',lc:'#b8860b'},
+    {label:'🌟 Alba',key:'alba',dc:'#ffd700',lc:'#8a6c00'},
+    {label:'🦅 Eagle',key:'e',dc:'#60b4ff',lc:'#1d5fa0'},
+    {label:'🐦 Birdie',key:'bi',dc:'#34d399',lc:'#16803c'},
+    {label:'Par',key:'pa',dc:'rgba(255,215,0,0.7)',lc:'#b8860b'},
+    {label:'Bogey',key:'bo',dc:'#666',lc:'#aaa'},
+    {label:'Double',key:'db',dc:'#666',lc:'#aaa'},
+    {label:'เละ',key:'mx',dc:'#ff6b61',lc:'#cc2222'},
+  ];
+  const sthBg=L?'#1a4a8a':'#1a3a6e', sthBd=L?'#0d3070':'#2a4a8e';
+  const stTdBd=L?'1px solid #dde':'1px solid #1e2d45';
+  const stRowO=L?'background:#fff':'background:#131f30';
+  const stRowE=L?'background:#f5f7fa':'background:#0f1a28';
+  const stWrap=L?'background:#fff':'background:#0d1320';
+  tblHTML+=`<div class="tbl-wrap" style="margin-top:12px;${stWrap}"><table class="tbl-new" style="border-collapse:collapse;width:100%"><thead><tr>
+    <th style="text-align:left;padding:10px 12px;font-size:${hfs};font-weight:700;color:${L?'#fff':'#ffd700'};background:${sthBg};border:1px solid ${sthBd};width:22%">📊 สถิติ</th>
+    ${players.map(p=>`<th style="text-align:center;padding:10px 3px;font-size:${hfs};font-weight:700;color:${L?'#fff':'#ffd700'};background:${sthBg};border:1px solid ${sthBd}">${shortName(p.name,n)}</th>`).join('')}
+    </tr></thead><tbody>`;
+  statRows.forEach((sr,ri)=>{
+    const rowBg=ri%2===0?stRowO:stRowE;
+    const sc=L?sr.lc:sr.dc;
+    tblHTML+=`<tr style="${rowBg}"><td style="text-align:left;padding:9px 12px;font-size:${hfs};font-weight:700;color:${sc};border:${stTdBd}">${sr.label}</td>${stats.map(st=>{const v=st[sr.key];return`<td style="text-align:center;font-size:${fs};font-weight:${v>0?700:400};color:${v>0?sc:'var(--lbl4,#333)'};padding:9px 3px;border:${stTdBd}">${v>0?v:'—'}</td>`;}).join('')}</tr>`;
+  });
+  tblHTML+=`</tbody></table></div>`;
   tblHTML+=`</tbody></table></div>`;
 
   // ── Srikrung Summary ──
@@ -582,7 +623,7 @@ export function buildMatrixHTML(gTot,n,fs,hfs){
     const rowTot=pp.map(row=>row.reduce((a,b)=>a+b,0));
     const thS=`padding:9px 4px;font-size:${hfs};font-weight:700;text-align:center;background:var(--bg3);border:0.5px solid var(--sep)`;
     let t=`<div class="tbl-wrap"><table class="tbl-inner" style="border-collapse:collapse;width:100%"><thead><tr><th style="${thS};text-align:left;padding-left:10px;"></th>${players.map(pl=>`<th style="${thS}">${shortName(pl.name,n)}</th>`).join('')}<th style="${thS};background:rgba(10,132,255,0.12);color:var(--blue)">ยอด</th></tr></thead><tbody>`;
-    players.forEach((pl,i)=>{const tot=rowTot[i];t+=`<tr><td style="padding:10px 4px 10px 10px;font-size:${fs};font-weight:700;color:var(--lbl);background:var(--bg3);border:0.5px solid var(--sep)">${pl.name}</td>${players.map((_,j)=>{if(i===j)return`<td style="background:var(--bg4);border:0.5px solid var(--sep)"></td>`;const v=pp[i][j];if(v===0)return`<td style="text-align:center;font-size:${fs};color:var(--lbl3);padding:10px 4px;border:0.5px solid var(--sep)">0</td>`;const c=v>0?'var(--green)':'var(--red)',bg=v>0?'rgba(48,209,88,0.07)':'rgba(255,69,58,0.06)';return`<td style="text-align:center;font-size:${fs};font-weight:700;color:${c};background:${bg};padding:10px 4px;border:0.5px solid var(--sep)">${v>0?'+':''}${v}</td>`;}).join('')}<td style="text-align:center;font-size:${fs};font-weight:800;color:${tot>0?'var(--green)':tot<0?'var(--red)':'var(--lbl2)'};background:${tot>0?'rgba(48,209,88,0.1)':tot<0?'rgba(255,69,58,0.08)':'var(--bg3)'};padding:10px 4px;border:0.5px solid var(--sep);border-left:2px solid rgba(10,132,255,0.3)">${tot>0?'+':''}${tot}</td></tr>`;});
+    players.forEach((pl,i)=>{const tot=rowTot[i];t+=`<tr><td style="padding:10px 4px 10px 8px;font-size:${hfs};font-weight:700;color:var(--lbl);background:var(--bg3);border:0.5px solid var(--sep)">${shortName(pl.name,n)}</td>${players.map((_,j)=>{if(i===j)return`<td style="background:var(--bg4);border:0.5px solid var(--sep)"></td>`;const v=pp[i][j];if(v===0)return`<td style="text-align:center;font-size:${fs};color:var(--lbl3);padding:10px 4px;border:0.5px solid var(--sep)">0</td>`;const c=v>0?'var(--green)':'var(--red)',bg=v>0?'rgba(48,209,88,0.07)':'rgba(255,69,58,0.06)';return`<td style="text-align:center;font-size:${fs};font-weight:700;color:${c};background:${bg};padding:10px 4px;border:0.5px solid var(--sep)">${v>0?'+':''}${v}</td>`;}).join('')}<td style="text-align:center;font-size:${fs};font-weight:800;color:${tot>0?'var(--green)':tot<0?'var(--red)':'var(--lbl2)'};background:${tot>0?'rgba(48,209,88,0.1)':tot<0?'rgba(255,69,58,0.08)':'var(--bg3)'};padding:10px 4px;border:0.5px solid var(--sep);border-left:2px solid rgba(10,132,255,0.3)">${tot>0?'+':''}${tot}</td></tr>`;});
     t+=`<tr style="background:var(--bg3);border-top:1.5px solid var(--sep)"><td style="padding:8px 4px 8px 10px;font-size:${hfs};font-weight:700;color:var(--lbl2);border:0.5px solid var(--sep)">รวม</td>${rowTot.map(v=>{const c=v>0?'var(--green)':v<0?'var(--red)':'var(--lbl2)';return`<td style="text-align:center;font-size:${fs};font-weight:800;color:${c};padding:8px 4px;border:0.5px solid var(--sep)">${v>0?'+':''}${v}</td>`;}).join('')}<td style="border:0.5px solid var(--sep)"></td></tr></tbody></table></div>`;
     return t;
   }

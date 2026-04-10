@@ -39,7 +39,7 @@ html[data-fs="XL"]{ --fs:1.75; }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 body{
   background:var(--bg);color:var(--lbl);
-  font-family:'Noto Sans Thai',-apple-system,BlinkMacSystemFont,'SF Pro Text','SF Pro Display',sans-serif;
-  min-height:100vh;overflow-x:hidden;font-size:16px;
+  font-family:'Sarabun',-apple-system,BlinkMacSystemFont,'SF Pro Text','SF Pro Display',sans-serif;
+  min-height:100vh;overflow-x:hidden;font-size:17px;
   padding-bottom:80px;transition:background .25s,color .25s;
 }

@@ -15,6 +15,11 @@ export function applyTheme(t){
   const btn=document.getElementById('theme-btn');
   if(btn)btn.textContent=t==='light'?'🌙':'☀️';
   try{localStorage.setItem(THEME_KEY,t);}catch(e){}
+  // rebuild results ถ้ากำลังแสดงหน้าผลลัพธ์อยู่
+  const resEl=document.getElementById('scr-results');
+  if(resEl && resEl.classList.contains('active')){
+    import('./render.js').then(m=>{ if(m.buildResults) m.buildResults(); }).catch(()=>{});
+  }
 }
 export function toggleTheme(){
   applyTheme(document.body.classList.contains('light')?'dark':'light');
