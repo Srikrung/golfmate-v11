@@ -7,7 +7,7 @@
 import { players, scores, pars, G,
          olympicData, farNearData, srikrungData, skipData, teamSoloPlayers,
          setPlayers, setScores, setGameStarted, setCurrentHole,
-         isGameStarted, getCurrentHole, LS_KEY, FB_URL } from './config.js';
+         isGameStarted, getCurrentHole, LS_KEY } from './config.js';
 
 // ── ui ──
 import { initTheme, toggleTheme, applyFontScale, initFontScale,
@@ -25,7 +25,7 @@ import { showHole, updateTotals, drSet, _refreshOlyInline,
 // ── modules ──
 import { initHcapPairs, addHcapPairsForPlayer, buildHcapUI,
          hcapTogglePair, hcapSetStroke, hcapSetField } from './modules/handicap.js';
-import { updateBiteMultUI, toggleBiteMult, setBiteMult,
+import { updateBiteMultUI, toggleBiteMult,
          toggleGameMidPlay, olyAct, olyReset, olyRenderHole,
          fnChangeMode, fnToggleSank, fnSelectPlayer, fnRenderHole } from './modules/games.js';
 import { sgToggle, sgChPutt, sgSetPutt1, sgRenderHole,
@@ -89,7 +89,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }, 400);
   loadOnlineSetting();
-  initRestoreBtn();
   initSwipe();
   updateBiteMultUI();
 
@@ -114,7 +113,7 @@ document.addEventListener('DOMContentLoaded', () => {
     setToday, fmtDate, toggleSw, toggleSkipPlayer, toggleSkipGame,
     toggleTeamSolo, toggleTeamScorecard, setTeamMode, setH2HSize, startGame, newGame,
     showAddPlayerModal, hideAddPlayerModal, confirmAddPlayer,
-    updateAddPlayerBtn, saveSession, loadSession, clearSession, clearGameData, initRestoreBtn, autoSave,
+    updateAddPlayerBtn, saveSession, loadSession, clearSession, clearGameData, autoSave,
     shareToLine,
     // course
     changeCoursePreset, applyParsFromPreset,
@@ -128,7 +127,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // games
     toggleGameMidPlay, olyAct, olyReset, olyRenderHole,
     fnChangeMode, fnToggleSank, fnSelectPlayer, fnRenderHole,
-    toggleBiteMult, setBiteMult, updateBiteMultUI,
+    toggleBiteMult, updateBiteMultUI,
     setHoleMatrixPill, setMatrixPill, lbToggleMatrix,
     // handicap
     hcapTogglePair, hcapSetStroke, hcapSetField, buildHcapUI,
@@ -201,14 +200,12 @@ export function toggleTeamScorecard(h, p){
   const cur    = G.team.domoTeams[h]?.[p] || 'A';
 
   if(isOut){
-    // ไม่เล่น → กลับ A
+    // ไม่เล่น → กลับ A — เฉพาะหลุมนี้
     skipData[h][p].delete('team');
     teamSoloPlayers.delete(p);
     G.team.domoTeams[h][p] = 'A';
-    // propagate A ไปหลุมถัดไป
-    for(let i=h+1;i<18;i++) G.team.domoTeams[i][p]='A';
   } else if(isSolo){
-    // Solo → ไม่เล่น
+    // Solo → ไม่เล่น — เฉพาะหลุมนี้
     teamSoloPlayers.delete(p);
     if(!skipData[h]){ skipData[h]=Array(players.length).fill(null).map(()=>new Set()); }
     else { while(skipData[h].length<players.length) skipData[h].push(new Set()); }
@@ -218,17 +215,16 @@ export function toggleTeamScorecard(h, p){
     // B → Solo
     teamSoloPlayers.add(p);
   } else {
-    // A → B — propagate ไปทุกหลุมถัดไป
+    // A → B — เฉพาะหลุมนี้
     G.team.domoTeams[h][p] = 'B';
-    for(let i=h+1;i<18;i++) G.team.domoTeams[i][p]='B';
   }
-  // อัปเดต badge ทุกหลุมที่เปลี่ยน
-  for(let i=h;i<18;i++){
-    const el=document.getElementById(`tb-${i}-${p}`);
-    if(el){
-      const {bg,cl,label}=getTeamBadgeProps(i,p);
-      el.style.background=bg; el.style.color=cl; el.textContent=label;
-    }
+  // อัปเดต badge เฉพาะจุด ไม่ต้อง render ทั้งหน้า
+  const el = document.getElementById(`tb-${h}-${p}`);
+  if(el){
+    const {bg,cl,label} = getTeamBadgeProps(h,p);
+    el.style.background = bg;
+    el.style.color = cl;
+    el.textContent = label;
   }
   updateTotals(); autoSave();
 }
@@ -484,10 +480,7 @@ export function loadSession(){
     const gd = data.G;
     if(gd){
       Object.assign(G.bite,    gd.bite);
-      G.bite.mults = {...{hio:10,albatross:5,eagle:3,birdie:2}, ...(gd.bite?.mults||{})};
-      // migrate: ถ้า mults เป็น default เก่า → อัปเกรดเป็น default ใหม่
-      if(G.bite.mults.hio===50) G.bite.mults.hio=10;
-      if(G.bite.mults.albatross===4) G.bite.mults.albatross=5;
+      G.bite.mults = {...{hio:50,albatross:4,eagle:3,birdie:2}, ...(gd.bite?.mults||{})};
       Object.assign(G.olympic, gd.olympic);
       Object.assign(G.team,    gd.team);
       Object.assign(G.farNear, gd.farNear);
@@ -503,19 +496,6 @@ export function loadSession(){
     if(data.courseName && cnEl) cnEl.value = data.courseName;
     if(data.gameDate   && gdEl) gdEl.value = data.gameDate;
 
-    // ── ใส่ชื่อ/HCP กลับเข้าช่อง Setup ──
-    const numEl = document.getElementById('num-players');
-    if(numEl) numEl.value = players.length;
-    renderPlayerRows();
-    setTimeout(()=>{
-      const pns = document.querySelectorAll('.pn');
-      const phs = document.querySelectorAll('.ph');
-      players.forEach((p,i)=>{
-        if(pns[i]) pns[i].value = p.name;
-        if(phs[i]) phs[i].value = p.hcp ?? 0;
-      });
-    }, 50);
-
     updateBiteMultUI();
     buildParGrid();
     buildProgressBar();
@@ -526,28 +506,6 @@ export function loadSession(){
 }
 
 export function clearSession(){ try{ localStorage.removeItem(LS_KEY); } catch(e){} }
-
-export async function initRestoreBtn(){
-  try{
-    const online = JSON.parse(localStorage.getItem('golfmate_online')||'{}');
-    const room = online.room || '';
-    if(!room || room==='DEFAULT') return;
-    const today = new Date().toISOString().split('T')[0].replace(/-/g,'');
-    const res = await fetch(`${FB_URL}/backup/${today}/${room}/session.json`);
-    if(!res.ok) return;
-    const data = await res.json();
-    if(!data?.players?.length) return;
-    const names = data.players.map(p=>p.name).join(', ');
-    const holes = data.scores?.[0]?.filter(v=>v!==null).length||0;
-    const dateStr = data.gameDate ? new Date(data.gameDate).toLocaleDateString('th-TH',{day:'numeric',month:'short'}) : '';
-    const btn=document.getElementById('restore-game-btn');
-    const roomLbl=document.getElementById('restore-room-lbl');
-    const infoLbl=document.getElementById('restore-info-lbl');
-    if(btn){ btn.style.display='block'; }
-    if(roomLbl) roomLbl.textContent = room;
-    if(infoLbl) infoLbl.textContent = `${dateStr} · ${names} · ${holes}/18 หลุม`;
-  }catch(e){}
-}
 
 export function clearGameData(){
   if(!confirm('ล้างข้อมูลเกมเก่า?\n\nสกอร์ในเครื่องจะหาย\n(Firebase backup ยังอยู่ — กู้คืนได้ภายหลัง)')) return;
@@ -564,43 +522,12 @@ export async function shareToLine(tid){
   const ov = document.getElementById('saving-ov');
   if(ov) ov.classList.add('show');
   try{
-    const src = document.getElementById(tid);
-    // A4 width = 794px (96dpi) เพื่อให้ชื่อยาวไม่ขาด
-    const A4_W = 794;
-
-    // สร้าง wrapper ชั่วคราวนอกหน้าจอ
-    const wrap = document.createElement('div');
-    wrap.style.cssText = `position:fixed;left:-9999px;top:0;width:${A4_W}px;background:${getComputedStyle(src).background||'#1a1a2e'};z-index:-1;`;
-
-    // clone element และปลด overflow/ellipsis ทั้งหมด
-    const clone = src.cloneNode(true);
-    clone.style.cssText = `width:${A4_W}px;min-width:${A4_W}px;max-width:none;overflow:visible;`;
-
-    // ปลด text-overflow ทุก element ใน clone
-    clone.querySelectorAll('*').forEach(el=>{
-      const s = el.style;
-      s.whiteSpace = 'normal';
-      s.overflow = 'visible';
-      s.textOverflow = 'unset';
-      s.maxWidth = 'none';
-    });
-
-    wrap.appendChild(clone);
-    document.body.appendChild(wrap);
-
-    const c = await html2canvas(wrap, {
-      backgroundColor: null,
-      scale: 2,
-      useCORS: true,
-      logging: false,
-      width: A4_W,
+    const c = await html2canvas(document.getElementById(tid),{
+      backgroundColor:'#000', scale:2, useCORS:true, logging:false,
       ignoreElements: el => el.hasAttribute('data-html2canvas-ignore')
     });
-
-    document.body.removeChild(wrap);
-
     c.toBlob(async b => {
-      const f = new File([b], 'golfmate-a4.png', {type:'image/png'});
+      const f = new File([b], 'golfmate.png', {type:'image/png'});
       if(ov) ov.classList.remove('show');
       if(navigator.canShare && navigator.canShare({files:[f]})){
         try{ await navigator.share({files:[f]}); } catch(e){}
@@ -617,7 +544,7 @@ Object.assign(window, {
   setToday, fmtDate, toggleSw, toggleSkipPlayer, toggleSkipGame,
   toggleTeamSolo, toggleTeamScorecard, setTeamMode, setH2HSize, startGame, newGame,
   showAddPlayerModal, hideAddPlayerModal, confirmAddPlayer,
-  updateAddPlayerBtn, saveSession, loadSession, clearSession, clearGameData, initRestoreBtn, autoSave,
+  updateAddPlayerBtn, saveSession, loadSession, clearSession, clearGameData, autoSave,
   shareToLine,
   changeCoursePreset, applyParsFromPreset,
   goTab, goGuide, goResults, goMoney, showMoneyDetail,
@@ -626,7 +553,7 @@ Object.assign(window, {
   chScore, startRpt, stopRpt, sws, swm, swe, setParAll, chPar, drSet,
   toggleGameMidPlay, olyAct, olyReset, olyRenderHole,
   fnChangeMode, fnToggleSank, fnSelectPlayer, fnRenderHole,
-  toggleBiteMult, setBiteMult, updateBiteMultUI,
+  toggleBiteMult, updateBiteMultUI,
   setHoleMatrixPill, setMatrixPill, lbToggleMatrix,
   hcapTogglePair, hcapSetStroke, hcapSetField, buildHcapUI,
   sgToggle, sgChPutt, sgSetPutt1,

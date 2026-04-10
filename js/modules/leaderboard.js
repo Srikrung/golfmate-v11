@@ -167,10 +167,10 @@ export function lbSwipeRoom(dir){
 
 export function lbSetTab(t){
   lbTab=t;
-  ['score','stats','sg','rooms'].forEach(k=>{
+  ['score','sg','rooms'].forEach(k=>{
     const el=document.getElementById('lb-t-'+k);if(!el)return;
     const on=k===t;
-    const col=k==='score'?'var(--blue)':k==='stats'?'var(--orange)':k==='rooms'?'var(--green)':'var(--green)';
+    const col=k==='score'?'var(--blue)':k==='rooms'?'var(--green)':'var(--green)';
     el.style.background=on?col:'var(--bg2)';el.style.color=on?'#fff':'var(--lbl2)';
   });
   lbRender();
@@ -187,7 +187,6 @@ export function lbRender(){
   if(lbTab==='rooms'){ lbRenderRooms(content); return; }
   if(!list.length){content.innerHTML='<div style="text-align:center;padding:40px 0;color:var(--lbl2);font-size:14px">⛳ ยังไม่มีข้อมูล</div>';return;}
   if(lbTab==='score')lbRenderScore(list,content);
-  else if(lbTab==='stats')lbRenderStats(list,content);
   else lbRenderSG(list,content);
 }
 
@@ -289,26 +288,52 @@ export function lbRenderScore(list,el){
   const n=list.length,fs=n<=3?13:n<=5?12:11,hfs=fs-1;
   const L=document.body.classList.contains('light');
   const blue=L?'#004fc4':'#4da3ff',green=L?'#1a7a3a':'#30d158',red=L?'#cc0000':'#ff453a';
+  const pars2=(lbAllP.find(x=>x.pars&&x.pars.length===18)||{pars:LB_PARS_DEFAULT}).pars;
   let cards=list.map((p,i)=>{
     const gross=p.total||0,hcp=p.hcp||0,net=gross-hcp;
     const f9=p.scores&&p.scores.slice(0,9).some(v=>v!==null)?p.scores.slice(0,9).reduce((a,v)=>a+(v||0),0):null;
     const b9=p.scores&&p.scores.slice(9).some(v=>v!==null)?p.scores.slice(9).reduce((a,v)=>a+(v||0),0):null;
-    const done=p.holesPlayed===18,netC=net<0?green:net>0?red:'var(--lbl2)',holes=p.holesPlayed||0;
-    return`<div style="background:var(--bg2);border-radius:13px;padding:11px 13px;margin-bottom:7px;display:flex;align-items:center;gap:10px">
-      <div style="font-size:${i<3?20:14}px;min-width:30px;text-align:center">${LB_MEDALS[i]||'#'+(i+1)}</div>
-      <div style="flex:1;min-width:0">
-        <div style="font-size:14px;font-weight:700;color:var(--lbl);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.name}</div>
-        <div style="font-size:11px;color:var(--lbl2);margin-top:1px">${p.room||'—'} · HCP${hcp} · ${holes}/18 หลุม</div>
-        <div style="height:3px;background:var(--bg4);border-radius:2px;margin-top:5px;overflow:hidden"><div style="height:3px;background:${blue};border-radius:2px;width:${Math.round(holes/18*100)}%"></div></div>
+    const done=p.holesPlayed===18,holes=p.holesPlayed||0;
+    // score types
+    const sc=countScoreTypes(p.scores||[],pars2);
+    const statChips=[
+      sc.hio>0 ?`<span style="display:inline-flex;align-items:center;gap:2px;background:var(--bg3);border-radius:20px;padding:3px 8px;font-size:11px;font-weight:700;color:#ffd700">🏆 HIO ${sc.hio}</span>`:'',
+      sc.alb>0 ?`<span style="display:inline-flex;align-items:center;gap:2px;background:var(--bg3);border-radius:20px;padding:3px 8px;font-size:11px;font-weight:700;color:#ffd700">🌟 Alb ${sc.alb}</span>`:'',
+      sc.egl>0 ?`<span style="display:inline-flex;align-items:center;gap:2px;background:var(--bg3);border-radius:20px;padding:3px 8px;font-size:11px;font-weight:700;color:${L?'#1d5fa0':'#60b4ff'}">🦅 Eagle ${sc.egl}</span>`:'',
+      sc.bir>0 ?`<span style="display:inline-flex;align-items:center;gap:2px;background:var(--bg3);border-radius:20px;padding:3px 8px;font-size:11px;font-weight:700;color:${L?'#cc0000':'#ff8080'}">🐦 Birdie ${sc.bir}</span>`:'',
+      sc.par>0 ?`<span style="background:var(--bg3);border-radius:20px;padding:3px 8px;font-size:11px;font-weight:700;color:rgba(255,215,0,0.7)">Par ${sc.par}</span>`:'',
+      sc.bog>0 ?`<span style="background:var(--bg3);border-radius:20px;padding:3px 8px;font-size:11px;font-weight:600;color:var(--lbl3)">Bogey ${sc.bog}</span>`:'',
+      sc.dbl>0 ?`<span style="background:var(--bg3);border-radius:20px;padding:3px 8px;font-size:11px;font-weight:600;color:var(--lbl3)">Double ${sc.dbl}</span>`:'',
+      sc.le>0  ?`<span style="background:var(--bg3);border-radius:20px;padding:3px 8px;font-size:11px;font-weight:700;color:${L?'#cc2222':'#ff6b61'}">เละ ${sc.le}</span>`:'',
+    ].filter(Boolean).join('');
+    const brd=i===0?`rgba(255,215,0,0.4)`:i===1?`rgba(192,192,192,0.35)`:i===2?`rgba(205,127,50,0.3)`:`var(--bg4)`;
+    const netCl=L?'#1a7a3a':'#34d399';
+    const sBlock=(lbl,val,isNet)=>`<div style="flex:1;text-align:center;background:${isNet?L?'rgba(52,211,153,0.07)':'rgba(52,211,153,0.07)':'var(--bg3)'};border-radius:9px;padding:6px 2px${isNet?';border:0.5px solid rgba(52,211,153,0.2)':''}">
+      <div style="font-size:10px;color:${isNet?netCl:'var(--lbl3)'};font-weight:600;margin-bottom:2px">${lbl}</div>
+      <div style="font-size:18px;font-weight:800;color:${isNet?netCl:val==='—'?'var(--bg4)':lbl.includes('9')?blue:'var(--lbl)'};line-height:1">${val}</div>
+    </div>`;
+    return`<div style="background:var(--bg2);border-radius:14px;padding:12px 14px;margin-bottom:8px;border:0.5px solid ${brd}">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="font-size:${i<3?26:18}px;font-weight:800;min-width:32px;text-align:center;color:var(--lbl3)">${LB_MEDALS[i]||'#'+(i+1)}</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:19px;font-weight:800;color:var(--lbl);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.name}</div>
+          <div style="font-size:11px;color:var(--lbl3);margin-top:1px">${p.room?'ห้อง '+p.room+' · ':''}HCP ${hcp} · ${holes}/18 หลุม</div>
+          <div style="height:3px;background:var(--bg4);border-radius:2px;margin-top:6px;overflow:hidden"><div style="height:3px;background:${blue};border-radius:2px;width:${Math.round(holes/18*100)}%"></div></div>
+        </div>
       </div>
-      <div style="text-align:right;flex-shrink:0">
-        <div style="font-size:12px;font-weight:600;color:var(--lbl2)">F9 <b style="color:${blue}">${f9!==null?f9:'—'}</b> · B9 <b style="color:${blue}">${b9!==null?b9:'—'}</b></div>
-        <div style="font-size:11px;color:var(--lbl2)">Gross ${gross||'—'}</div>
-        <div style="font-size:19px;font-weight:800;color:${netC}">Net ${net}${done?'':'<span style="font-size:9px">*</span>'}</div>
+      <div style="display:flex;align-items:stretch;gap:6px;margin-top:10px;padding-top:10px;border-top:0.5px solid var(--sep)">
+        ${sBlock('9 แรก',f9!==null?String(f9):'—',false)}
+        <div style="width:0.5px;background:var(--sep)"></div>
+        ${sBlock('9 หลัง',b9!==null?String(b9):'—',false)}
+        <div style="width:0.5px;background:var(--sep)"></div>
+        ${sBlock('Gross',gross?String(gross):'—',false)}
+        <div style="width:0.5px;background:var(--sep)"></div>
+        ${sBlock('Net',gross?String(net)+(done?'':'*'):'—',true)}
       </div>
+      ${statChips?`<div style="display:flex;flex-wrap:wrap;gap:5px;margin-top:8px;padding-top:8px;border-top:0.5px solid var(--sep)">${statChips}</div>`:''}
     </div>`;
   }).join('');
-  const shortN=name=>n>=5?name.substring(0,4):name;
+  const shortN=name=>name.length>6?name.slice(0,6)+'…':name;
   let thead=`<thead><tr>
     <th style="padding:6px 2px;font-size:${hfs}px;font-weight:600;color:var(--lbl2);background:var(--bg3);text-align:center;width:10%">H</th>
     <th style="padding:6px 2px;font-size:${hfs}px;font-weight:600;color:var(--lbl2);background:var(--bg3);text-align:center;width:8%">P</th>
@@ -348,7 +373,7 @@ export function lbRenderStats(list,el){
   ];
   const counts=sorted.map(p=>countScoreTypes(p.scores||[],pars));
   const n=sorted.length;
-  const shortN=name=>n>=5?name.substring(0,4):name;
+  const shortN=name=>name.length>6?name.slice(0,6)+'…':name;
   const roomLabel=lbRoom?` — ${lbRoom}`:'';
   const L=document.body.classList.contains('light');
   const thBg=L?'#1a4a8a':'#1a3a6e', thBd=L?'#0d3070':'#2a4a8e';

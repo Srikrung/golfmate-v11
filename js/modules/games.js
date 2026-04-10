@@ -72,9 +72,10 @@ export function calcOlympicHole(h){
   const bPt=2+dqC;
   const inf=players.map((_,p)=>{
     const st=od.status[p],idx=od.order.indexOf(p);let base=null,sank=false;
+    const ordLen=od.order.length;
     if(st==='chip'){base=7;sank=true;}
-    else if(st==='sank'&&idx!==-1){base=Math.min(7,bPt+idx);sank=true;}
-    else if(st==='miss'&&idx!==-1){base=Math.min(7,bPt+idx);sank=false;}
+    else if(st==='sank'&&idx!==-1){base=Math.min(7,bPt+(ordLen-1-idx));sank=true;}
+    else if(st==='miss'&&idx!==-1){base=Math.min(7,bPt+(ordLen-1-idx));sank=false;}
     else if(st==='dq-sank'){base=1;sank=true;}
     else if(st==='dq-miss'){base=1;sank=false;}
     if(base===null)return{p,pts:null,sank:false};
@@ -232,7 +233,7 @@ export function olyRenderHole(h){
     return`<div class="oly-r-row"><div class="oly-r-name">${pl.name}</div>
       <button class="oly-btn ob-chip${isChip?' on':''} ${isDQ?'ob-dis':''}" onclick="olyAct(${h},${p},'chip')">Chip</button>
       <button class="oly-btn ob-dq${isDQ?' on':''} ${isChip||idx!==-1?'ob-dis':''}" onclick="olyAct(${h},${p},'dq')">🚫 DQ</button>
-      <button class="oly-btn ob-rank${idx!==-1?' on':''} ${isChip||isDQ?'ob-dis':''}" onclick="olyAct(${h},${p},'rank')">${idx!==-1?`#${idx+1}(${Math.min(7,bPt+idx)})`:'ลำดับ'}</button>
+      <button class="oly-btn ob-rank${idx!==-1?' on':''} ${isChip||isDQ?'ob-dis':''}" onclick="olyAct(${h},${p},'rank')">${idx!==-1?`ระยะ ${Math.min(7,bPt+(od.order.length-1-idx))}pt`:'ลำดับ'}</button>
       <button class="oly-btn ${isSank?'ob-sank on':isMiss?'ob-miss on':'ob-sank'} ${isChip||(idx===-1&&!isDQ)?'ob-dis':''}" onclick="olyAct(${h},${p},'putt')">${isSank?'ลง ✅':isMiss?'ไม่ลง ❌':'พัตต์?'}</button>
     </div>`;
   }).join('');

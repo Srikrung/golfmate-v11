@@ -354,8 +354,8 @@
   <button class="cta" onclick="startGame()">เริ่มบันทึกสกอร์ ⛳</button>
   <button onclick="clearGameData()"
     style="width:100%;margin-top:8px;padding:12px;border-radius:999px;
-    border:1px solid var(--sep);background:transparent;
-    color:var(--lbl3);font-family:inherit;font-size:13px;cursor:pointer">
+    border:1.5px solid rgba(255,69,58,0.5);background:rgba(255,69,58,0.08);
+    color:var(--red);font-family:inherit;font-size:13px;font-weight:700;cursor:pointer">
     🗑 ล้างข้อมูลเกมเก่า
   </button>
 </div>
@@ -395,7 +395,6 @@
   <!-- 3 Tabs -->
   <div style="display:flex;gap:3px;padding:0 14px 6px">
     <button id="lb-t-score" onclick="lbSetTab('score')" style="flex:1;padding:7px 4px;border-radius:9px;border:none;font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;background:var(--blue);color:#fff">🏆 สกอร์</button>
-    <button id="lb-t-stats" onclick="lbSetTab('stats')" style="flex:1;padding:7px 4px;border-radius:9px;border:none;font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;background:var(--bg2);color:var(--lbl2)">📊 สถิติ</button>
     <button id="lb-t-sg"    onclick="lbSetTab('sg')"    style="flex:1;padding:7px 4px;border-radius:9px;border:none;font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;background:var(--bg2);color:var(--lbl2)">⛳ FW·GIR·Putt</button>
   </div>
 

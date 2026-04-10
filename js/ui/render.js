@@ -15,7 +15,7 @@ import { computeHcapLiveAll, calcHcapFinalEnd, calcHcapHole } from '../modules/h
 
 
 // ── HELPERS ──
-export function shortName(name,n){return n>=5&&name.length>3?name.slice(0,3)+'.':name;}
+export function shortName(name,n){return name.length>6?name.slice(0,6)+'…':name;}
 export function moneyCell(v,fs){
   v=Math.round(v);
   if(v===0)return`<td style="text-align:center;font-size:${fs};color:var(--lbl3);padding:7px 2px">—</td>`;
@@ -232,7 +232,7 @@ export function _refreshOlyInline(h){
       el.className = `ob${specific?' '+specific:''}${active?' ob-on':''}${dim?' ob-dim':''}`;
       if(label !== undefined){
         if(isRank){
-          el.innerHTML = '<span class="rn">'+label+'</span><span class="rl">อันดับ</span>';
+          el.innerHTML = '<span class="rn">'+label+'</span>';
         } else {
           el.textContent = label;
         }
@@ -241,7 +241,7 @@ export function _refreshOlyInline(h){
 
     setBtn(`oly-chip-${h}-${p}`, isChip, false, '🟡 Chip');
     setBtn(`oly-dq-${h}-${p}`,   isDQ,   isChip||idx!==-1, '🚫 DQ');
-    const rankLabel = idx!==-1 ? (idx+1)+'st' : '—';
+    const rankLabel = idx!==-1 ? 'ระยะ '+Math.min(7,bPt+(od.order.length-1-idx))+'pt' : '—';
     setBtn(`oly-rank-${h}-${p}`, idx!==-1, isChip||isDQ, rankLabel, true);
     setBtn(`oly-sank-${h}-${p}`, isSank, false, isSank?'ลง ✓ ✅':'ลง ✓');
     setBtn(`oly-miss-${h}-${p}`, isMiss, false, 'ไม่ลง');
@@ -397,7 +397,7 @@ export function buildResults(){
   const L=document.body.classList.contains('light');
   const thBg=L?'#1a4a8a':'#1a3a6e';
   const thBd=L?'#0d3070':'#2a4a8e';
-  const thS=`padding:10px 3px;font-size:${hfs};font-weight:700;color:${L?'#fff':'#ffd700'};text-align:center;background:${thBg};border:1px solid ${thBd}`;
+  const thS=`padding:8px 1px;font-size:${hfs};font-weight:700;color:${L?'#fff':'#ffd700'};text-align:center;background:${thBg};border:1px solid ${thBd};overflow:hidden;white-space:nowrap;text-overflow:ellipsis;max-width:0`;
   const tdBd=L?'1px solid #dde':'1px solid #1e2d45';
   const rowOdd=L?'background:#fff':'background:#131f30';
   const rowEven=L?'background:#f5f7fa':'background:#0f1a28';
@@ -439,7 +439,7 @@ export function buildResults(){
   const stWrap=L?'background:#fff':'background:#0d1320';
   tblHTML+=`<div class="tbl-wrap" style="margin-top:12px;${stWrap}"><table class="tbl-new" style="border-collapse:collapse;width:100%"><thead><tr>
     <th style="text-align:left;padding:10px 12px;font-size:${hfs};font-weight:700;color:${L?'#fff':'#ffd700'};background:${sthBg};border:1px solid ${sthBd};width:22%">📊 สถิติ</th>
-    ${players.map(p=>`<th style="text-align:center;padding:10px 3px;font-size:${hfs};font-weight:700;color:${L?'#fff':'#ffd700'};background:${sthBg};border:1px solid ${sthBd}">${shortName(p.name,n)}</th>`).join('')}
+    ${players.map(p=>`<th style="text-align:center;padding:8px 1px;font-size:${hfs};font-weight:700;color:${L?'#fff':'#ffd700'};background:${sthBg};border:1px solid ${sthBd};overflow:hidden;white-space:nowrap;text-overflow:ellipsis;max-width:0">${shortName(p.name,n)}</th>`).join('')}
     </tr></thead><tbody>`;
   statRows.forEach((sr,ri)=>{
     const rowBg=ri%2===0?stRowO:stRowE;
