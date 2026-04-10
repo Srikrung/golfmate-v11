@@ -30,6 +30,7 @@ body.light .tab-bar{background:rgba(242,242,247,0.95)}
 /* ── SCREENS ── */
 .screen{display:none;padding:16px 16px 20px;background:var(--bg);min-height:100vh}
 .screen.active{display:block}
+#scr-scorecard{min-height:auto!important;padding-bottom:80px}
 #scr-lb{padding:0!important;min-height:0!important}
 #scr-lb.active{
   display:flex!important;flex-direction:column;overflow:hidden;
