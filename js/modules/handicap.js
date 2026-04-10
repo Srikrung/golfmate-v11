@@ -13,7 +13,7 @@ export function initHcapPairs(n){
   const newPairs=[];
   for(let i=0;i<n;i++)for(let j=i+1;j<n;j++){
     const found=existing.find(p=>p.i===i&&p.j===j);
-    newPairs.push(found||{i,j,on:false,type:'float',payMode:'end',front:0,back:0,activeFrom:0,strokeShots:{3:0,4:0,5:0,6:0}});
+    newPairs.push(found||{i,j,on:false,type:'float',payMode:'end',front:0,back:0,activeFrom:0,strokeShots:{3:0,4:0,5:0,6:0},dir:'ij'});
   }
   G.hcap.pairs=newPairs;
   buildHcapUI();
@@ -22,7 +22,7 @@ export function initHcapPairs(n){
 export function addHcapPairsForPlayer(newIdx){
   for(let i=0;i<newIdx;i++){
     if(!G.hcap.pairs.find(p=>p.i===i&&p.j===newIdx)){
-      G.hcap.pairs.push({i,j:newIdx,on:false,type:'float',payMode:'end',front:0,back:0,activeFrom:getCurrentHole(),strokeShots:{3:0,4:0,5:0,6:0}});
+      G.hcap.pairs.push({i,j:newIdx,on:false,type:'float',payMode:'end',front:0,back:0,activeFrom:getCurrentHole(),strokeShots:{3:0,4:0,5:0,6:0},dir:'ij'});
     }
   }
   buildHcapUI();
@@ -36,12 +36,15 @@ export function buildHcapUI(){
   const btnSt=(on,col)=>`padding:5px 10px;border-radius:7px;border:1.5px solid ${on?col:'var(--bg4)'};background:${on?col.replace(')',',0.15)').replace('rgb','rgba'):'var(--bg3)'};color:${on?'#fff':'var(--lbl2)'};font-family:inherit;font-size:11px;font-weight:700;cursor:pointer`;
   wrap.innerHTML=G.hcap.pairs.map((p,k)=>{
     const nameI=players[p.i]?.name||`P${p.i+1}`,nameJ=players[p.j]?.name||`P${p.j+1}`;
+    const dir=p.dir||'ij';
+    const giver=dir==='ij'?nameI:nameJ, receiver=dir==='ij'?nameJ:nameI;
     const isFloat=p.type==='float',isStroke=p.type==='stroke';
     const isEnd=p.payMode==='end',isLive=p.payMode==='live';
     return`<div style="padding:10px 0;border-bottom:0.5px solid var(--sep)">
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
         <div class="sw${p.on?' on':''}" id="sw-hcap-${k}" onclick="hcapTogglePair(${k})" style="flex-shrink:0"></div>
-        <span style="font-size:14px;font-weight:700;color:var(--lbl);flex:1">${nameI} <span style="color:var(--purple)">ต่อ</span> ${nameJ}</span>
+        <span style="font-size:14px;font-weight:700;color:var(--lbl);flex:1">${giver} <span style="color:var(--purple)">ต่อ</span> ${receiver}</span>
+        <button onclick="hcapFlipDir(${k})" style="padding:4px 10px;border-radius:8px;border:1.5px solid rgba(191,90,242,0.4);background:rgba(191,90,242,0.08);color:var(--purple);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">⇄</button>
       </div>
       <div id="hcap-body-${k}" style="display:${p.on?'block':'none'}">
         <div style="display:flex;gap:6px;margin-bottom:8px">
@@ -71,7 +74,7 @@ export function buildHcapUI(){
         </div>
         <div style="font-size:11px;color:var(--lbl3)">ตัวอย่าง: ต่อ 5pt → ${nameJ} ต้องชนะเกิน 5pt ถึงได้เงิน</div>`
         :`<div style="padding:4px 0">
-          <div style="font-size:11px;color:var(--lbl2);margin-bottom:8px">จำนวนช็อตที่ให้ต่อ (${nameJ} ได้ต่อ)</div>
+          <div style="font-size:11px;color:var(--lbl2);margin-bottom:8px">จำนวนช็อตที่ให้ต่อ (${receiver} ได้ต่อ)</div>
           <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px">
             ${[3,4,5,6].map(par=>{
               const val=(p.strokeShots&&p.strokeShots[par]!==undefined)?p.strokeShots[par]:0;
@@ -84,11 +87,17 @@ export function buildHcapUI(){
               </div>`;
             }).join('')}
           </div>
-          <div style="font-size:11px;color:var(--lbl3);margin-top:6px">(ลดสกอร์ ${nameJ} ก่อนเปรียบกับ ${nameI})</div>
+          <div style="font-size:11px;color:var(--lbl3);margin-top:6px">(ลดสกอร์ ${receiver} ก่อนเปรียบกับ ${giver})</div>
         </div>`}
       </div>
     </div>`;
   }).join('');
+}
+
+export function hcapFlipDir(k){
+  const p=G.hcap.pairs[k];
+  p.dir=(p.dir||'ij')==='ij'?'ji':'ij';
+  buildHcapUI();autoSave();
 }
 
 export function hcapTogglePair(k){
@@ -123,11 +132,14 @@ export function calcBitePairStroke(h,pi,pj,pairObj){
   if(skipData[h]?.[pi]?.has('bite')||skipData[h]?.[pj]?.has('bite'))return{i:0,j:0};
   const par=pars[h];
   const shots=pairObj&&pairObj.strokeShots?(pairObj.strokeShots[par]??getStrokeShots(par)):getStrokeShots(par);
-  const sj=sj_raw-shots;
+  // dir:'ij' = j ได้รับช็อต (default), dir:'ji' = i ได้รับช็อต
+  const dir=pairObj?.dir||'ij';
+  const si_adj=dir==='ji'?si-shots:si;
+  const sj=dir==='ij'?sj_raw-shots:sj_raw;
   const r=G.bite.val,tm=(G.turbo.on&&G.turbo.holes.has(h))?G.turbo.mult:1;
   let mi=0,mj=0;
-  if(si<sj){const a=r*getBiteMult(si,par)*tm;mi+=a;mj-=a;}
-  else if(sj<si){const a=r*getBiteMult(sj,par)*tm;mj+=a;mi-=a;}
+  if(si_adj<sj){const a=r*getBiteMult(si_adj,par)*tm;mi+=a;mj-=a;}
+  else if(sj<si_adj){const a=r*getBiteMult(sj,par)*tm;mj+=a;mi-=a;}
   return{i:mi,j:mj};
 }
 

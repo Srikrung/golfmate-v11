@@ -363,7 +363,7 @@ export function lbRenderStats(list,el){
   });
   const ROWS=[
     {l:'🏆 HIO',k:'hio',dc:'#ffd700',lc:'#b8860b'},
-    {l:'🌟 Albatross',k:'alb',dc:'#ffd700',lc:'#8a6c00'},
+    {l:'🌟 Alba',k:'alb',dc:'#ffd700',lc:'#8a6c00'},
     {l:'🦅 Eagle',k:'egl',dc:'#60b4ff',lc:'#1d5fa0'},
     {l:'🐦 Birdie',k:'bir',dc:'#34d399',lc:'#16803c'},
     {l:'Par',k:'par',dc:'rgba(255,215,0,0.7)',lc:'#b8860b'},

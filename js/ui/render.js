@@ -83,7 +83,7 @@ export function refWidget(h,p){
   let k='';
   if(v===1)k='hio';else if(d<=-3)k='alba';else if(d===-2)k='e';else if(d===-1)k='bi';
   else if(d===0)k='pa';else if(d===1)k='bo';else if(d===2)k='db';else k='wr';
-  const M={hio:{bg:'linear-gradient(135deg,var(--yellow),#c8a000)',t:'HIO',cls:'b-hio'},alba:{bg:'rgba(255,214,10,0.12)',t:'Albatross',cls:'b-alba'},e:{bg:'rgba(255,214,10,0.1)',t:'Eagle',cls:'b-eagle'},bi:{bg:'rgba(48,209,88,0.12)',t:'Birdie',cls:'b-birdie'},pa:{bg:'rgba(255,215,0,0.07)',t:'Par',cls:'b-par'},bo:{bg:'rgba(255,255,255,0.05)',t:'Bogey',cls:'b-bogey'},db:{bg:'rgba(255,255,255,0.05)',t:'Double',cls:'b-double'},wr:{bg:'rgba(255,69,58,0.1)',t:'เละ',cls:'b-worse'}};
+  const M={hio:{bg:'linear-gradient(135deg,var(--yellow),#c8a000)',t:'HIO',cls:'b-hio'},alba:{bg:'rgba(255,214,10,0.12)',t:'Alba',cls:'b-alba'},e:{bg:'rgba(255,214,10,0.1)',t:'Eagle',cls:'b-eagle'},bi:{bg:'rgba(48,209,88,0.12)',t:'Birdie',cls:'b-birdie'},pa:{bg:'rgba(255,215,0,0.07)',t:'Par',cls:'b-par'},bo:{bg:'rgba(255,255,255,0.05)',t:'Bogey',cls:'b-bogey'},db:{bg:'rgba(255,255,255,0.05)',t:'Double',cls:'b-double'},wr:{bg:'rgba(255,69,58,0.1)',t:'เละ',cls:'b-worse'}};
   if(ctrl)ctrl.style.background=M[k].bg;
   badge.textContent=M[k].t;badge.className=`s-badge ${M[k].cls}`;
 }
@@ -423,30 +423,29 @@ export function buildResults(){
   }
   // ── stats table ใหม่ มีเส้น border ──
   const statRows=[
-    {label:'🏆 HIO',key:'hio',dc:'#ffd700',lc:'#b8860b'},
-    {label:'🌟 Alba',key:'alba',dc:'#ffd700',lc:'#8a6c00'},
-    {label:'🦅 Eagle',key:'e',dc:'#60b4ff',lc:'#1d5fa0'},
-    {label:'🐦 Birdie',key:'bi',dc:'#34d399',lc:'#16803c'},
+    {label:'HIO',key:'hio',dc:'#ffd700',lc:'#b8860b'},
+    {label:'Alba',key:'alba',dc:'#ffd700',lc:'#8a6c00'},
+    {label:'Eagle',key:'e',dc:'#60b4ff',lc:'#1d5fa0'},
+    {label:'Birdie',key:'bi',dc:'#34d399',lc:'#16803c'},
     {label:'Par',key:'pa',dc:'rgba(255,215,0,0.7)',lc:'#b8860b'},
     {label:'Bogey',key:'bo',dc:'#666',lc:'#aaa'},
     {label:'Double',key:'db',dc:'#666',lc:'#aaa'},
     {label:'เละ',key:'mx',dc:'#ff6b61',lc:'#cc2222'},
   ];
-  const sthBg=L?'#1a4a8a':'#1a3a6e', sthBd=L?'#0d3070':'#2a4a8e';
-  const stTdBd=L?'1px solid #dde':'1px solid #1e2d45';
-  const stRowO=L?'background:#fff':'background:#131f30';
-  const stRowE=L?'background:#f5f7fa':'background:#0f1a28';
-  const stWrap=L?'background:#fff':'background:#0d1320';
-  tblHTML+=`<div class="tbl-wrap" style="margin-top:12px;${stWrap}"><table class="tbl-new" style="border-collapse:collapse;width:100%"><thead><tr>
-    <th style="text-align:left;padding:10px 12px;font-size:${hfs};font-weight:700;color:${L?'#fff':'#ffd700'};background:${sthBg};border:1px solid ${sthBd};width:22%">📊 สถิติ</th>
-    ${players.map(p=>`<th style="text-align:center;padding:8px 1px;font-size:${hfs};font-weight:700;color:${L?'#fff':'#ffd700'};background:${sthBg};border:1px solid ${sthBd};overflow:hidden;white-space:nowrap;text-overflow:ellipsis;max-width:0">${shortName(p.name,n)}</th>`).join('')}
-    </tr></thead><tbody>`;
+  // ── stat rows ตรงใน tbody เดียวกัน — colspan=2 แทน H+P ──
+  const statHdrBg=`background:${thBg}`;
+  tblHTML+=`<tr style="${statHdrBg}">
+    <th colspan="2" style="text-align:left;padding:9px 10px;font-size:${hfs};font-weight:700;color:${L?'#fff':'#ffd700'};border:${tdBd}">📊 สถิติ</th>
+    ${players.map(p=>`<th style="text-align:center;padding:8px 1px;font-size:${hfs};font-weight:700;color:${L?'#fff':'#ffd700'};border:${tdBd};overflow:hidden;white-space:nowrap;text-overflow:ellipsis;max-width:0">${shortName(p.name,n)}</th>`).join('')}
+  </tr>`;
   statRows.forEach((sr,ri)=>{
-    const rowBg=ri%2===0?stRowO:stRowE;
+    const rowBg=ri%2===0?(L?'background:#fff':'background:#131f30'):(L?'background:#f5f7fa':'background:#0f1a28');
     const sc=L?sr.lc:sr.dc;
-    tblHTML+=`<tr style="${rowBg}"><td style="text-align:left;padding:9px 12px;font-size:${hfs};font-weight:700;color:${sc};border:${stTdBd}">${sr.label}</td>${stats.map(st=>{const v=st[sr.key];return`<td style="text-align:center;font-size:${fs};font-weight:${v>0?700:400};color:${v>0?sc:'var(--lbl4,#333)'};padding:9px 3px;border:${stTdBd}">${v>0?v:'—'}</td>`;}).join('')}</tr>`;
+    tblHTML+=`<tr style="${rowBg}">
+      <td colspan="2" style="text-align:left;padding:8px 10px;font-size:${hfs};font-weight:700;color:${sc};border:${tdBd}">${sr.label}</td>
+      ${stats.map(st=>{const v=st[sr.key];return`<td style="text-align:center;font-size:${fs};font-weight:${v>0?700:400};color:${v>0?sc:'var(--lbl4,#333)'};padding:8px 3px;border:${tdBd}">${v>0?v:'—'}</td>`;}).join('')}
+    </tr>`;
   });
-  tblHTML+=`</tbody></table></div>`;
   tblHTML+=`</tbody></table></div>`;
 
   // ── Srikrung Summary ──
@@ -544,12 +543,34 @@ export function buildMoney(){
     netHTML+=`<div style="background:var(--bg2);border-radius:12px;padding:10px 12px;border:0.5px solid ${v>0?'rgba(48,209,88,0.3)':v<0?'rgba(255,69,58,0.3)':'var(--sep)'}"><div style="font-size:11px;color:var(--lbl2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${pl.name}</div><div style="font-size:${n<=3?22:18}px;font-weight:800;color:${v>0?'var(--green)':v<0?'var(--red)':'var(--lbl2)'};margin-top:3px">${v>0?'+':''}${v.toLocaleString()}฿</div><div style="font-size:9px;color:var(--lbl2);margin-top:3px;line-height:1.6">${games}${hcapTag}</div></div>`;
   });
   netHTML+='</div>';
-  let txs=[],bal=[...tot],pos=[],neg=[];
-  for(let i=0;i<n;i++){if(bal[i]>0)pos.push({name:players[i].name,b:bal[i]});else if(bal[i]<0)neg.push({name:players[i].name,b:Math.abs(bal[i])});}
-  pos.sort((a,b)=>b.b-a.b);neg.sort((a,b)=>a.b-b.b);
-  let pi=0,ni=0;
-  while(pi<pos.length&&ni<neg.length){const amt=Math.min(pos[pi].b,neg[ni].b);if(amt>0)txs.push({from:neg[ni].name,to:pos[pi].name,amt});pos[pi].b-=amt;neg[ni].b-=amt;if(pos[pi].b===0)pi++;if(neg[ni].b===0)ni++;}
-  const transfersHTML=txs.length?`<div class="money-card"><div class="mc-hdr"><div class="mc-lbl">โอนให้</div></div>${txs.map(tx=>`<div class="m-row"><div style="display:flex;align-items:center;gap:8px;flex:1"><span style="font-size:15px;color:var(--red);font-weight:600">${tx.from}</span><span style="font-size:18px;color:var(--lbl3);line-height:1">→</span><span style="font-size:15px;color:var(--green);font-weight:600">${tx.to}</span></div><div class="m-amt mw" style="font-size:20px">${tx.amt.toLocaleString()}฿</div></div>`).join('')}</div>`:'';
+  // raw transfers — แยกตามเกม ไม่หักลบกลบหนี้
+  const GAME_ICONS={bite:'🐶',olympic:'🏅',team:'🤝',farNear:'🎯'};
+  const GAME_NAMES={bite:'หมากัด',olympic:'โอลิมปิก',team:'ทีม',farNear:'Far-Near'};
+  let rawTxRows='';
+  ['bite','olympic','team','farNear'].filter(k=>G[k].on).forEach(k=>{
+    const val=G[k].val||1,gArr=gTot[k];
+    const payors=players.map((pl,p)=>({name:pl.name,amt:gArr[p]})).filter(x=>x.amt<0);
+    const recvs =players.map((pl,p)=>({name:pl.name,amt:gArr[p]})).filter(x=>x.amt>0);
+    payors.forEach(pa=>{
+      recvs.forEach(re=>{
+        const rowAmt=Math.round(Math.abs(pa.amt));
+        if(rowAmt>0){
+          rawTxRows+=`<div style="display:flex;align-items:center;padding:11px 14px;border-bottom:0.5px solid var(--sep)">
+            <div style="flex:1">
+              <div style="display:flex;align-items:center;gap:8px">
+                <span style="font-size:15px;font-weight:700;color:var(--red)">${pa.name}</span>
+                <span style="font-size:18px;color:var(--lbl4,#333)">→</span>
+                <span style="font-size:15px;font-weight:700;color:var(--green)">${re.name}</span>
+              </div>
+              <div style="font-size:10px;color:var(--lbl3);margin-top:2px">${GAME_ICONS[k]} ${GAME_NAMES[k]}</div>
+            </div>
+            <div style="font-size:20px;font-weight:800;color:var(--lbl)">${rowAmt.toLocaleString()}฿</div>
+          </div>`;
+        }
+      });
+    });
+  });
+  const transfersHTML=rawTxRows?`<div style="background:var(--bg2);border-radius:12px;overflow:hidden;border:0.5px solid var(--sep)">${rawTxRows}</div>`:'';
   const thS=`padding:7px 2px;font-size:${hfs};font-weight:600;color:var(--lbl2);text-align:center;background:var(--bg3);border-bottom:0.5px solid var(--sep)`;
   const front9Tot=players.map((_,p)=>Array.from({length:9},(_,h)=>allMH[h].bite[p]+allMH[h].olympic[p]+allMH[h].team[p]+allMH[h].farNear[p]).reduce((a,b)=>a+b,0));
   const back9Tot=players.map((_,p)=>Array.from({length:9},(_,i)=>{const h=i+9;return allMH[h].bite[p]+allMH[h].olympic[p]+allMH[h].team[p]+allMH[h].farNear[p];}).reduce((a,b)=>a+b,0));
@@ -563,17 +584,24 @@ export function buildMoney(){
   masterHTML+=`<tr style="background:var(--bg3);border-top:1.5px solid var(--blue)"><td colspan="2" style="text-align:center;font-size:${hfs};font-weight:700;color:var(--blue);padding:8px 2px">รวม ฿</td>${players.map((_,p)=>{const v=tot[p];return`<td style="text-align:center;font-size:${fs};font-weight:800;color:${v>0?'var(--green)':v<0?'var(--red)':'var(--lbl2)'};padding:8px 2px">${v>0?'+':''}${v.toLocaleString()}</td>`;}).join('')}</tr></tbody></table></div>`;
 
   document.getElementById('money-content').innerHTML=`
-    <div style="text-align:center;margin-bottom:14px;padding-bottom:12px;border-bottom:0.5px solid var(--sep)">
-      <div style="font-size:20px;font-weight:700;color:var(--lbl)">${document.getElementById('course-name').value||'ไม่ระบุสนาม'}</div>
+    <div style="margin-bottom:12px;padding-bottom:10px;border-bottom:0.5px solid var(--sep)">
+      <div style="font-size:18px;font-weight:800;color:var(--lbl)">${document.getElementById('course-name').value||'ไม่ระบุสนาม'}</div>
     </div>
-    <div style="font-size:15px;font-weight:700;color:var(--lbl);margin-bottom:10px">📊 Matrix พ้อย</div>
+    <div style="font-size:15px;font-weight:700;color:var(--lbl);margin-bottom:8px">📊 Matrix พ้อย</div>
     ${buildMatrixHTML(gTot,n,fs,hfs)}
-    <button class="nav-b pr" style="width:100%;margin:14px 0 4px;font-size:16px;padding:14px" onclick="showMoneyDetail(this)">💵 คำนวณเงิน</button>
-    <div id="money-detail" style="display:none;margin-top:4px">
-      ${netHTML}${transfersHTML}
-      <div style="font-size:15px;font-weight:700;color:var(--lbl);margin:14px 0 8px">📋 MASTER รายหลุม (฿)</div>
-      ${masterHTML}
-    </div>`;
+    ${netHTML?`
+    <button onclick="(function(el,arr){const o=el.style.display!=='none';el.style.display=o?'none':'block';arr.style.transform=o?'rotate(0)':'rotate(180deg)'})(document.getElementById('money-sum'),this.querySelector('.marr'))"
+      style="width:100%;display:flex;align-items:center;justify-content:space-between;padding:11px 14px;border-radius:12px;border:1.5px solid rgba(52,209,88,0.25);background:rgba(52,209,88,0.06);font-family:inherit;cursor:pointer;font-size:14px;font-weight:700;color:var(--green);margin-top:12px">
+      <span>💰 ยอดรวม (฿)</span><span class="marr" style="font-size:11px;color:var(--lbl3);transition:transform .25s">▼</span>
+    </button>
+    <div id="money-sum" style="display:none;margin-top:6px;margin-bottom:4px">${netHTML}</div>`:''}
+    ${transfersHTML?`
+    <button onclick="(function(el,arr){const o=el.style.display!=='none';el.style.display=o?'none':'block';arr.style.transform=o?'rotate(0)':'rotate(180deg)'})(document.getElementById('money-tx'),this.querySelector('.tarr'))"
+      style="width:100%;display:flex;align-items:center;justify-content:space-between;padding:11px 14px;border-radius:12px;border:1.5px solid rgba(255,159,10,0.25);background:rgba(255,159,10,0.06);font-family:inherit;cursor:pointer;font-size:14px;font-weight:700;color:var(--orange);margin-top:8px">
+      <span>💸 ใครโอนให้ใครเท่าไร</span><span class="tarr" style="font-size:11px;color:var(--lbl3);transition:transform .25s">▼</span>
+    </button>
+    <div id="money-tx" style="display:none;margin-top:6px">${transfersHTML}</div>`:''}
+  `;
 }
 
 export function showMoneyDetail(btn){
