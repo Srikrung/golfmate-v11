@@ -576,13 +576,27 @@ export async function shareToLine(tid){
     const clone = src.cloneNode(true);
     clone.style.cssText = `width:${A4_W}px;min-width:${A4_W}px;max-width:none;overflow:visible;`;
 
-    // ปลด text-overflow ทุก element ใน clone
+    // ปลด text-overflow + ใส่ compact styles สำหรับ share
+    const isDarkMode = document.body.classList.contains('dark') || !document.body.classList.contains('light');
     clone.querySelectorAll('*').forEach(el=>{
       const s = el.style;
       s.whiteSpace = 'normal';
       s.overflow = 'visible';
       s.textOverflow = 'unset';
       s.maxWidth = 'none';
+    });
+    // compact: ลด padding/font ทุก td/th
+    clone.querySelectorAll('td,th').forEach(el=>{
+      const cur = parseFloat(getComputedStyle(el).paddingTop)||0;
+      if(cur>4){ el.style.paddingTop='4px'; el.style.paddingBottom='4px'; }
+      const fs = parseFloat(getComputedStyle(el).fontSize)||14;
+      if(fs>13) el.style.fontSize = Math.round(fs*0.82)+'px';
+    });
+    // stat header names — force สีให้ถูกต้องตามธีม
+    clone.querySelectorAll('tr.stat-hdr td, tr.stat-hdr th').forEach(el=>{
+      el.style.setProperty('background', isDarkMode?'#1a3a6e':'#1a4a8a','important');
+      el.style.setProperty('color', isDarkMode?'#ffd700':'#ffffff','important');
+      el.style.fontWeight='700';
     });
 
     wrap.appendChild(clone);
