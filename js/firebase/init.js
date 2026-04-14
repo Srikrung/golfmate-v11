@@ -23,10 +23,6 @@ export function updateRoomCode(){
   document.getElementById('room-code').value=code;
   document.getElementById('room-code-preview').textContent=code||'—';
 }
-  for(let i=0;i<sn.options.length;i++) if(sn.options[i].value===d1){sn.selectedIndex=i;break;}
-  for(let i=0;i<sn2.options.length;i++) if(sn2.options[i].value===d2){sn2.selectedIndex=i;break;}
-  updateRoomCode();
-}
 export function getRoomCode(){return(document.getElementById('room-code')?.value||'').trim()||'DEFAULT';}
 const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbytrMvvaaZ_AsJ2aeEGLDqN23rRVm7Xs6fYzWFSWorDXEf-IPIzB86Roz1nDnE5Us_GHg/exec';
 export function getApiUrl(){return(document.getElementById('api-url')?.value||'').trim()||APPS_SCRIPT_URL;}
