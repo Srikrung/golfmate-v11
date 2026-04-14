@@ -397,30 +397,42 @@ export function buildResults(){
   const L=document.body.classList.contains('light');
   const thBg=L?'#1a4a8a':'#1a3a6e';
   const thBd=L?'#0d3070':'#2a4a8e';
-  const thS=`padding:8px 1px;font-size:${hfs};font-weight:700;color:${L?'#fff':'#ffd700'};text-align:center;background:${thBg};border:1px solid ${thBd};overflow:hidden;white-space:nowrap;text-overflow:ellipsis;max-width:0`;
-  const tdBd=L?'1px solid #dde':'1px solid #1e2d45';
+  // responsive font + layout ตามจำนวนคน
+  const narrow=n<=3;
+  const fsSc=n<=2?20:n<=3?18:n<=4?17:15;
+  const fsHdr=n<=3?14:13;
+  const fsSub=n<=3?16:14;
+  const fsTot=n<=2?26:n<=3?22:n<=4?20:18;
+  const wBall=n<=2?28:n<=4?26:22;
+  const hW=narrow?'12%':'6%', pW=narrow?'11%':'5%';
+  const nmW=((100-parseFloat(hW)-parseFloat(pW))/n).toFixed(1)+'%';
+  const thS=`padding:8px 1px;font-size:${fsHdr}px;font-weight:700;color:${L?'#fff':'#ffd700'};text-align:center;background:${thBg};border:1px solid ${thBd};overflow:hidden;white-space:nowrap;text-overflow:ellipsis;max-width:0`;
+  const tdBd=L?'1px solid #bbb':'1px solid #333';
   const rowOdd=L?'background:#fff':'background:#131f30';
   const rowEven=L?'background:#f5f7fa':'background:#0f1a28';
-  const hColStyle=`text-align:center;font-size:${hfs};font-weight:600;color:${L?'#555':'#ffd700'};padding:10px 3px;${L?'background:#eef2fa':'background:#0a1520'};border:${tdBd}`;
+  const hColStyle=`text-align:center;font-size:${fsHdr-1}px;font-weight:600;color:${L?'#555':'#ffd700'};padding:10px 2px;${L?'background:#eef2fa':'background:#0a1520'};border:${tdBd}`;
   const wrapBg=L?'background:#fff':'background:#0d1320';
-  let tblHTML=`<div class="tbl-wrap" style="${wrapBg}"><table class="tbl-new" style="border-collapse:collapse;width:100%"><thead><tr><th style="${thS};width:${n<=3?'12%':'9%'}">H</th><th style="${thS};width:${n<=3?'11%':'8%'}">P</th>${players.map(p=>`<th style="${thS}">${shortName(p.name,n)}</th>`).join('')}</tr></thead><tbody>`;
+  // ≤3 คน: center + max-width เพื่อไม่ให้คอลัมน์กว้างเกิน
+  const maxW=narrow?`${Math.max(280,n*160)}px`:'100%';
+  const tblWrap=`<div class="tbl-wrap" style="${wrapBg};margin-left:auto;margin-right:auto;max-width:${maxW}">`;
+  let tblHTML=`${tblWrap}<table class="tbl-new" style="border-collapse:collapse;width:100%"><colgroup><col style="width:${hW}"><col style="width:${pW}">${players.map(()=>`<col style="width:${nmW}">`).join('')}</colgroup><thead><tr><th style="${thS}">H</th><th style="${thS}">P</th>${players.map(p=>`<th style="${thS}">${shortName(p.name,n)}</th>`).join('')}</tr></thead><tbody>`;
   for(let h=0;h<18;h++){
     const rowBg=h%2===0?rowOdd:rowEven;
-    tblHTML+=`<tr style="${rowBg}"><td style="${hColStyle}">${h+1}</td><td style="${hColStyle}">${pars[h]}</td>${players.map((_,p)=>scoreCell(scores[p][h],pars[h],fs,tdBd)).join('')}</tr>`;
+    tblHTML+=`<tr style="${rowBg}"><td style="${hColStyle}">${h+1}</td><td style="${hColStyle}">${pars[h]}</td>${players.map((_,p)=>scoreCell(scores[p][h],pars[h],fsSc+'px',tdBd)).join('')}</tr>`;
     if(h===8){
       const subBg=L?'background:#ddeeff':'background:rgba(255,215,0,0.1)';
       const subCl=L?'#1a4a8a':'#ffd700';
       const par9a=pars.slice(0,9).reduce((s,v)=>s+v,0);
       const overPosCl=L?'#cc4400':'#ff9966';
       const overNegCl=L?'#004fc4':'#4da3ff';
-      tblHTML+=`<tr style="${subBg}"><td colspan="2" style="text-align:center;font-size:${fs};font-weight:800;color:${L?'#1a4a8a':'#fff'};padding:8px 2px;border:${tdBd}">9 แรก</td>${players.map((_,p)=>{
+      tblHTML+=`<tr style="${subBg}"><td colspan="2" style="text-align:center;font-size:${fsHdr}px;font-weight:800;color:${L?'#1a4a8a':'#fff'};padding:8px 2px;border:${tdBd}">9 แรก</td>${players.map((_,p)=>{
         const f9=scores[p].slice(0,9).reduce((s,v)=>s+(v||0),0);
         const f9valid=scores[p].slice(0,9).some(v=>v!==null);
         if(!f9valid) return`<td style="text-align:center;padding:8px 2px;border:${tdBd}"><span style="color:${subCl};font-size:${fs};font-weight:800">—</span></td>`;
         const diff=f9-par9a;
         const overCl=diff>0?overPosCl:diff<0?overNegCl:'rgba(150,150,150,0.8)';
         const overTxt=diff===0?'E':(diff>0?'+':'')+diff;
-        return`<td style="text-align:center;padding:8px 2px;border:${tdBd}"><div style="color:${subCl};font-size:${fs};font-weight:800">${f9}</div><div style="font-size:10px;font-weight:700;color:${overCl};margin-top:1px">เกิน ${overTxt}</div></td>`;
+        return`<td style="text-align:center;padding:8px 2px;border:${tdBd}"><div style="color:${subCl};font-size:${fsSub}px;font-weight:800">${f9}</div><div style="font-size:10px;font-weight:700;color:${overCl};margin-top:1px">เกิน ${overTxt}</div></td>`;
       }).join('')}</tr>`;
     }
     if(h===17){
@@ -434,26 +446,26 @@ export function buildResults(){
       const overNegCl=L?'#004fc4':'#4da3ff';
       const overPosTot=L?'#ffbb88':'#ff9966';
       const overNegTot=L?'#88ddff':'#4da3ff';
-      tblHTML+=`<tr style="${subBg}"><td colspan="2" style="text-align:center;font-size:${fs};font-weight:800;color:${L?'#1a4a8a':'#fff'};padding:8px 2px;border:${tdBd}">9 หลัง</td>${players.map((_,p)=>{
+      tblHTML+=`<tr style="${subBg}"><td colspan="2" style="text-align:center;font-size:${fsHdr}px;font-weight:800;color:${L?'#1a4a8a':'#fff'};padding:8px 2px;border:${tdBd}">9 หลัง</td>${players.map((_,p)=>{
         const b9=scores[p].slice(9,18).reduce((s,v)=>s+(v||0),0);
         const b9valid=scores[p].slice(9,18).some(v=>v!==null);
         if(!b9valid) return`<td style="text-align:center;padding:8px 2px;border:${tdBd}"><span style="color:${subCl};font-size:${fs};font-weight:800">—</span></td>`;
         const diff=b9-par9b;
         const overCl=diff>0?overPosCl:diff<0?overNegCl:'rgba(150,150,150,0.8)';
         const overTxt=diff===0?'E':(diff>0?'+':'')+diff;
-        return`<td style="text-align:center;padding:8px 2px;border:${tdBd}"><div style="color:${subCl};font-size:${fs};font-weight:800">${b9}</div><div style="font-size:10px;font-weight:700;color:${overCl};margin-top:1px">เกิน ${overTxt}</div></td>`;
+        return`<td style="text-align:center;padding:8px 2px;border:${tdBd}"><div style="color:${subCl};font-size:${fsSub}px;font-weight:800">${b9}</div><div style="font-size:10px;font-weight:700;color:${overCl};margin-top:1px">เกิน ${overTxt}</div></td>`;
       }).join('')}</tr>`;
-      tblHTML+=`<tr style="${totBg}"><td colspan="2" style="text-align:center;font-size:${fs};font-weight:800;color:${L?'#fff':'#fff'};padding:10px 2px;border:${tdBd}">รวม</td>${players.map((_,p)=>{
+      tblHTML+=`<tr style="${totBg}"><td colspan="2" style="text-align:center;font-size:${fsHdr}px;font-weight:800;color:#fff;padding:10px 2px;border:${tdBd}">รวม</td>${players.map((_,p)=>{
         const tot=scores[p].reduce((s,v)=>s+(v||0),0);
         const hcp=players[p].hcp||0;
         const net=tot-hcp;
         const valid=scores[p].some(v=>v!==null);
         const netColor=net<0?'var(--green)':net>0?'var(--red)':'var(--lbl)';
-        if(!valid) return`<td style="text-align:center;padding:10px 2px;border:${tdBd}"><span style="color:${totCl};font-size:${fs};font-weight:800">—</span></td>`;
+        if(!valid) return`<td style="text-align:center;padding:10px 2px;border:${tdBd}"><span style="color:${totCl};font-size:${fsTot}px;font-weight:800">—</span></td>`;
         const diff=tot-parTot;
         const overCl=diff>0?overPosTot:diff<0?overNegTot:'rgba(255,255,255,0.5)';
         const overTxt=diff===0?'E':(diff>0?'+':'')+diff;
-        return`<td style="text-align:center;padding:10px 2px;border:${tdBd}"><div style="color:${totCl};font-size:${fs};font-weight:800">${tot}</div>${hcp>0?`<div style="font-size:10px;color:${netColor};margin-top:1px">Net ${net}</div>`:''}<div style="font-size:10px;font-weight:700;color:${overCl};margin-top:1px">เกิน ${overTxt}</div></td>`;
+        return`<td style="text-align:center;padding:10px 2px;border:${tdBd}"><div style="color:${totCl};font-size:${fsTot}px;font-weight:800">${tot}</div>${hcp>0?`<div style="font-size:10px;color:${netColor};margin-top:1px">Net ${net}</div>`:''}<div style="font-size:10px;font-weight:700;color:${overCl};margin-top:1px">เกิน ${overTxt}</div></td>`;
       }).join('')}</tr>`;
     }
   }
