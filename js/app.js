@@ -38,7 +38,7 @@ import { goLeaderboard, lbGoPrev, lbGoNext,
          lbSetTab, lbSetRoom, lbFetch } from './modules/leaderboard.js';
 
 // ── firebase ──
-import { toggleSyncSw, updateRoomCode, syncEnabled, getRoomCode } from './firebase/init.js';
+import { toggleSyncSw, updateRoomCode, autoGenRoomCode, autoGenRoomCode, syncEnabled, getRoomCode } from './firebase/init.js';
 import { loadOnlineSetting, goOnlineSetup, saveOnlineSetup, testConnection } from './firebase/room.js';
 import { createRoom, syncFullBackup, restoreFromFirebase,
          deleteRoomFromFirebase } from './firebase/sync.js';
@@ -138,7 +138,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // leaderboard
     goLeaderboard, lbGoPrev, lbGoNext, lbSetTab, lbSetRoom, lbFetch,
     // firebase
-    toggleSyncSw, updateRoomCode,
+    toggleSyncSw, updateRoomCode, autoGenRoomCode,
     goOnlineSetup, saveOnlineSetup, testConnection, createRoom,
     restoreFromFirebase, restoreJoinSrikrung,
     deleteRoomFromFirebase,
@@ -649,7 +649,7 @@ Object.assign(window, {
   hcapTogglePair, hcapFlipDir, hcapSetStroke, hcapSetField, buildHcapUI,
   sgToggle, sgChPutt, sgSetPutt1,
   goLeaderboard, lbGoPrev, lbGoNext, lbSetTab, lbSetRoom, lbFetch,
-  toggleSyncSw, updateRoomCode,
+  toggleSyncSw, updateRoomCode, autoGenRoomCode,
   goOnlineSetup, saveOnlineSetup, testConnection, createRoom,
   joinRoomLookup, selectJoinPlayer,
   showExportModal, hideExportModal, setExportWho, doExport,
