@@ -38,7 +38,7 @@ import { goLeaderboard, lbGoPrev, lbGoNext,
          lbSetTab, lbSetRoom, lbFetch } from './modules/leaderboard.js';
 
 // ── firebase ──
-import { toggleSyncSw, updateRoomCode, autoGenRoomCode, autoGenRoomCode, syncEnabled, getRoomCode } from './firebase/init.js';
+import { toggleSyncSw, updateRoomCode, autoGenRoomCode, syncEnabled, getRoomCode } from './firebase/init.js';
 import { loadOnlineSetting, goOnlineSetup, saveOnlineSetup, testConnection } from './firebase/room.js';
 import { createRoom, syncFullBackup, restoreFromFirebase,
          deleteRoomFromFirebase } from './firebase/sync.js';
