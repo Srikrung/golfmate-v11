@@ -38,7 +38,7 @@ import { goLeaderboard, lbGoPrev, lbGoNext,
          lbSetTab, lbSetRoom, lbFetch } from './modules/leaderboard.js';
 
 // ── firebase ──
-import { toggleSyncSw, updateRoomCode, autoGenRoomCode, syncEnabled, getRoomCode } from './firebase/init.js';
+import { toggleSyncSw, updateRoomCode, syncEnabled, getRoomCode } from './firebase/init.js';
 import { loadOnlineSetting, goOnlineSetup, saveOnlineSetup, testConnection } from './firebase/room.js';
 import { createRoom, syncFullBackup, restoreFromFirebase,
          deleteRoomFromFirebase } from './firebase/sync.js';
@@ -51,6 +51,22 @@ function scheduleBackup(){
   _backupTimer = setTimeout(()=>{ syncFullBackup(); }, 10000);
 }
 
+
+// ── Auto Generate Room Code ──
+function autoGenRoomCode(){
+  const letters='ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  const letter=letters[Math.floor(Math.random()*26)];
+  const day=new Date().getDate();
+  const d1=Math.floor(day/10).toString();
+  const d2=(day%10).toString();
+  const sl=document.getElementById('room-code-letter');
+  const sn=document.getElementById('room-code-num');
+  const sn2=document.getElementById('room-code-num2');
+  for(let i=0;i<sl.options.length;i++) if(sl.options[i].value===letter){sl.selectedIndex=i;break;}
+  for(let i=0;i<sn.options.length;i++) if(sn.options[i].value===d1){sn.selectedIndex=i;break;}
+  for(let i=0;i<sn2.options.length;i++) if(sn2.options[i].value===d2){sn2.selectedIndex=i;break;}
+  updateRoomCode();
+}
 // ============================================================
 // INIT
 // ============================================================
