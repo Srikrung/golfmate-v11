@@ -23,6 +23,21 @@ export function updateRoomCode(){
   document.getElementById('room-code').value=code;
   document.getElementById('room-code-preview').textContent=code||'—';
 }
+export function autoGenRoomCode(){
+  const letters='ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  const letter=letters[Math.floor(Math.random()*26)];
+  const day=new Date().getDate();
+  const d1=Math.floor(day/10).toString();
+  const d2=(day%10).toString();
+  // set selects
+  const sl=document.getElementById('room-code-letter');
+  const sn=document.getElementById('room-code-num');
+  const sn2=document.getElementById('room-code-num2');
+  for(let i=0;i<sl.options.length;i++) if(sl.options[i].value===letter){sl.selectedIndex=i;break;}
+  for(let i=0;i<sn.options.length;i++) if(sn.options[i].value===d1){sn.selectedIndex=i;break;}
+  for(let i=0;i<sn2.options.length;i++) if(sn2.options[i].value===d2){sn2.selectedIndex=i;break;}
+  updateRoomCode();
+}
 export function getRoomCode(){return(document.getElementById('room-code')?.value||'').trim()||'DEFAULT';}
 const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbytrMvvaaZ_AsJ2aeEGLDqN23rRVm7Xs6fYzWFSWorDXEf-IPIzB86Roz1nDnE5Us_GHg/exec';
 export function getApiUrl(){return(document.getElementById('api-url')?.value||'').trim()||APPS_SCRIPT_URL;}
