@@ -43,3 +43,7 @@ body{
   min-height:100vh;overflow-x:hidden;font-size:17px;
   padding-bottom:80px;transition:background .25s,color .25s;
 }
+
+/* ── saving overlay ── */
+#saving-ov{display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.55);align-items:center;justify-content:center;flex-direction:column;gap:12px;}
+#saving-ov.show{display:flex;}

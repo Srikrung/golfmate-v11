@@ -587,68 +587,77 @@ export async function shareToLine(tid){
   const ov = document.getElementById('saving-ov');
   if(ov) ov.classList.add('show');
   try{
-    const src = document.getElementById(tid);
-    // A4 width = 794px (96dpi) เพื่อให้ชื่อยาวไม่ขาด
+    const L = document.body.classList.contains('light');
     const A4_W = 794;
+    const n = players.length;
+    const HW=46, PW=38, NW_MAX=Math.round((A4_W-32-HW-PW)/8);
+    const nW = NW_MAX;
+    const tblW = Math.min(HW+PW+n*nW, A4_W-32);
+    const par9a=pars.slice(0,9).reduce((a,b)=>a+b,0);
+    const par9b=pars.slice(9).reduce((a,b)=>a+b,0);
+    const cn=document.getElementById('course-name')?.value||'ไม่ระบุสนาม';
+    const ds=fmtDate(document.getElementById('game-date')?.value||'');
 
-    // สร้าง wrapper ชั่วคราวนอกหน้าจอ
-    const wrap = document.createElement('div');
-    wrap.style.cssText = `position:fixed;left:-9999px;top:0;width:${A4_W}px;background:${getComputedStyle(src).background||'#1a1a2e'};z-index:-1;`;
+    const thBg=L?'#1a4a8a':'#1a3a6e', thCl=L?'#fff':'#ffd700';
+    const tdBd=L?'1px solid #bbb':'1px solid #333';
+    const rowO=L?'#fff':'#131f30', rowE=L?'#f5f7fa':'#0f1a28';
+    const hcBg=L?'#eef2fa':'#0a1520', hcCl=L?'#555':'#ffd700';
+    const subBg=L?'#ddeeff':'rgba(255,215,0,0.1)', subCl=L?'#1a4a8a':'#ffd700';
+    const totBg=L?'#1a4a8a':'rgba(255,215,0,0.22)', totCl=L?'#fff':'#ffd700';
+    const ovP=L?'#cc4400':'#ff9966', ovN=L?'#004fc4':'#4da3ff';
+    const totOvP=L?'#ffbb88':'#ff9966', totOvN=L?'#88ddff':'#4da3ff';
 
-    // clone element และปลด overflow/ellipsis ทั้งหมด
-    const clone = src.cloneNode(true);
-    clone.style.cssText = `width:${A4_W}px;min-width:${A4_W}px;max-width:none;overflow:visible;`;
+    function scHTML(s,par){
+      if(s===null||s===undefined) return`<td style="border:${tdBd};padding:6px 2px;text-align:center;background:inherit"><span style="font-size:20px;color:rgba(150,150,150,.3)">—</span></td>`;
+      const d=s-par;
+      if(d>=2) return`<td style="border:${tdBd};padding:6px 2px;text-align:center;background:inherit"><span style="font-size:24px;font-weight:700;color:${L?'#444':'rgba(255,255,255,.6)'}">${s}</span></td>`;
+      if(d===1) return`<td style="border:${tdBd};padding:6px 2px;text-align:center;background:inherit"><span style="font-size:22px;font-weight:600;color:${L?'#ccc':'rgba(255,255,255,.28)'}">${s}</span></td>`;
+      if(d===0) return`<td style="border:${tdBd};padding:6px 2px;text-align:center;background:inherit"><span style="font-size:24px;font-weight:800;color:${L?'#004fc4':'#4da3ff'}">${s}</span></td>`;
+      const bg=d===-1?(L?'#cc0000':'#7a1a1a'):d===-2?(L?'#004fc4':'#1a3560'):(L?'#8a5c00':'#7a5800');
+      const cl=d===-1?(L?'#fff':'#ff8080'):d===-2?(L?'#fff':'#60b4ff'):'#fff';
+      return`<td style="border:${tdBd};padding:6px 2px;text-align:center;background:inherit"><span style="display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:50%;font-size:16px;font-weight:800;background:${bg};color:${cl}">${s}</span></td>`;
+    }
+    function ovDiv(d,tot){
+      const oc=d>0?(tot?totOvP:ovP):d<0?(tot?totOvN:ovN):'rgba(150,150,150,.6)';
+      const ot=d===0?'E':(d>0?'+':'')+d;
+      return`<div style="font-size:10px;font-weight:700;color:${oc}">เกิน ${ot}</div>`;
+    }
 
-    // ปลด text-overflow + ใส่ compact styles สำหรับ share
-    const isDarkMode = document.body.classList.contains('dark') || !document.body.classList.contains('light');
-    clone.querySelectorAll('*').forEach(el=>{
-      const s = el.style;
-      s.whiteSpace = 'normal';
-      s.overflow = 'visible';
-      s.textOverflow = 'unset';
-      s.maxWidth = 'none';
-    });
-    // compact: ลด padding/font ทุก td/th
-    clone.querySelectorAll('td,th').forEach(el=>{
-      const cur = parseFloat(getComputedStyle(el).paddingTop)||0;
-      if(cur>4){ el.style.paddingTop='4px'; el.style.paddingBottom='4px'; }
-      const fs = parseFloat(getComputedStyle(el).fontSize)||14;
-      if(fs>13) el.style.fontSize = Math.round(fs*0.82)+'px';
-    });
-    // stat header names — force สีให้ถูกต้องตามธีม
-    clone.querySelectorAll('tr.stat-hdr td, tr.stat-hdr th').forEach(el=>{
-      el.style.setProperty('background', isDarkMode?'#1a3a6e':'#1a4a8a','important');
-      el.style.setProperty('color', isDarkMode?'#ffd700':'#ffffff','important');
-      el.style.fontWeight='700';
-    });
+    const thS=`background:${thBg};color:${thCl};border:1px solid #333;padding:9px 2px;font-size:13px;font-weight:700;text-align:center`;
+    const colgroup=`<colgroup><col style="width:${HW}px"><col style="width:${PW}px">${players.map(()=>`<col style="width:${nW}px">`).join('')}</colgroup>`;
+    const thead=`<thead><tr><th style="${thS}">H</th><th style="${thS}">P</th>${players.map(p=>`<th style="${thS};overflow:hidden;white-space:nowrap;text-overflow:ellipsis;max-width:0">${p.name.slice(0,4)}</th>`).join('')}</tr></thead>`;
 
-    wrap.appendChild(clone);
+    let tbody='<tbody>';
+    for(let h=0;h<18;h++){
+      const par=pars[h], bg=h%2===0?rowO:rowE;
+      tbody+=`<tr style="background:${bg}"><td style="background:${hcBg};color:${hcCl};border:${tdBd};padding:8px 2px;font-size:13px;font-weight:600;text-align:center">${h+1}</td><td style="background:${hcBg};color:${hcCl};border:${tdBd};padding:8px 2px;font-size:13px;font-weight:600;text-align:center">${par}</td>${players.map((_,p)=>scHTML(scores[p][h],par)).join('')}</tr>`;
+      if(h===8){
+        const f9s=players.map((_,p)=>scores[p].slice(0,9).reduce((s,v)=>s+(v||0),0));
+        tbody+=`<tr style="background:${subBg}"><td colspan="2" style="border:1px solid ${L?'#999':'#444'};padding:8px 2px;font-size:13px;font-weight:800;color:${subCl};text-align:center">9 แรก</td>${f9s.map(v=>{const d=v-par9a;return`<td style="border:1px solid ${L?'#999':'#444'};padding:6px 2px;text-align:center;background:${subBg}"><div style="font-size:18px;font-weight:800;color:${subCl}">${v}</div>${ovDiv(d,false)}</td>`;}).join('')}</tr>`;
+      }
+    }
+    const b9s=players.map((_,p)=>scores[p].slice(9).reduce((s,v)=>s+(v||0),0));
+    const tots=players.map((_,p)=>scores[p].reduce((s,v)=>s+(v||0),0));
+    tbody+=`<tr style="background:${subBg}"><td colspan="2" style="border:1px solid ${L?'#999':'#444'};padding:8px 2px;font-size:13px;font-weight:800;color:${subCl};text-align:center">9 หลัง</td>${b9s.map(v=>{const d=v-par9b;return`<td style="border:1px solid ${L?'#999':'#444'};padding:6px 2px;text-align:center;background:${subBg}"><div style="font-size:18px;font-weight:800;color:${subCl}">${v||'—'}</div>${v?ovDiv(d,false):''}</td>`;}).join('')}</tr>`;
+    tbody+=`<tr style="background:${totBg}"><td colspan="2" style="border:1px solid #333;padding:9px 2px;font-size:13px;font-weight:800;color:${totCl};text-align:center">รวม</td>${tots.map((v,p)=>{const pl=pars.reduce((s,pv,h)=>s+(scores[p][h]!==null&&scores[p][h]!==undefined?pv:0),0);const d=v-pl;return`<td style="border:1px solid #333;padding:6px 2px;text-align:center;background:${totBg}"><div style="font-size:22px;font-weight:800;color:${totCl}">${v}</div>${ovDiv(d,true)}</td>`;}).join('')}</tr></tbody>`;
+
+    const html=`<div style="text-align:center;margin-bottom:14px"><div style="font-size:11px;letter-spacing:1px;text-transform:uppercase;color:${L?'#888':'#555'};margin-bottom:3px">⛳ ผลการแข่งขัน</div><div style="font-size:22px;font-weight:800;color:${L?'#111':'#fff'}">${cn}</div><div style="font-size:12px;color:${L?'#888':'#555'};margin-top:2px">${ds}</div></div><div style="display:flex;justify-content:center;border-radius:12px;overflow:hidden;margin-bottom:14px"><table style="width:${tblW}px;border-collapse:collapse;table-layout:fixed">${colgroup}${thead}${tbody}</table></div><div style="display:flex;align-items:center;gap:10px;padding:12px 14px;background:linear-gradient(135deg,#1a6a3a,#2d9e5c);border-radius:12px"><span style="font-size:22px">⛳</span><div style="flex:1;font-size:12px;font-weight:700;color:#fff">ประกันกอล์ฟ ครอบคลุม Hole-in-One<br><span style="font-size:10px;opacity:.8">ศรีกรุงโบรคเกอร์ · www.ศรีกรุง.com</span></div><span style="padding:6px 12px;border-radius:8px;background:rgba(255,255,255,0.2);border:1.5px solid rgba(255,255,255,0.5);color:#fff;font-size:11px;font-weight:700">ดูเลย</span></div>`;
+
+    const wrap=document.createElement('div');
+    wrap.style.cssText=`position:fixed;left:-9999px;top:0;width:${A4_W}px;padding:16px;font-family:'Noto Sans Thai',-apple-system,sans-serif;background:${L?'#f2f2f7':'#111827'};z-index:-1;box-sizing:border-box`;
+    wrap.innerHTML=html;
     document.body.appendChild(wrap);
 
-    // detect theme background
-    const isDark = document.body.classList.contains('dark') || !document.body.classList.contains('light');
-    const bgColor = isDark ? '#111827' : '#f2f2f7';
-
-    const c = await html2canvas(wrap, {
-      backgroundColor: bgColor,
-      scale: 2,
-      useCORS: true,
-      logging: false,
-      width: A4_W,
-      ignoreElements: el => el.hasAttribute('data-html2canvas-ignore')
-    });
-
+    const c=await html2canvas(wrap,{backgroundColor:L?'#f2f2f7':'#111827',scale:2,useCORS:true,logging:false,width:A4_W});
     document.body.removeChild(wrap);
 
-    c.toBlob(async b => {
-      const f = new File([b], 'golfmate-a4.png', {type:'image/png'});
+    c.toBlob(async b=>{
+      const f=new File([b],'golfmate.png',{type:'image/png'});
       if(ov) ov.classList.remove('show');
-      if(navigator.canShare && navigator.canShare({files:[f]})){
-        try{ await navigator.share({files:[f]}); } catch(e){}
-      } else {
-        alert('ไม่สามารถแชร์ตรงๆ ได้ โปรดบันทึกหน้าจอแทนครับ');
-      }
-    }, 'image/png');
+      if(navigator.canShare&&navigator.canShare({files:[f]})){
+        try{ await navigator.share({files:[f]}); }catch(e){}
+      } else { alert('ไม่สามารถแชร์ตรงๆ ได้ โปรดบันทึกหน้าจอแทนครับ'); }
+    },'image/png');
   } catch(e){ if(ov) ov.classList.remove('show'); }
 }
 

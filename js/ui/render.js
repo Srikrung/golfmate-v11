@@ -560,10 +560,19 @@ export function buildResults(){
       </button>
       <div id="sg-res" style="display:none;margin-top:6px">${sgHTML}</div>
     </div>` : ''}
-    <div class="ad-banner" data-html2canvas-ignore="true">
-      <div style="font-size:14px;color:var(--lbl)">⛳ ประกันกอล์ฟครอบคลุม Hole-in-One</div>
-      <a href="https://insure.724.co.th/golf-insure/u/AM00035138" target="_blank" class="ad-btn">ดูรายละเอียด → www.ศรีกรุง.com</a>
-    </div>`;
+    <a href="https://insure.724.co.th/golf-insure/u/AM00035138" target="_blank" data-html2canvas-ignore="true"
+      style="display:flex;align-items:center;gap:12px;padding:14px 16px;margin-top:12px;
+      background:linear-gradient(135deg,#1a6a3a,#2d9e5c);border-radius:12px;text-decoration:none">
+      <div style="font-size:28px;flex-shrink:0">⛳</div>
+      <div style="flex:1">
+        <div style="font-size:13px;font-weight:700;color:#fff">ประกันกอล์ฟ ครอบคลุม Hole-in-One</div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.75);margin-top:2px">ศรีกรุงโบรคเกอร์ · www.ศรีกรุง.com</div>
+      </div>
+      <div style="padding:7px 14px;border-radius:8px;background:rgba(255,255,255,0.2);
+        border:1.5px solid rgba(255,255,255,0.5);color:#fff;font-size:12px;font-weight:700;white-space:nowrap">
+        ดูรายละเอียด
+      </div>
+    </a>`;
 }
 
 // ── BUILD MONEY ──
