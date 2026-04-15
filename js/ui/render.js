@@ -492,6 +492,9 @@ export function buildResults(){
     ${players.map(p=>`<th style="text-align:center;padding:8px 1px;font-size:${hfs};font-weight:700;color:${L?'#fff':'#ffd700'};background:${sthBg};border:1px solid ${sthBd};overflow:hidden;white-space:nowrap;text-overflow:ellipsis;max-width:0">${shortName(p.name,n)}</th>`).join('')}
     </tr></thead><tbody>`;
   statRows.forEach((sr,ri)=>{
+    // ซ่อนแถวถ้าไม่มีค่าในสถิตินั้นเลย
+    const hasAny=stats.some(st=>st[sr.key]>0);
+    if(!hasAny) return;
     const rowBg=ri%2===0?stRowO:stRowE;
     const sc=L?sr.lc:sr.dc;
     tblHTML+=`<tr style="${rowBg}"><td style="text-align:left;padding:9px 12px;font-size:${hfs};font-weight:700;color:${sc};border:${stTdBd}">${sr.label}</td>${stats.map(st=>{const v=st[sr.key];return`<td style="text-align:center;font-size:${fs};font-weight:${v>0?700:400};color:${v>0?sc:'var(--lbl4,#333)'};padding:9px 3px;border:${stTdBd}">${v>0?v:'—'}</td>`;}).join('')}</tr>`;
