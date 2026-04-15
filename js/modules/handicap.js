@@ -102,7 +102,7 @@ export function hcapFlipDir(k){
 
 export function hcapTogglePair(k){
   G.hcap.pairs[k].on=!G.hcap.pairs[k].on;
-  if(G.hcap.pairs[k].on&&isGameStarted())G.hcap.pairs[k].activeFrom=0;
+  if(G.hcap.pairs[k].on&&isGameStarted())G.hcap.pairs[k].activeFrom=getCurrentHole();
   buildHcapUI();autoSave();
 }
 export function hcapSetStroke(k,par,val){
@@ -203,8 +203,8 @@ export function calcHcapFinalEnd(){
       const jPts=Math.round(raw.j/G.bite.val);
       if(h<9)frontPts+=jPts; else backPts+=jPts;
     }
-    const frontNet=p.front>0?frontPts+p.front:frontPts;
-    const backNet=p.back>0?backPts+p.back:backPts;
+    const frontNet=p.front>0?frontPts-p.front:frontPts;
+    const backNet=p.back>0?backPts-p.back:backPts;
     const totalMoney=(frontNet+backNet)*G.bite.val;
     m[j]+=totalMoney;m[i]-=totalMoney;
   }

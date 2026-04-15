@@ -445,6 +445,7 @@ export function saveSession(){
   try{
     localStorage.setItem(LS_KEY, JSON.stringify({
       v:1, players, scores, pars,
+      saveDate: new Date().toISOString().slice(0,10), // YYYY-MM-DD
       currentHole: getCurrentHole(),
       gameStarted: isGameStarted(),
       G:{
@@ -474,6 +475,12 @@ export function loadSession(){
     const raw = localStorage.getItem(LS_KEY); if(!raw) return false;
     const data = JSON.parse(raw);
     if(!data?.v || !data.players?.length) return false;
+    // ตรวจข้ามวัน — ถ้าบันทึกคนละวัน ล้างอัตโนมัติ
+    const today = new Date().toISOString().slice(0,10);
+    if(data.saveDate && data.saveDate !== today){
+      localStorage.removeItem(LS_KEY);
+      return false;
+    }
     setPlayers(data.players);
     setScores(data.scores);
     pars.splice(0, pars.length, ...data.pars);

@@ -462,7 +462,9 @@ export function buildResults(){
         const valid=scores[p].some(v=>v!==null);
         const netColor=net<0?'var(--green)':net>0?'var(--red)':'var(--lbl)';
         if(!valid) return`<td style="text-align:center;padding:10px 2px;border:${tdBd}"><span style="color:${totCl};font-size:${fsTot}px;font-weight:800">—</span></td>`;
-        const diff=tot-parTot;
+        // ใช้ par เฉพาะหลุมที่เล่นจริง
+        const playedParTot=pars.reduce((s,v,h)=>s+(scores[p][h]!==null&&scores[p][h]!==undefined?v:0),0);
+        const diff=tot-playedParTot;
         const overCl=diff>0?overPosTot:diff<0?overNegTot:'rgba(255,255,255,0.5)';
         const overTxt=diff===0?'E':(diff>0?'+':'')+diff;
         return`<td style="text-align:center;padding:10px 2px;border:${tdBd}"><div style="color:${totCl};font-size:${fsTot}px;font-weight:800">${tot}</div>${hcp>0?`<div style="font-size:10px;color:${netColor};margin-top:1px">Net ${net}</div>`:''}<div style="font-size:10px;font-weight:700;color:${overCl};margin-top:1px">เกิน ${overTxt}</div></td>`;

@@ -30,10 +30,14 @@ export function updateBiteMultUI(){
     const inp=document.getElementById(`bm-val-${k}`);
     if(inp) inp.value=bm[k];
   });
-  // อัปเดต sub-label — แสดงครบทุกตัว
+  // อัปเดต sub-label
   const sub=document.getElementById('bite-sub-lbl');
   if(sub){
-    sub.textContent=`HIO×${bm.hio} Alba×${bm.albatross} Eagle×${bm.eagle} Birdie×${bm.birdie}`;
+    const parts=keys.filter(k=>bm[k]>1).map(k=>({
+      hio:`HIO×${bm.hio}`,albatross:`Alb×${bm.albatross}`,
+      eagle:`Eagle×${bm.eagle}`,birdie:`Birdie×${bm.birdie}`
+    }[k]));
+    sub.textContent=parts.length?parts.join(' '):'Par ×1 เท่านั้น';
   }
 }
 export function getBiteMult(s,p){
