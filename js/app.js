@@ -610,8 +610,8 @@ export async function shareToLine(tid){
     function scHTML(s,par){
       if(s===null||s===undefined) return`<td style="border:${tdBd};padding:6px 2px;text-align:center;background:inherit"><span style="font-size:20px;color:rgba(150,150,150,.3)">—</span></td>`;
       const d=s-par;
-      if(d>=2) return`<td style="border:${tdBd};padding:6px 2px;text-align:center;background:inherit"><span style="font-size:24px;font-weight:700;color:${L?'#444':'rgba(255,255,255,.6)'}">${s}</span></td>`;
-      if(d===1) return`<td style="border:${tdBd};padding:6px 2px;text-align:center;background:inherit"><span style="font-size:22px;font-weight:600;color:${L?'#ccc':'rgba(255,255,255,.28)'}">${s}</span></td>`;
+      const overCl=L?'#111':'rgba(255,255,255,.9)'; // Bogey/Double/เละ สีเข้ม อ่านง่าย
+      if(d>=1) return`<td style="border:${tdBd};padding:6px 2px;text-align:center;background:inherit"><span style="font-size:24px;font-weight:700;color:${overCl}">${s}</span></td>`;
       if(d===0) return`<td style="border:${tdBd};padding:6px 2px;text-align:center;background:inherit"><span style="font-size:24px;font-weight:800;color:${L?'#004fc4':'#4da3ff'}">${s}</span></td>`;
       const bg=d===-1?(L?'#cc0000':'#7a1a1a'):d===-2?(L?'#004fc4':'#1a3560'):(L?'#8a5c00':'#7a5800');
       const cl=d===-1?(L?'#fff':'#ff8080'):d===-2?(L?'#fff':'#60b4ff'):'#fff';
